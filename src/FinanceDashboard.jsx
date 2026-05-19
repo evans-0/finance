@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react"
+import { Link } from "react-router-dom"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
 const C = {
@@ -315,6 +316,8 @@ export default function FinanceDashboard() {
           <span style={{ color: C.amber, fontWeight: 700, fontSize: 15, letterSpacing: 3 }}>▐ MKTVISION</span>
           <span style={{ color: C.borderBright, fontSize: 20 }}>|</span>
           <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 2 }}>MARKETS TERMINAL</span>
+          <Link to="/" style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, textDecoration: "none", marginLeft: 8 }}>HOME</Link>
+          <Link to="/calculators" style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, textDecoration: "none" }}>CALCULATORS</Link>
         </div>
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
           {(indices.length ? indices : [
