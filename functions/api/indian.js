@@ -1,11 +1,7 @@
-// Watchlist: Twelve Data (authenticated, reliable for top 10)
-// Search / single lookup: Yahoo Finance (covers ALL NSE stocks, no key needed)
-
 const WATCHLIST = [
   "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
   "HINDUNILVR", "SBIN", "BHARTIARTL", "WIPRO", "ITC",
 ]
-
 const CACHE_TTL = 60
 
 function corsHeaders(origin, allowed) {
@@ -30,29 +26,36 @@ function parseTwelveQuote(symbol, q) {
   }
 }
 
-async function fetchYahooQuote(symbol) {
-  // Yahoo Finance uses SYMBOL.NS format for NSE stocks
-  const yahooSym = symbol.endsWith(".NS") ? symbol : `${symbol}.NS`
+async function fetchIndividual(symbol, apiKey) {
   const r = await fetch(
-    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(yahooSym)}`,
-    { headers: { "User-Agent": "Mozilla/5.0" } }
+    `https://api.twelvedata.com/quote?symbol=${symbol}&exchange=NSE&apikey=${apiKey}`
   )
   if (!r.ok) return null
-  const data = await r.json()
-  const q    = data?.quoteResponse?.result?.[0]
-  if (!q || !q.regularMarketPrice) return null
+  const q = await r.json()
+  return parseTwelveQuote(symbol, q)
+}
 
-  const baseSymbol = symbol.replace(/\.NS$/i, "")
-  return {
-    symbol:   baseSymbol,
-    name:     q.shortName || q.longName || baseSymbol,
-    price:    +q.regularMarketPrice.toFixed(2),
-    change:   +(q.regularMarketChange || 0).toFixed(2),
-    pct:      +(q.regularMarketChangePercent || 0).toFixed(4),
-    high:     q.regularMarketDayHigh   || null,
-    low:      q.regularMarketDayLow    || null,
-    exchange: "NSE",
-  }
+async function fetchYahooQuote(symbol) {
+  const yahooSym = symbol.endsWith(".NS") ? symbol : `${symbol}.NS`
+  try {
+    const r = await fetch(
+      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(yahooSym)}`,
+      { headers: { "User-Agent": "Mozilla/5.0" } }
+    )
+    if (!r.ok) return null
+    const data = await r.json()
+    const q    = data?.quoteResponse?.result?.[0]
+    if (!q || !q.regularMarketPrice) return null
+    const base = symbol.replace(/\.NS$/i, "")
+    return {
+      symbol: base, name: q.shortName || q.longName || base,
+      price: +q.regularMarketPrice.toFixed(2),
+      change: +(q.regularMarketChange || 0).toFixed(2),
+      pct: +(q.regularMarketChangePercent || 0).toFixed(4),
+      high: q.regularMarketDayHigh || null, low: q.regularMarketDayLow || null,
+      exchange: "NSE",
+    }
+  } catch { return null }
 }
 
 export async function onRequest({ request, env, waitUntil }) {
@@ -66,18 +69,21 @@ export async function onRequest({ request, env, waitUntil }) {
       status: 403, headers: { "Content-Type": "application/json", ...cors },
     })
   }
+  if (!env.TWELVEDATA_KEY) {
+    return new Response(JSON.stringify({ error: "Service unavailable" }), {
+      status: 503, headers: { "Content-Type": "application/json", ...cors },
+    })
+  }
 
   const { searchParams } = new URL(request.url)
   const rawSymbol = searchParams.get("symbol")
 
-  // ── Single symbol lookup (search) — Yahoo Finance, covers ALL NSE stocks ─────
+  // ── Single symbol (search) ────────────────────────────────────────────────────
   if (rawSymbol) {
     const symbol = rawSymbol.trim().toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 25)
-    if (!symbol) {
-      return new Response(JSON.stringify({ error: "Invalid symbol" }), {
-        status: 400, headers: { "Content-Type": "application/json", ...cors },
-      })
-    }
+    if (!symbol) return new Response(JSON.stringify({ error: "Invalid symbol" }), {
+      status: 400, headers: { "Content-Type": "application/json", ...cors },
+    })
 
     const cacheKey = new Request(`https://cache.mktvision.internal/yahoo-${symbol}`)
     const cached   = await caches.default.match(cacheKey)
@@ -89,11 +95,9 @@ export async function onRequest({ request, env, waitUntil }) {
     }
 
     const result = await fetchYahooQuote(symbol)
-    if (!result) {
-      return new Response(JSON.stringify({ error: "Symbol not found" }), {
-        status: 404, headers: { "Content-Type": "application/json", ...cors },
-      })
-    }
+    if (!result) return new Response(JSON.stringify({ error: "Symbol not found" }), {
+      status: 404, headers: { "Content-Type": "application/json", ...cors },
+    })
 
     const body     = JSON.stringify([result])
     const response = new Response(body, {
@@ -103,15 +107,9 @@ export async function onRequest({ request, env, waitUntil }) {
     return response
   }
 
-  // ── Watchlist — Twelve Data batch (authenticated, reliable) ──────────────────
-  if (!env.TWELVEDATA_KEY) {
-    return new Response(JSON.stringify({ error: "Service unavailable" }), {
-      status: 503, headers: { "Content-Type": "application/json", ...cors },
-    })
-  }
-
+  // ── Watchlist: try batch first, fall back to individual requests ──────────────
   const cache    = caches.default
-  const cacheKey = new Request("https://cache.mktvision.internal/indian-v5")
+  const cacheKey = new Request("https://cache.mktvision.internal/indian-v6")
   const cached   = await cache.match(cacheKey)
   if (cached) {
     const data = await cached.json()
@@ -120,34 +118,39 @@ export async function onRequest({ request, env, waitUntil }) {
     })
   }
 
+  let results = []
+
+  // Try batch first (1 API call)
   try {
     const r = await fetch(
       `https://api.twelvedata.com/quote?symbol=${WATCHLIST.join(",")}&exchange=NSE&apikey=${env.TWELVEDATA_KEY}`
     )
-    if (!r.ok) throw new Error("upstream")
-    const data    = await r.json()
-    const results = WATCHLIST
-      .map(sym => parseTwelveQuote(sym, data[sym] || (data.symbol === sym ? data : null)))
-      .filter(Boolean)
-
-    // Fall back to Yahoo Finance for any that Twelve Data missed
-    const missing = WATCHLIST.filter(sym => !results.find(r => r.symbol === sym))
-    if (missing.length) {
-      const fallbacks = await Promise.all(missing.map(fetchYahooQuote))
-      results.push(...fallbacks.filter(Boolean))
+    if (r.ok) {
+      const data = await r.json()
+      results = WATCHLIST
+        .map(sym => parseTwelveQuote(sym, data[sym] || (data.symbol === sym ? data : null)))
+        .filter(Boolean)
     }
+  } catch {}
 
-    if (!results.length) throw new Error("no data")
+  // Fall back to individual requests for any missing stocks
+  if (results.length < WATCHLIST.length) {
+    const fetched  = new Set(results.map(r => r.symbol))
+    const missing  = WATCHLIST.filter(s => !fetched.has(s))
+    const fallbacks = await Promise.all(missing.map(s => fetchIndividual(s, env.TWELVEDATA_KEY)))
+    results.push(...fallbacks.filter(Boolean))
+  }
 
-    const body     = JSON.stringify(results)
-    const response = new Response(body, {
-      headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "MISS", ...cors },
-    })
-    waitUntil(cache.put(cacheKey, response.clone()))
-    return response
-  } catch {
+  if (!results.length) {
     return new Response(JSON.stringify({ error: "Service unavailable" }), {
       status: 502, headers: { "Content-Type": "application/json", ...cors },
     })
   }
+
+  const body     = JSON.stringify(results)
+  const response = new Response(body, {
+    headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "MISS", ...cors },
+  })
+  waitUntil(cache.put(cacheKey, response.clone()))
+  return response
 }

@@ -302,12 +302,11 @@ export default function FinanceDashboard() {
         </div>
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
           {(indices.length ? indices : [
-            { name: "S&P 500", val: 0, pct: 0 }, { name: "NASDAQ", val: 0, pct: 0 },
-            { name: "DOW", val: 0, pct: 0 },     { name: "VIX", val: 0, pct: 0 },
+            { name: "S&P 500", pct: 0 }, { name: "NASDAQ", pct: 0 },
+            { name: "DOW", pct: 0 },     { name: "VIX", pct: 0 },
           ]).map(idx => (
             <span key={idx.name} style={{ fontSize: 11 }}>
               <span style={{ color: C.textSec }}>{idx.name}&nbsp;</span>
-              <span style={{ color: C.text }}>{idx.val ? fIdx(idx.val) : "—"}&nbsp;</span>
               {idx.val
                 ? <span style={{ color: idx.pct >= 0 ? C.green : C.red }}>{idx.pct >= 0 ? "+" : ""}{idx.pct.toFixed(2)}%</span>
                 : <span style={{ color: C.textDim }}>—</span>
