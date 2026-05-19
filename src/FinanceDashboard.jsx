@@ -331,7 +331,7 @@ export default function FinanceDashboard() {
           ))}
         </div>
         <div style={{ fontSize: 12, color: C.amber, fontWeight: 600 }}>
-          {time.toLocaleTimeString("en-US", { hour12: false })} EST
+          {time.toLocaleTimeString("en-US", { hour12: false, timeZone: "America/New_York" })} EST
         </div>
       </div>
 
