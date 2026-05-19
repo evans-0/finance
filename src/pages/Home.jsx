@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 
 const C = {
