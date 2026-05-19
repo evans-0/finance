@@ -1,17 +1,13 @@
-// Indian stocks via Twelve Data (free tier: 800 req/day, 8 req/min)
-// Uses individual requests to avoid batch response format issues
-
-const INDIAN_STOCKS = [
-  { symbol: "INFY",       name: "Infosys Ltd"          },
-  { symbol: "TCS",        name: "Tata Consultancy"      },
-  { symbol: "RELIANCE",   name: "Reliance Industries"   },
-  { symbol: "HDFCBANK",   name: "HDFC Bank"             },
-  { symbol: "ICICIBANK",  name: "ICICI Bank"            },
-  { symbol: "HINDUNILVR", name: "Hindustan Unilever"    },
-  { symbol: "SBIN",       name: "State Bank of India"   },
-  { symbol: "BHARTIARTL", name: "Bharti Airtel"         },
-  { symbol: "WIPRO",      name: "Wipro Ltd"             },
-  { symbol: "ITC",        name: "ITC Ltd"               },
+// 8 stocks — matches Twelve Data free tier limit of 8 req/min
+const WATCHLIST = [
+  { symbol: "RELIANCE",   name: "Reliance Industries" },
+  { symbol: "TCS",        name: "Tata Consultancy"    },
+  { symbol: "INFY",       name: "Infosys Ltd"         },
+  { symbol: "HDFCBANK",   name: "HDFC Bank"           },
+  { symbol: "ICICIBANK",  name: "ICICI Bank"          },
+  { symbol: "SBIN",       name: "State Bank of India" },
+  { symbol: "BHARTIARTL", name: "Bharti Airtel"       },
+  { symbol: "ITC",        name: "ITC Ltd"             },
 ]
 
 const CACHE_TTL = 60
@@ -30,16 +26,13 @@ async function fetchQuote(symbol, apiKey) {
   )
   if (!r.ok) return null
   const q = await r.json()
-
-  // Twelve Data returns { status: "error", message: "..." } on failure
   if (q.status === "error" || !q.name) return null
 
-  // Use close for live price; fall back to previous_close if market is closed / close is 0
   const price = parseFloat(q.close) || parseFloat(q.previous_close) || 0
   if (!price) return null
 
-  const prev   = parseFloat(q.previous_close) || price
-  const pct    = q.percent_change
+  const prev = parseFloat(q.previous_close) || price
+  const pct  = q.percent_change
     ? parseFloat(q.percent_change)
     : prev ? ((price - prev) / prev) * 100 : 0
 
@@ -53,6 +46,19 @@ async function fetchQuote(symbol, apiKey) {
     low:    parseFloat(q.low)   || null,
     exchange: "NSE",
   }
+}
+
+// Fetch in two staggered batches to stay within 8 req/min
+async function fetchWatchlist(apiKey) {
+  const half = Math.ceil(WATCHLIST.length / 2)
+  const batchA = WATCHLIST.slice(0, half)
+  const batchB = WATCHLIST.slice(half)
+
+  const resultsA = await Promise.all(batchA.map(({ symbol }) => fetchQuote(symbol, apiKey)))
+  await new Promise(r => setTimeout(r, 400)) // small gap between batches
+  const resultsB = await Promise.all(batchB.map(({ symbol }) => fetchQuote(symbol, apiKey)))
+
+  return [...resultsA, ...resultsB].filter(Boolean)
 }
 
 export async function onRequest({ request, env, waitUntil }) {
@@ -74,8 +80,49 @@ export async function onRequest({ request, env, waitUntil }) {
     })
   }
 
+  const { searchParams } = new URL(request.url)
+  const rawSymbol = searchParams.get("symbol")
+
+  // ── Single symbol lookup (search) ────────────────────────────────────────────
+  if (rawSymbol) {
+    const symbol = rawSymbol.trim().toUpperCase()
+      .replace(/\.(NS|BO)$/, "")
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 20)
+
+    if (!symbol) {
+      return new Response(JSON.stringify({ error: "Invalid symbol" }), {
+        status: 400, headers: { "Content-Type": "application/json", ...cors },
+      })
+    }
+
+    const cacheKey = new Request(`https://cache.mktvision.internal/indian-sym-${symbol}`)
+    const cached   = await caches.default.match(cacheKey)
+    if (cached) {
+      const data = await cached.json()
+      return new Response(JSON.stringify(data), {
+        headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "HIT", ...cors },
+      })
+    }
+
+    const result = await fetchQuote(symbol, env.TWELVEDATA_KEY)
+    if (!result) {
+      return new Response(JSON.stringify({ error: "Symbol not found" }), {
+        status: 404, headers: { "Content-Type": "application/json", ...cors },
+      })
+    }
+
+    const body     = JSON.stringify([result])
+    const response = new Response(body, {
+      headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "MISS", ...cors },
+    })
+    waitUntil(caches.default.put(cacheKey, response.clone()))
+    return response
+  }
+
+  // ── Watchlist ─────────────────────────────────────────────────────────────────
   const cache    = caches.default
-  const cacheKey = new Request("https://cache.mktvision.internal/indian-v2")
+  const cacheKey = new Request("https://cache.mktvision.internal/indian-v3")
   const cached   = await cache.match(cacheKey)
 
   if (cached) {
@@ -86,12 +133,7 @@ export async function onRequest({ request, env, waitUntil }) {
   }
 
   try {
-    const results = (
-      await Promise.all(
-        INDIAN_STOCKS.map(({ symbol }) => fetchQuote(symbol, env.TWELVEDATA_KEY))
-      )
-    ).filter(Boolean) // drop any that errored
-
+    const results = await fetchWatchlist(env.TWELVEDATA_KEY)
     if (!results.length) throw new Error("no data")
 
     const body     = JSON.stringify(results)

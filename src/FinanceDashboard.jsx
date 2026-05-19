@@ -169,15 +169,29 @@ export default function FinanceDashboard() {
 
   const handleSearchSelect = useCallback(async result => {
     setSearchQuery(""); setSearchResults([]); setSearchOpen(false)
+    const isIndian = /\.(NS|BO)$/i.test(result.symbol)
     try {
-      const r = await fetch(`/api/stocks?symbols=${result.symbol}`)
-      const data = await r.json()
-      const q = data?.[0]
-      setSelected({
-        id: `search_${result.symbol}`, symbol: result.symbol, name: result.name,
-        type: "stock", price: q?.price ?? null, pct: q?.pct ?? null,
-        high: q?.high ?? null, low: q?.low ?? null, cap: "—", stockLoading: false,
-      })
+      if (isIndian) {
+        const r = await fetch(`/api/indian?symbol=${encodeURIComponent(result.symbol)}`)
+        const data = await r.json()
+        const q = data?.[0]
+        setSelected({
+          id: `search_${result.symbol}`, symbol: q?.symbol || result.symbol,
+          name: q?.name || result.name, type: "indian",
+          price: q?.price ?? null, pct: q?.pct ?? null,
+          high: q?.high ?? null, low: q?.low ?? null,
+          exchange: "NSE", stockLoading: false,
+        })
+      } else {
+        const r = await fetch(`/api/stocks?symbols=${result.symbol}`)
+        const data = await r.json()
+        const q = data?.[0]
+        setSelected({
+          id: `search_${result.symbol}`, symbol: result.symbol, name: result.name,
+          type: "stock", price: q?.price ?? null, pct: q?.pct ?? null,
+          high: q?.high ?? null, low: q?.low ?? null, cap: "—", stockLoading: false,
+        })
+      }
     } catch {}
   }, [])
 
