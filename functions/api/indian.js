@@ -1,9 +1,17 @@
 // Indian stocks via Twelve Data (free tier: 800 req/day, 8 req/min)
-// Symbols: RELIANCE, TCS, INFY, HDFCBANK etc. — no suffix needed, exchange=NSE
+// Uses individual requests to avoid batch response format issues
 
 const INDIAN_STOCKS = [
-  "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
-  "HINDUNILVR", "SBIN", "BHARTIARTL", "WIPRO", "ITC"
+  { symbol: "INFY",       name: "Infosys Ltd"          },
+  { symbol: "TCS",        name: "Tata Consultancy"      },
+  { symbol: "RELIANCE",   name: "Reliance Industries"   },
+  { symbol: "HDFCBANK",   name: "HDFC Bank"             },
+  { symbol: "ICICIBANK",  name: "ICICI Bank"            },
+  { symbol: "HINDUNILVR", name: "Hindustan Unilever"    },
+  { symbol: "SBIN",       name: "State Bank of India"   },
+  { symbol: "BHARTIARTL", name: "Bharti Airtel"         },
+  { symbol: "WIPRO",      name: "Wipro Ltd"             },
+  { symbol: "ITC",        name: "ITC Ltd"               },
 ]
 
 const CACHE_TTL = 60
@@ -13,6 +21,37 @@ function corsHeaders(origin, allowed) {
     "Access-Control-Allow-Origin": allowed ? (origin === allowed ? origin : "null") : "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Vary": "Origin",
+  }
+}
+
+async function fetchQuote(symbol, apiKey) {
+  const r = await fetch(
+    `https://api.twelvedata.com/quote?symbol=${symbol}&exchange=NSE&apikey=${apiKey}`
+  )
+  if (!r.ok) return null
+  const q = await r.json()
+
+  // Twelve Data returns { status: "error", message: "..." } on failure
+  if (q.status === "error" || !q.name) return null
+
+  // Use close for live price; fall back to previous_close if market is closed / close is 0
+  const price = parseFloat(q.close) || parseFloat(q.previous_close) || 0
+  if (!price) return null
+
+  const prev   = parseFloat(q.previous_close) || price
+  const pct    = q.percent_change
+    ? parseFloat(q.percent_change)
+    : prev ? ((price - prev) / prev) * 100 : 0
+
+  return {
+    symbol,
+    name:   q.name,
+    price:  +price.toFixed(2),
+    change: +(price - prev).toFixed(2),
+    pct:    +pct.toFixed(4),
+    high:   parseFloat(q.high)  || null,
+    low:    parseFloat(q.low)   || null,
+    exchange: "NSE",
   }
 }
 
@@ -36,7 +75,7 @@ export async function onRequest({ request, env, waitUntil }) {
   }
 
   const cache    = caches.default
-  const cacheKey = new Request("https://cache.mktvision.internal/indian")
+  const cacheKey = new Request("https://cache.mktvision.internal/indian-v2")
   const cached   = await cache.match(cacheKey)
 
   if (cached) {
@@ -47,33 +86,13 @@ export async function onRequest({ request, env, waitUntil }) {
   }
 
   try {
-    // Twelve Data supports batch requests — fetch all in one call
-    const symbols = INDIAN_STOCKS.join(",")
-    const r = await fetch(
-      `https://api.twelvedata.com/quote?symbol=${symbols}&exchange=NSE&apikey=${env.TWELVEDATA_KEY}`
-    )
-    if (!r.ok) throw new Error("upstream")
-    const data = await r.json()
+    const results = (
+      await Promise.all(
+        INDIAN_STOCKS.map(({ symbol }) => fetchQuote(symbol, env.TWELVEDATA_KEY))
+      )
+    ).filter(Boolean) // drop any that errored
 
-    // Batch response: keyed by symbol when multiple, direct object when one
-    const results = INDIAN_STOCKS.map(sym => {
-      const q = data[sym] || data  // fallback for single-symbol response
-      if (!q || q.status === "error" || !q.close) return null
-      const price  = parseFloat(q.close)
-      const prev   = parseFloat(q.previous_close)
-      const change = price - prev
-      const pct    = prev ? (change / prev) * 100 : 0
-      return {
-        symbol: sym,
-        name: q.name || sym,
-        price: +price.toFixed(2),
-        change: +change.toFixed(2),
-        pct: +pct.toFixed(4),
-        high: parseFloat(q.high),
-        low:  parseFloat(q.low),
-        exchange: "NSE",
-      }
-    }).filter(Boolean)
+    if (!results.length) throw new Error("no data")
 
     const body     = JSON.stringify(results)
     const response = new Response(body, {
