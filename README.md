@@ -1,4 +1,4 @@
-# MktVision — Markets Terminal
+# MktVision - Markets Terminal
 
 A Bloomberg-style real-time markets dashboard with financial calculators. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
 
