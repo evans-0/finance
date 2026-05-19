@@ -1,5 +1,5 @@
 const MAX_QUERY_LENGTH = 20
-const CACHE_TTL        = 120 // search results can be cached longer
+const CACHE_TTL        = 120
 
 function corsHeaders(origin, allowed) {
   return {
@@ -28,7 +28,6 @@ export async function onRequest({ request, env, waitUntil }) {
     })
   }
 
-  // Sanitize: letters, digits, spaces and dots only (handles "Apple Inc." etc.)
   const raw = (new URL(request.url).searchParams.get("q") || "")
   const q   = raw.trim().replace(/[^A-Za-z0-9\s.]/g, "").slice(0, MAX_QUERY_LENGTH)
 
@@ -51,17 +50,17 @@ export async function onRequest({ request, env, waitUntil }) {
 
   try {
     const r = await fetch(
-      `https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&exchange=US&token=${env.FINNHUB_KEY}`
+      `https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&token=${env.FINNHUB_KEY}`
     )
     if (!r.ok) throw new Error("upstream")
     const data = await r.json()
 
     const results = (data.result || [])
       .filter(item =>
-        item.type === "Common Stock" &&
+        (item.type === "Common Stock" || item.type === "EQS") &&
         item.symbol &&
-        !item.symbol.includes(".") && // exclude ADRs like BRK.B
-        item.symbol.length <= 6
+        // Allow US tickers OR Indian .NS/.BO symbols
+        (/^[A-Z]{1,6}$/.test(item.symbol) || /^[A-Z0-9]{1,20}\.(NS|BO)$/.test(item.symbol))
       )
       .slice(0, 8)
       .map(item => ({ symbol: item.symbol, name: item.description }))
