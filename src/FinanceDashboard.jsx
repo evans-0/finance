@@ -129,6 +129,8 @@ export default function FinanceDashboard() {
   const [cryptoLoading, setCryptoLoading] = useState(true)
   const [cryptoError, setCryptoError]     = useState(false)
   const [chartLoading, setChartLoading]   = useState(false)
+  const [news, setNews]                   = useState([])
+  const [newsLoading, setNewsLoading]     = useState(false)
   const [time, setTime]                   = useState(new Date())
   const [lastUpdated, setLastUpdated]     = useState(null)
 
@@ -278,6 +280,20 @@ export default function FinanceDashboard() {
     return () => ctrl.abort()
   }, [selected])
 
+  // Fetch news when selection changes
+  useEffect(() => {
+    if (!selected) return
+    setNewsLoading(true)
+    setNews([])
+    const type   = selected.type === "crypto" ? "crypto" : selected.type === "indian" ? "indian" : "stock"
+    const symbol = selected.type === "stock" ? selected.symbol : ""
+    fetch(`/api/news?symbol=${symbol}&type=${type}`)
+      .then(r => r.json())
+      .then(d => setNews(d.articles || []))
+      .catch(() => setNews([]))
+      .finally(() => setNewsLoading(false))
+  }, [selected?.id])
+
   const isIndian       = selected?.type === "indian"
   const currency       = isIndian ? "₹" : "$"
   const price          = isIndian ? selected.price : selected?.type === "stock" ? selected.price : selected?.current_price || 0
@@ -315,7 +331,7 @@ export default function FinanceDashboard() {
           ))}
         </div>
         <div style={{ fontSize: 12, color: C.amber, fontWeight: 600 }}>
-          {time.toLocaleTimeString("en-US", { hour12: false, timeZone: "America/New_York" })} EST
+          {time.toLocaleTimeString("en-US", { hour12: false })} EST
         </div>
       </div>
 
@@ -426,6 +442,42 @@ export default function FinanceDashboard() {
                   </AreaChart>
                 </ResponsiveContainer>
               )
+            }
+          </div>
+
+          {/* News */}
+          <div style={{ borderTop: `1px solid ${C.border}`, padding: "12px 16px" }}>
+            <div style={{ fontSize: 10, color: C.textSec, marginBottom: 10, letterSpacing: 1.5 }}>
+              LATEST NEWS
+            </div>
+            {newsLoading
+              ? <div style={{ fontSize: 11, color: C.textDim }}>loading news...</div>
+              : news.length === 0
+              ? <div style={{ fontSize: 11, color: C.textDim }}>no news available</div>
+              : news.map((a, i) => (
+                <a key={i} href={a.url} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "block", textDecoration: "none", padding: "7px 0", borderBottom: `1px solid ${C.border}` }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#0a1828"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+                    <div style={{ fontSize: 12, color: C.text, lineHeight: 1.4, flex: 1 }}>
+                      {a.headline.length > 80 ? a.headline.slice(0, 80) + "..." : a.headline}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
+                      <span style={{ fontSize: 10, color: C.amber }}>{a.source}</span>
+                      <span style={{ fontSize: 10, color: C.textDim }}>
+                        {(() => {
+                          const diff = Math.floor((Date.now() - a.datetime * 1000) / 60000)
+                          if (diff < 60) return diff + "m ago"
+                          if (diff < 1440) return Math.floor(diff / 60) + "h ago"
+                          return Math.floor(diff / 1440) + "d ago"
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              ))
             }
           </div>
 
