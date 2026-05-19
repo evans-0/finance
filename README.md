@@ -1,8 +1,8 @@
 # MktVision — Markets Terminal
 
-A Bloomberg-style real-time markets dashboard built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
+A Bloomberg-style real-time markets dashboard with financial calculators. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
 
-> **Live demo:** [mktvision.pages.dev](https://mktvision.pages.dev)
+> **Live:** [mkt-vision.com](https://mkt-vision.com) · **Terminal:** [mkt-vision.com/dashboard](https://mkt-vision.com/dashboard)
 
 ![MktVision Dashboard](screenshot.png)
 
@@ -10,14 +10,24 @@ A Bloomberg-style real-time markets dashboard built with React, deployed on Clou
 
 ## Features
 
+### Markets Terminal
 - **Live US equities** — real-time quotes for AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN via Finnhub
-- **Live Indian NSE stocks** — top 8 NSE stocks via Twelve Data
-- **Live crypto** — top 8 by market cap with 30-day price charts via CoinGecko (no key required)
-- **Live market indices** — S&P 500, NASDAQ, DOW, VIX via ETF proxies (SPY/QQQ/DIA/UVXY)
-- **Universal search** — search any US ticker or NSE stock, routes to the right data source automatically
+- **Live Indian NSE stocks** — top 8 NSE stocks with ₹ prices via Twelve Data
+- **Live crypto** — top 8 by market cap with 30-day price charts via CoinGecko
+- **Live market indices** — S&P 500, NASDAQ, DOW, VIX percentage changes via ETF proxies
+- **Universal search** — search any US ticker or NSE stock in one box
 - **30-day price charts** — area charts for all assets using Recharts
-- **Real-time clock** — live EST clock in the header
 - **Auto-refresh** — all data refreshes every 60 seconds
+
+> **Note:** 30-day stock charts are simulated — Finnhub historical data requires a paid plan. Current prices, % change, high/low and all other data is live.
+
+### Financial Calculators
+- **SIP Calculator** — future value of systematic investments with growth chart
+- **EMI Calculator** — loan repayments with yearly amortization breakdown
+- **Compound Interest** — compare annual, quarterly and monthly compounding
+- **Stock Returns** — P&L, absolute return and CAGR including brokerage costs
+- **Portfolio Allocator** — visualise holdings with a pie chart
+- **Options P&L** — call/put payoff diagram with breakeven and key levels
 
 ---
 
@@ -30,6 +40,7 @@ Browser
    ├── /api/indices                      ──▶  Cloudflare Worker  ──▶  Finnhub API (ETF proxies)
    ├── /api/indian?symbol=RELIANCE       ──▶  Cloudflare Worker  ──▶  Twelve Data API
    ├── /api/search?q=apple               ──▶  Cloudflare Worker  ──▶  Finnhub + Twelve Data
+   ├── /api/news?symbol=AAPL             ──▶  Cloudflare Worker  ──▶  Finnhub News API
    └── CoinGecko API                     ──▶  Direct (no key needed)
 ```
 
@@ -41,7 +52,7 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, Recharts |
+| Frontend | React 18, React Router v6, Recharts |
 | Build | Vite |
 | Hosting | Cloudflare Pages |
 | API proxy | Cloudflare Pages Functions (Workers) |
@@ -54,10 +65,44 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 ## Security
 
 - **No API keys in the frontend bundle** — all keys are server-side in Cloudflare Workers
-- **Origin locking** — Worker rejects requests from any domain other than the Pages URL
-- **Input sanitization** — all symbol inputs are sanitized and validated before reaching external APIs
+- **Origin locking** — Worker rejects requests from any domain other than `mkt-vision.com`
+- **Input sanitization** — all symbol inputs sanitized and validated before reaching external APIs
 - **Server-side caching** — Cloudflare Workers Cache API prevents rate limit abuse
 - **Secrets** — keys stored as encrypted Secrets in Cloudflare, never visible after creation
+
+---
+
+## Project Structure
+
+```
+├── functions/
+│   └── api/
+│       ├── stocks.js      # US equity quotes → Finnhub
+│       ├── indices.js     # Market indices → Finnhub (ETF proxies)
+│       ├── indian.js      # NSE stock quotes → Twelve Data
+│       ├── search.js      # Symbol search → Finnhub + Twelve Data
+│       └── news.js        # Market news → Finnhub
+├── src/
+│   ├── components/
+│   │   └── Navbar.jsx
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── CalculatorsHub.jsx
+│   │   └── calculators/
+│   │       ├── SIP.jsx
+│   │       ├── EMI.jsx
+│   │       ├── Compound.jsx
+│   │       ├── StockReturn.jsx
+│   │       ├── Portfolio.jsx
+│   │       └── Options.jsx
+│   ├── App.jsx
+│   ├── FinanceDashboard.jsx
+│   └── main.jsx
+├── index.html
+├── package.json
+└── vite.config.js
+```
 
 ---
 
@@ -79,50 +124,29 @@ npm install
 npm run dev
 ```
 
-> Indian stock data and indices won't load locally without running `wrangler pages dev`. US stocks and crypto work out of the box.
-
 ### Deployment
 
 1. Push to GitHub
-2. Connect the repo to [Cloudflare Pages](https://pages.cloudflare.com)
-3. Set build command: `npm run build`, output directory: `dist`
+2. Connect repo to [Cloudflare Pages](https://pages.cloudflare.com)
+3. Build command: `npm run build` · Output directory: `dist`
 4. Add environment variables under **Settings → Environment Variables**:
 
 | Variable | Type | Value |
 |---|---|---|
 | `FINNHUB_KEY` | Secret | Your Finnhub API key |
 | `TWELVEDATA_KEY` | Secret | Your Twelve Data API key |
-| `ALLOWED_ORIGIN` | Plaintext | `https://your-project.pages.dev` |
+| `ALLOWED_ORIGIN` | Plaintext | `https://mkt-vision.com` |
 
-5. Redeploy — Cloudflare auto-deploys on every `git push` after setup
-
----
-
-## Project Structure
-
-```
-├── functions/
-│   └── api/
-│       ├── stocks.js      # US equity quotes → Finnhub
-│       ├── indices.js     # Market indices → Finnhub (ETF proxies)
-│       ├── indian.js      # NSE stock quotes → Twelve Data
-│       └── search.js      # Symbol search → Finnhub + Twelve Data
-├── src/
-│   ├── FinanceDashboard.jsx   # Main dashboard component
-│   └── main.jsx               # React entry point
-├── index.html
-├── package.json
-└── vite.config.js
-```
+5. Redeploy — Cloudflare auto-deploys on every `git push`
 
 ---
 
 ## Known Limitations
 
-- **Stock chart data is simulated** — Finnhub historical candles require a paid plan. Charts use a random walk seeded from the live price, so the shape is illustrative rather than accurate.
-- **NSE search coverage** — Twelve Data free tier covers NIFTY 50 and major indices. Less liquid NSE stocks may not be available.
-- **Indian stock refresh rate** — NSE prices update every 15 minutes (vs 60 seconds for US stocks) to stay within Twelve Data's 800 credits/day free tier limit.
-- **Index absolute values not shown** — Finnhub free tier doesn't expose `^GSPC` etc. ETF proxies (SPY/QQQ/DIA) provide accurate percentage change but not the raw index level.
+- **Stock chart data is simulated** — Finnhub historical candles require a paid plan. Charts use a seeded random walk from the live price.
+- **NSE search coverage** — Twelve Data free tier covers major NSE stocks. Less liquid tickers may not be available.
+- **Indian stock refresh rate** — NSE prices update every 15 minutes to stay within Twelve Data's 800 credits/day free tier limit.
+- **Index absolute values** — Finnhub free tier returns zero for `^GSPC` etc. ETF proxies (SPY/QQQ/DIA) show accurate percentage change only.
 
 ---
 
