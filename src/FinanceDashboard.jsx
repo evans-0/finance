@@ -19,12 +19,12 @@ const STOCK_META = [
 
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
 
-function fp(n) {
+function fp(n, currency = "$") {
   if (n == null) return "—"
-  if (n < 0.01)  return "$" + n.toFixed(6)
-  if (n < 1)     return "$" + n.toFixed(4)
-  if (n >= 1000) return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  return "$" + n.toFixed(2)
+  if (n < 0.01)  return currency + n.toFixed(6)
+  if (n < 1)     return currency + n.toFixed(4)
+  if (n >= 1000) return currency + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return currency + n.toFixed(2)
 }
 
 function fIdx(n) {
@@ -55,20 +55,22 @@ function mkMockChart(base, days = 30) {
   return pts
 }
 
-function ChartTooltip({ active, payload, label }) {
+function ChartTooltip({ active, payload, label, currency }) {
   if (!active || !payload?.length) return null
   return (
     <div style={{ background: "#0a1828", border: `1px solid ${C.border}`, padding: "6px 10px", borderRadius: 3, fontSize: 11, fontFamily: MONO }}>
       <div style={{ color: C.textSec, marginBottom: 2 }}>{label}</div>
-      <div style={{ color: C.text, fontWeight: 600 }}>{fp(payload[0].value)}</div>
+      <div style={{ color: C.text, fontWeight: 600 }}>{fp(payload[0].value, currency)}</div>
     </div>
   )
 }
 
 function WatchRow({ asset, selected, onSelect }) {
-  const price = asset.type === "stock" ? asset.price : asset.current_price || 0
-  const pct   = asset.type === "stock" ? asset.pct   : asset.price_change_percentage_24h || 0
+  const isIndian = asset.type === "indian"
+  const price = isIndian ? asset.price : asset.type === "stock" ? asset.price : asset.current_price || 0
+  const pct   = isIndian ? asset.pct   : asset.type === "stock" ? asset.pct   : asset.price_change_percentage_24h || 0
   const up    = pct >= 0
+  const curr  = isIndian ? "₹" : "$"
   const [hov, setHov] = useState(false)
   return (
     <div onClick={() => onSelect(asset)} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
@@ -87,7 +89,7 @@ function WatchRow({ asset, selected, onSelect }) {
         {asset.stockLoading
           ? <div style={{ fontSize: 11, color: C.textDim }}>...</div>
           : <>
-              <div style={{ fontSize: 11, color: C.text }}>{fp(price)}</div>
+              <div style={{ fontSize: 11, color: C.text }}>{fp(price, curr)}</div>
               <div style={{ fontSize: 10, color: up ? C.green : C.red }}>{up ? "▲" : "▼"} {Math.abs(pct || 0).toFixed(2)}%</div>
             </>
         }
@@ -105,20 +107,31 @@ function Stat({ label, value, loading }) {
   )
 }
 
+function SectionHeader({ label, status, error }) {
+  return (
+    <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>{label}</span>
+      <span style={{ fontSize: 9, color: error ? C.red : C.green }}>● {error ? "ERROR" : status}</span>
+    </div>
+  )
+}
+
 export default function FinanceDashboard() {
   const [stocks, setStocks]               = useState(STOCK_META.map(s => ({ ...s, price: null, pct: null, high: null, low: null, stockLoading: true })))
+  const [indianStocks, setIndianStocks]   = useState([])
   const [cryptos, setCryptos]             = useState([])
   const [indices, setIndices]             = useState([])
   const [selected, setSelected]           = useState(null)
   const [chart, setChart]                 = useState([])
   const [stocksError, setStocksError]     = useState(false)
+  const [indianError, setIndianError]     = useState(false)
+  const [indianLoading, setIndianLoading] = useState(true)
   const [cryptoLoading, setCryptoLoading] = useState(true)
   const [cryptoError, setCryptoError]     = useState(false)
   const [chartLoading, setChartLoading]   = useState(false)
   const [time, setTime]                   = useState(new Date())
   const [lastUpdated, setLastUpdated]     = useState(null)
 
-  // Search
   const [searchQuery, setSearchQuery]     = useState("")
   const [searchResults, setSearchResults] = useState([])
   const [searchLoading, setSearchLoading] = useState(false)
@@ -130,14 +143,12 @@ export default function FinanceDashboard() {
     return () => clearInterval(t)
   }, [])
 
-  // Close search dropdown on outside click
   useEffect(() => {
     const handler = e => { if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false) }
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
   }, [])
 
-  // Debounced search
   useEffect(() => {
     if (searchQuery.length < 1) { setSearchResults([]); setSearchOpen(false); return }
     const t = setTimeout(async () => {
@@ -156,28 +167,18 @@ export default function FinanceDashboard() {
     return () => clearTimeout(t)
   }, [searchQuery])
 
-  // Select search result — fetch live quote then set as selected
   const handleSearchSelect = useCallback(async result => {
-    setSearchQuery("")
-    setSearchResults([])
-    setSearchOpen(false)
+    setSearchQuery(""); setSearchResults([]); setSearchOpen(false)
     try {
       const r = await fetch(`/api/stocks?symbols=${result.symbol}`)
       const data = await r.json()
       const q = data?.[0]
       setSelected({
-        id: `search_${result.symbol}`,
-        symbol: result.symbol,
-        name: result.name,
-        type: "stock",
-        price: q?.price ?? null,
-        pct: q?.pct ?? null,
-        high: q?.high ?? null,
-        low: q?.low ?? null,
-        cap: "—",
-        stockLoading: false,
+        id: `search_${result.symbol}`, symbol: result.symbol, name: result.name,
+        type: "stock", price: q?.price ?? null, pct: q?.pct ?? null,
+        high: q?.high ?? null, low: q?.low ?? null, cap: "—", stockLoading: false,
       })
-    } catch { /* selected stays as-is */ }
+    } catch {}
   }, [])
 
   const fetchIndices = useCallback(async () => {
@@ -186,14 +187,13 @@ export default function FinanceDashboard() {
       if (!r.ok) throw new Error()
       const data = await r.json()
       if (!data.error) setIndices(data)
-    } catch { /* keep previous values */ }
+    } catch {}
   }, [])
 
   const fetchStocks = useCallback(async () => {
     setStocksError(false)
-    const symbols = STOCK_META.map(s => s.symbol).join(",")
     try {
-      const r = await fetch(`/api/stocks?symbols=${symbols}`)
+      const r = await fetch(`/api/stocks?symbols=${STOCK_META.map(s => s.symbol).join(",")}`)
       if (!r.ok) throw new Error()
       const data = await r.json()
       if (data.error) throw new Error()
@@ -205,6 +205,21 @@ export default function FinanceDashboard() {
     } catch {
       setStocksError(true)
       setStocks(prev => prev.map(s => ({ ...s, stockLoading: false })))
+    }
+  }, [])
+
+  const fetchIndian = useCallback(async () => {
+    setIndianError(false)
+    try {
+      const r = await fetch("/api/indian")
+      if (!r.ok) throw new Error()
+      const data = await r.json()
+      if (data.error) throw new Error()
+      setIndianStocks(data.map(s => ({ ...s, id: `in_${s.symbol}`, type: "indian" })))
+    } catch {
+      setIndianError(true)
+    } finally {
+      setIndianLoading(false)
     }
   }, [])
 
@@ -223,12 +238,10 @@ export default function FinanceDashboard() {
   }, [])
 
   useEffect(() => {
-    fetchIndices()
-    fetchStocks()
-    fetchCrypto()
-    const t = setInterval(() => { fetchIndices(); fetchStocks(); fetchCrypto() }, 60000)
+    fetchIndices(); fetchStocks(); fetchIndian(); fetchCrypto()
+    const t = setInterval(() => { fetchIndices(); fetchStocks(); fetchIndian(); fetchCrypto() }, 60000)
     return () => clearInterval(t)
-  }, [fetchIndices, fetchStocks, fetchCrypto])
+  }, [fetchIndices, fetchStocks, fetchIndian, fetchCrypto])
 
   useEffect(() => {
     if (!selected && stocks.length) setSelected(stocks[0])
@@ -237,7 +250,7 @@ export default function FinanceDashboard() {
   useEffect(() => {
     if (!selected) return
     setChartLoading(true)
-    if (selected.type === "stock") {
+    if (selected.type === "stock" || selected.type === "indian") {
       const base = selected.price || 150
       const timer = setTimeout(() => { setChart(mkMockChart(base)); setChartLoading(false) }, 200)
       return () => clearTimeout(timer)
@@ -251,55 +264,55 @@ export default function FinanceDashboard() {
     return () => ctrl.abort()
   }, [selected])
 
-  const price           = selected?.type === "stock" ? selected.price : selected?.current_price || 0
-  const pct             = selected?.type === "stock" ? selected.pct   : selected?.price_change_percentage_24h || 0
-  const up              = pct >= 0
-  const cmin            = chart.length ? Math.min(...chart.map(d => d.p)) * 0.997 : 0
-  const cmax            = chart.length ? Math.max(...chart.map(d => d.p)) * 1.003 : 1
-  const isStockLoading  = selected?.type === "stock" && selected?.stockLoading
+  const isIndian       = selected?.type === "indian"
+  const currency       = isIndian ? "₹" : "$"
+  const price          = isIndian ? selected.price : selected?.type === "stock" ? selected.price : selected?.current_price || 0
+  const pct            = isIndian ? selected.pct   : selected?.type === "stock" ? selected.pct   : selected?.price_change_percentage_24h || 0
+  const up             = pct >= 0
+  const cmin           = chart.length ? Math.min(...chart.map(d => d.p)) * 0.997 : 0
+  const cmax           = chart.length ? Math.max(...chart.map(d => d.p)) * 1.003 : 1
+  const isStockLoading = (selected?.type === "stock" || isIndian) && selected?.stockLoading
+
+  const statHigh = isIndian ? fp(selected?.high, "₹") : selected?.type === "stock" ? fp(selected?.high) : fp(selected?.high_24h || 0)
+  const statLow  = isIndian ? fp(selected?.low,  "₹") : selected?.type === "stock" ? fp(selected?.low)  : fp(selected?.low_24h  || 0)
 
   return (
     <div style={{ background: C.bg, fontFamily: MONO, color: C.text, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div style={{ background: C.panel, borderBottom: `1px solid ${C.border}`, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ color: C.amber, fontWeight: 700, fontSize: 15, letterSpacing: 3 }}>▐ MKTVISION</span>
           <span style={{ color: C.borderBright, fontSize: 20 }}>|</span>
           <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 2 }}>MARKETS TERMINAL</span>
         </div>
-
-        {/* Live indices */}
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
           {(indices.length ? indices : [
-            { name: "S&P 500", val: 0, pct: 0 },
-            { name: "NASDAQ",  val: 0, pct: 0 },
-            { name: "DOW",     val: 0, pct: 0 },
-            { name: "VIX",     val: 0, pct: 0 },
-          ]).map(idx => {
-            const up = idx.pct >= 0
-            return (
-              <span key={idx.name} style={{ fontSize: 11 }}>
-                <span style={{ color: C.textSec }}>{idx.name}&nbsp;</span>
-                <span style={{ color: C.text }}>{idx.val ? fIdx(idx.val) : "—"}&nbsp;</span>
-                {idx.val ? <span style={{ color: up ? C.green : C.red }}>{up ? "+" : ""}{idx.pct.toFixed(2)}%</span> : <span style={{ color: C.textDim }}>—</span>}
-              </span>
-            )
-          })}
+            { name: "S&P 500", val: 0, pct: 0 }, { name: "NASDAQ", val: 0, pct: 0 },
+            { name: "DOW", val: 0, pct: 0 },     { name: "VIX", val: 0, pct: 0 },
+          ]).map(idx => (
+            <span key={idx.name} style={{ fontSize: 11 }}>
+              <span style={{ color: C.textSec }}>{idx.name}&nbsp;</span>
+              <span style={{ color: C.text }}>{idx.val ? fIdx(idx.val) : "—"}&nbsp;</span>
+              {idx.val
+                ? <span style={{ color: idx.pct >= 0 ? C.green : C.red }}>{idx.pct >= 0 ? "+" : ""}{idx.pct.toFixed(2)}%</span>
+                : <span style={{ color: C.textDim }}>—</span>
+              }
+            </span>
+          ))}
         </div>
-
         <div style={{ fontSize: 12, color: C.amber, fontWeight: 600 }}>
           {time.toLocaleTimeString("en-US", { hour12: false })} EST
         </div>
       </div>
 
-      {/* ── Body ── */}
+      {/* Body */}
       <div style={{ display: "flex", flex: 1 }}>
 
-        {/* Watchlist + Search */}
-        <div style={{ width: 210, minWidth: 210, borderRight: `1px solid ${C.border}`, background: C.panel, display: "flex", flexDirection: "column" }}>
+        {/* Sidebar */}
+        <div style={{ width: 210, minWidth: 210, borderRight: `1px solid ${C.border}`, background: C.panel, display: "flex", flexDirection: "column", overflowY: "auto" }}>
 
-          {/* Search box */}
+          {/* Search */}
           <div ref={searchRef} style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, position: "relative" }}>
             <input
               type="text"
@@ -307,21 +320,13 @@ export default function FinanceDashboard() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               onFocus={() => searchResults.length && setSearchOpen(true)}
-              style={{
-                width: "100%", background: C.bg, border: `1px solid ${C.border}`,
-                color: C.text, padding: "5px 8px", fontSize: 11, fontFamily: MONO,
-                borderRadius: 3, outline: "none", boxSizing: "border-box",
-              }}
+              style={{ width: "100%", background: C.bg, border: `1px solid ${C.border}`, color: C.text, padding: "5px 8px", fontSize: 11, fontFamily: MONO, borderRadius: 3, outline: "none", boxSizing: "border-box" }}
             />
-            {searchLoading && (
-              <div style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: C.textDim }}>...</div>
-            )}
+            {searchLoading && <div style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: C.textDim }}>...</div>}
             {searchOpen && searchResults.length > 0 && (
               <div style={{ position: "absolute", top: "calc(100% - 2px)", left: 10, right: 10, background: C.panel, border: `1px solid ${C.borderBright}`, borderRadius: "0 0 3px 3px", zIndex: 200, maxHeight: 220, overflowY: "auto" }}>
                 {searchResults.map(r => (
-                  <div
-                    key={r.symbol}
-                    onClick={() => handleSearchSelect(r)}
+                  <div key={r.symbol} onClick={() => handleSearchSelect(r)}
                     style={{ padding: "7px 10px", cursor: "pointer", borderBottom: `1px solid ${C.border}`, display: "flex", gap: 8, alignItems: "baseline" }}
                     onMouseEnter={e => e.currentTarget.style.background = "#0a1828"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
@@ -334,25 +339,23 @@ export default function FinanceDashboard() {
             )}
           </div>
 
-          {/* Equities */}
-          <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>EQUITIES</span>
-            <span style={{ fontSize: 9, color: stocksError ? C.red : C.green }}>● {stocksError ? "ERROR" : "LIVE"}</span>
-          </div>
+          <SectionHeader label="EQUITIES" status="LIVE" error={stocksError} />
           {stocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={setSelected} />)}
 
-          {/* Crypto */}
-          <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>CRYPTO</span>
-            <span style={{ fontSize: 9, color: cryptoError ? C.red : C.green }}>● {cryptoError ? "ERROR" : "LIVE"}</span>
-          </div>
+          <SectionHeader label="INDIA · NSE" status="LIVE" error={indianError} />
+          {indianLoading
+            ? <div style={{ padding: "16px 12px", fontSize: 11, color: C.textDim, textAlign: "center" }}>fetching...</div>
+            : indianStocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={setSelected} />)
+          }
+
+          <SectionHeader label="CRYPTO" status="LIVE" error={cryptoError} />
           {cryptoLoading
             ? <div style={{ padding: "16px 12px", fontSize: 11, color: C.textDim, textAlign: "center" }}>fetching...</div>
             : cryptos.map(c => <WatchRow key={c.id} asset={c} selected={selected?.id === c.id} onSelect={setSelected} />)
           }
         </div>
 
-        {/* Main area */}
+        {/* Main */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
 
           {/* Asset info */}
@@ -360,23 +363,24 @@ export default function FinanceDashboard() {
             <div>
               <div style={{ fontSize: 10, color: C.textSec, marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontWeight: 600, color: C.text }}>{selected?.name || "—"}</span>
+                {isIndian && <span style={{ fontSize: 9, color: C.amber }}>NSE</span>}
                 <span style={{ fontSize: 9, color: C.green }}>● LIVE</span>
               </div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                 {isStockLoading
                   ? <span style={{ fontSize: 28, color: C.textDim }}>loading...</span>
                   : <>
-                      <span style={{ fontSize: 32, fontWeight: 700, color: C.text, letterSpacing: -0.5 }}>{fp(price)}</span>
+                      <span style={{ fontSize: 32, fontWeight: 700, color: C.text, letterSpacing: -0.5 }}>{fp(price, currency)}</span>
                       <span style={{ fontSize: 16, color: up ? C.green : C.red, fontWeight: 600 }}>{up ? "▲" : "▼"} {Math.abs(pct || 0).toFixed(2)}%</span>
                     </>
                 }
               </div>
             </div>
             <div style={{ display: "flex", gap: 28, flexWrap: "wrap", paddingBottom: 4 }}>
-              <Stat label="MKT CAP"  value={selected?.type === "stock" ? selected.cap             : fL(selected?.market_cap || 0)}  loading={isStockLoading} />
-              <Stat label="24H VOL"  value={selected?.type === "stock" ? "—"                      : fL(selected?.total_volume || 0)} loading={isStockLoading} />
-              <Stat label="24H HIGH" value={selected?.type === "stock" ? fp(selected?.high)        : fp(selected?.high_24h || 0)}     loading={isStockLoading} />
-              <Stat label="24H LOW"  value={selected?.type === "stock" ? fp(selected?.low)         : fp(selected?.low_24h || 0)}      loading={isStockLoading} />
+              <Stat label="MKT CAP"  value={isIndian ? "—" : selected?.type === "stock" ? selected.cap : fL(selected?.market_cap || 0)} loading={isStockLoading} />
+              <Stat label="24H VOL"  value={isIndian ? "—" : selected?.type === "stock" ? "—" : fL(selected?.total_volume || 0)}         loading={isStockLoading} />
+              <Stat label="24H HIGH" value={statHigh} loading={isStockLoading} />
+              <Stat label="24H LOW"  value={statLow}  loading={isStockLoading} />
             </div>
           </div>
 
@@ -399,9 +403,12 @@ export default function FinanceDashboard() {
                     </defs>
                     <XAxis dataKey="t" tick={{ fill: C.textDim, fontSize: 10, fontFamily: MONO }} tickLine={false} axisLine={{ stroke: C.border }} interval="preserveStartEnd" />
                     <YAxis domain={[cmin, cmax]} tick={{ fill: C.textDim, fontSize: 10, fontFamily: MONO }} tickLine={false} axisLine={false} width={76}
-                      tickFormatter={v => v >= 10000 ? "$"+(v/1000).toFixed(0)+"k" : v >= 1000 ? "$"+(v/1000).toFixed(1)+"k" : v < 1 ? "$"+v.toFixed(3) : "$"+v.toFixed(0)}
+                      tickFormatter={v => {
+                        const pfx = isIndian ? "₹" : "$"
+                        return v >= 10000 ? pfx+(v/1000).toFixed(0)+"k" : v >= 1000 ? pfx+(v/1000).toFixed(1)+"k" : v < 1 ? pfx+v.toFixed(3) : pfx+v.toFixed(0)
+                      }}
                     />
-                    <Tooltip content={<ChartTooltip />} />
+                    <Tooltip content={<ChartTooltip currency={currency} />} />
                     <Area type="monotone" dataKey="p" stroke={up ? C.green : C.red} strokeWidth={1.5} fill="url(#areaGrad)" dot={false} activeDot={{ r: 3, fill: up ? C.green : C.red, stroke: "none" }} />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -413,8 +420,8 @@ export default function FinanceDashboard() {
           <div style={{ borderTop: `1px solid ${C.border}`, padding: "10px 16px" }}>
             <div style={{ fontSize: 10, color: C.textSec, marginBottom: 8, letterSpacing: 1.5 }}>MARKET MOVERS</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {[...stocks, ...cryptos.slice(0, 4)].map(a => {
-                const p2 = a.type === "stock" ? a.pct : a.price_change_percentage_24h || 0
+              {[...stocks, ...indianStocks.slice(0, 3), ...cryptos.slice(0, 3)].map(a => {
+                const p2 = a.type === "indian" ? a.pct : a.type === "stock" ? a.pct : a.price_change_percentage_24h || 0
                 const u2 = p2 >= 0
                 return (
                   <div key={a.id || a.symbol} onClick={() => setSelected(a)}
@@ -434,7 +441,7 @@ export default function FinanceDashboard() {
 
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
-        <span style={{ fontSize: 10, color: C.textDim }}>INDICES + STOCKS: FINNHUB VIA CF WORKER · CRYPTO: COINGECKO · REFRESH: 60S</span>
+        <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
         <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>
     </div>
