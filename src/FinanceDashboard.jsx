@@ -1,18 +1,11 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
 const C = {
-  bg: "#020c18",
-  panel: "#050f1e",
-  panelSel: "#0a1a30",
-  border: "#0c1d34",
-  borderBright: "#162840",
-  green: "#00e676",
-  red: "#ff3c5c",
-  amber: "#f5a623",
-  text: "#c8d8f0",
-  textSec: "#506888",
-  textDim: "#1e3050",
+  bg: "#020c18", panel: "#050f1e", panelSel: "#0a1a30",
+  border: "#0c1d34", borderBright: "#162840",
+  green: "#00e676", red: "#ff3c5c", amber: "#f5a623",
+  text: "#c8d8f0", textSec: "#506888", textDim: "#1e3050",
 }
 
 const STOCK_META = [
@@ -24,13 +17,6 @@ const STOCK_META = [
   { id: "s_amzn",  symbol: "AMZN",  name: "Amazon.com",      cap: "$2.02T", type: "stock" },
 ]
 
-const INDICES = [
-  { name: "S&P 500", val: "5,308.15",  pct: "+0.24%", up: true  },
-  { name: "NASDAQ",  val: "16,780.24", pct: "-0.14%", up: false },
-  { name: "DOW",     val: "39,431.21", pct: "+0.14%", up: true  },
-  { name: "VIX",     val: "14.23",     pct: "+3.27%", up: false },
-]
-
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
 
 function fp(n) {
@@ -39,6 +25,12 @@ function fp(n) {
   if (n < 1)     return "$" + n.toFixed(4)
   if (n >= 1000) return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   return "$" + n.toFixed(2)
+}
+
+function fIdx(n) {
+  if (!n) return "—"
+  if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return n.toFixed(2)
 }
 
 function fL(n) {
@@ -77,19 +69,14 @@ function WatchRow({ asset, selected, onSelect }) {
   const price = asset.type === "stock" ? asset.price : asset.current_price || 0
   const pct   = asset.type === "stock" ? asset.pct   : asset.price_change_percentage_24h || 0
   const up    = pct >= 0
-  const [hovered, setHovered] = useState(false)
+  const [hov, setHov] = useState(false)
   return (
-    <div
-      onClick={() => onSelect(asset)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <div onClick={() => onSelect(asset)} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        padding: "7px 12px", cursor: "pointer", display: "flex",
-        justifyContent: "space-between", alignItems: "center",
-        background: selected ? C.panelSel : hovered ? "#080f1e" : "transparent",
+        padding: "7px 12px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
+        background: selected ? C.panelSel : hov ? "#080f1e" : "transparent",
         borderLeft: `2px solid ${selected ? C.amber : "transparent"}`,
-        borderBottom: `1px solid ${C.border}`,
-        transition: "background 0.1s",
+        borderBottom: `1px solid ${C.border}`, transition: "background 0.1s",
       }}
     >
       <div>
@@ -119,23 +106,89 @@ function Stat({ label, value, loading }) {
 }
 
 export default function FinanceDashboard() {
-  const [stocks, setStocks]             = useState(STOCK_META.map(s => ({ ...s, price: null, pct: null, high: null, low: null, stockLoading: true })))
-  const [cryptos, setCryptos]           = useState([])
-  const [selected, setSelected]         = useState(null)
-  const [chart, setChart]               = useState([])
-  const [stocksError, setStocksError]   = useState(false)
+  const [stocks, setStocks]               = useState(STOCK_META.map(s => ({ ...s, price: null, pct: null, high: null, low: null, stockLoading: true })))
+  const [cryptos, setCryptos]             = useState([])
+  const [indices, setIndices]             = useState([])
+  const [selected, setSelected]           = useState(null)
+  const [chart, setChart]                 = useState([])
+  const [stocksError, setStocksError]     = useState(false)
   const [cryptoLoading, setCryptoLoading] = useState(true)
-  const [cryptoError, setCryptoError]   = useState(false)
-  const [chartLoading, setChartLoading] = useState(false)
-  const [time, setTime]                 = useState(new Date())
-  const [lastUpdated, setLastUpdated]   = useState(null)
+  const [cryptoError, setCryptoError]     = useState(false)
+  const [chartLoading, setChartLoading]   = useState(false)
+  const [time, setTime]                   = useState(new Date())
+  const [lastUpdated, setLastUpdated]     = useState(null)
+
+  // Search
+  const [searchQuery, setSearchQuery]     = useState("")
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchOpen, setSearchOpen]       = useState(false)
+  const searchRef                         = useRef(null)
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(t)
   }, [])
 
-  // Live stock quotes — routed through Cloudflare Worker, key stays server-side
+  // Close search dropdown on outside click
+  useEffect(() => {
+    const handler = e => { if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false) }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  // Debounced search
+  useEffect(() => {
+    if (searchQuery.length < 1) { setSearchResults([]); setSearchOpen(false); return }
+    const t = setTimeout(async () => {
+      setSearchLoading(true)
+      try {
+        const r = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
+        const data = await r.json()
+        setSearchResults(data.results || [])
+        setSearchOpen(true)
+      } catch {
+        setSearchResults([])
+      } finally {
+        setSearchLoading(false)
+      }
+    }, 350)
+    return () => clearTimeout(t)
+  }, [searchQuery])
+
+  // Select search result — fetch live quote then set as selected
+  const handleSearchSelect = useCallback(async result => {
+    setSearchQuery("")
+    setSearchResults([])
+    setSearchOpen(false)
+    try {
+      const r = await fetch(`/api/stocks?symbols=${result.symbol}`)
+      const data = await r.json()
+      const q = data?.[0]
+      setSelected({
+        id: `search_${result.symbol}`,
+        symbol: result.symbol,
+        name: result.name,
+        type: "stock",
+        price: q?.price ?? null,
+        pct: q?.pct ?? null,
+        high: q?.high ?? null,
+        low: q?.low ?? null,
+        cap: "—",
+        stockLoading: false,
+      })
+    } catch { /* selected stays as-is */ }
+  }, [])
+
+  const fetchIndices = useCallback(async () => {
+    try {
+      const r = await fetch("/api/indices")
+      if (!r.ok) throw new Error()
+      const data = await r.json()
+      if (!data.error) setIndices(data)
+    } catch { /* keep previous values */ }
+  }, [])
+
   const fetchStocks = useCallback(async () => {
     setStocksError(false)
     const symbols = STOCK_META.map(s => s.symbol).join(",")
@@ -143,13 +196,11 @@ export default function FinanceDashboard() {
       const r = await fetch(`/api/stocks?symbols=${symbols}`)
       if (!r.ok) throw new Error()
       const data = await r.json()
-      if (data.error) throw new Error(data.error)
-      setStocks(
-        STOCK_META.map(meta => {
-          const live = data.find(d => d.symbol === meta.symbol)
-          return { ...meta, price: live?.price ?? null, pct: live?.pct ?? null, high: live?.high ?? null, low: live?.low ?? null, stockLoading: false }
-        })
-      )
+      if (data.error) throw new Error()
+      setStocks(STOCK_META.map(meta => {
+        const live = data.find(d => d.symbol === meta.symbol)
+        return { ...meta, price: live?.price ?? null, pct: live?.pct ?? null, high: live?.high ?? null, low: live?.low ?? null, stockLoading: false }
+      }))
       setLastUpdated(new Date())
     } catch {
       setStocksError(true)
@@ -157,7 +208,6 @@ export default function FinanceDashboard() {
     }
   }, [])
 
-  // Live crypto via CoinGecko (no key needed)
   const fetchCrypto = useCallback(async () => {
     setCryptoError(false)
     try {
@@ -173,17 +223,17 @@ export default function FinanceDashboard() {
   }, [])
 
   useEffect(() => {
+    fetchIndices()
     fetchStocks()
     fetchCrypto()
-    const t = setInterval(() => { fetchStocks(); fetchCrypto() }, 60000)
+    const t = setInterval(() => { fetchIndices(); fetchStocks(); fetchCrypto() }, 60000)
     return () => clearInterval(t)
-  }, [fetchStocks, fetchCrypto])
+  }, [fetchIndices, fetchStocks, fetchCrypto])
 
   useEffect(() => {
     if (!selected && stocks.length) setSelected(stocks[0])
   }, [stocks, selected])
 
-  // Chart data — CoinGecko for crypto, mock for stocks (Finnhub historical requires paid tier)
   useEffect(() => {
     if (!selected) return
     setChartLoading(true)
@@ -201,48 +251,97 @@ export default function FinanceDashboard() {
     return () => ctrl.abort()
   }, [selected])
 
-  const price        = selected?.type === "stock" ? selected.price : selected?.current_price || 0
-  const pct          = selected?.type === "stock" ? selected.pct   : selected?.price_change_percentage_24h || 0
-  const up           = pct >= 0
-  const cmin         = chart.length ? Math.min(...chart.map(d => d.p)) * 0.997 : 0
-  const cmax         = chart.length ? Math.max(...chart.map(d => d.p)) * 1.003 : 1
-  const isStockLoading = selected?.type === "stock" && selected?.stockLoading
+  const price           = selected?.type === "stock" ? selected.price : selected?.current_price || 0
+  const pct             = selected?.type === "stock" ? selected.pct   : selected?.price_change_percentage_24h || 0
+  const up              = pct >= 0
+  const cmin            = chart.length ? Math.min(...chart.map(d => d.p)) * 0.997 : 0
+  const cmax            = chart.length ? Math.max(...chart.map(d => d.p)) * 1.003 : 1
+  const isStockLoading  = selected?.type === "stock" && selected?.stockLoading
 
   return (
     <div style={{ background: C.bg, fontFamily: MONO, color: C.text, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <div style={{ background: C.panel, borderBottom: `1px solid ${C.border}`, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ color: C.amber, fontWeight: 700, fontSize: 15, letterSpacing: 3 }}>▐ MKTVISION</span>
           <span style={{ color: C.borderBright, fontSize: 20 }}>|</span>
           <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 2 }}>MARKETS TERMINAL</span>
         </div>
+
+        {/* Live indices */}
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-          {INDICES.map(idx => (
-            <span key={idx.name} style={{ fontSize: 11 }}>
-              <span style={{ color: C.textSec }}>{idx.name}&nbsp;</span>
-              <span style={{ color: C.text }}>{idx.val}&nbsp;</span>
-              <span style={{ color: idx.up ? C.green : C.red }}>{idx.pct}</span>
-            </span>
-          ))}
+          {(indices.length ? indices : [
+            { name: "S&P 500", val: 0, pct: 0 },
+            { name: "NASDAQ",  val: 0, pct: 0 },
+            { name: "DOW",     val: 0, pct: 0 },
+            { name: "VIX",     val: 0, pct: 0 },
+          ]).map(idx => {
+            const up = idx.pct >= 0
+            return (
+              <span key={idx.name} style={{ fontSize: 11 }}>
+                <span style={{ color: C.textSec }}>{idx.name}&nbsp;</span>
+                <span style={{ color: C.text }}>{idx.val ? fIdx(idx.val) : "—"}&nbsp;</span>
+                {idx.val ? <span style={{ color: up ? C.green : C.red }}>{up ? "+" : ""}{idx.pct.toFixed(2)}%</span> : <span style={{ color: C.textDim }}>—</span>}
+              </span>
+            )
+          })}
         </div>
+
         <div style={{ fontSize: 12, color: C.amber, fontWeight: 600 }}>
           {time.toLocaleTimeString("en-US", { hour12: false })} EST
         </div>
       </div>
 
-      {/* Body */}
+      {/* ── Body ── */}
       <div style={{ display: "flex", flex: 1 }}>
 
-        {/* Watchlist */}
+        {/* Watchlist + Search */}
         <div style={{ width: 210, minWidth: 210, borderRight: `1px solid ${C.border}`, background: C.panel, display: "flex", flexDirection: "column" }}>
+
+          {/* Search box */}
+          <div ref={searchRef} style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, position: "relative" }}>
+            <input
+              type="text"
+              placeholder="⌕  Search any ticker..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onFocus={() => searchResults.length && setSearchOpen(true)}
+              style={{
+                width: "100%", background: C.bg, border: `1px solid ${C.border}`,
+                color: C.text, padding: "5px 8px", fontSize: 11, fontFamily: MONO,
+                borderRadius: 3, outline: "none", boxSizing: "border-box",
+              }}
+            />
+            {searchLoading && (
+              <div style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: C.textDim }}>...</div>
+            )}
+            {searchOpen && searchResults.length > 0 && (
+              <div style={{ position: "absolute", top: "calc(100% - 2px)", left: 10, right: 10, background: C.panel, border: `1px solid ${C.borderBright}`, borderRadius: "0 0 3px 3px", zIndex: 200, maxHeight: 220, overflowY: "auto" }}>
+                {searchResults.map(r => (
+                  <div
+                    key={r.symbol}
+                    onClick={() => handleSearchSelect(r)}
+                    style={{ padding: "7px 10px", cursor: "pointer", borderBottom: `1px solid ${C.border}`, display: "flex", gap: 8, alignItems: "baseline" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#0a1828"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <span style={{ fontSize: 12, fontWeight: 600, color: C.amber, minWidth: 48 }}>{r.symbol}</span>
+                    <span style={{ fontSize: 10, color: C.textSec, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Equities */}
           <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>EQUITIES</span>
             <span style={{ fontSize: 9, color: stocksError ? C.red : C.green }}>● {stocksError ? "ERROR" : "LIVE"}</span>
           </div>
           {stocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={setSelected} />)}
 
+          {/* Crypto */}
           <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>CRYPTO</span>
             <span style={{ fontSize: 9, color: cryptoError ? C.red : C.green }}>● {cryptoError ? "ERROR" : "LIVE"}</span>
@@ -253,7 +352,7 @@ export default function FinanceDashboard() {
           }
         </div>
 
-        {/* Chart area */}
+        {/* Main area */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
 
           {/* Asset info */}
@@ -274,10 +373,10 @@ export default function FinanceDashboard() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 28, flexWrap: "wrap", paddingBottom: 4 }}>
-              <Stat label="MKT CAP"  value={selected?.type === "stock" ? selected.cap                      : fL(selected?.market_cap || 0)}  loading={isStockLoading} />
-              <Stat label="24H VOL"  value={selected?.type === "stock" ? "—"                               : fL(selected?.total_volume || 0)} loading={isStockLoading} />
-              <Stat label="24H HIGH" value={selected?.type === "stock" ? fp(selected?.high)                : fp(selected?.high_24h || 0)}     loading={isStockLoading} />
-              <Stat label="24H LOW"  value={selected?.type === "stock" ? fp(selected?.low)                 : fp(selected?.low_24h || 0)}      loading={isStockLoading} />
+              <Stat label="MKT CAP"  value={selected?.type === "stock" ? selected.cap             : fL(selected?.market_cap || 0)}  loading={isStockLoading} />
+              <Stat label="24H VOL"  value={selected?.type === "stock" ? "—"                      : fL(selected?.total_volume || 0)} loading={isStockLoading} />
+              <Stat label="24H HIGH" value={selected?.type === "stock" ? fp(selected?.high)        : fp(selected?.high_24h || 0)}     loading={isStockLoading} />
+              <Stat label="24H LOW"  value={selected?.type === "stock" ? fp(selected?.low)         : fp(selected?.low_24h || 0)}      loading={isStockLoading} />
             </div>
           </div>
 
@@ -335,7 +434,7 @@ export default function FinanceDashboard() {
 
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
-        <span style={{ fontSize: 10, color: C.textDim }}>STOCKS: FINNHUB VIA CF WORKER · CRYPTO: COINGECKO · REFRESH: 60S</span>
+        <span style={{ fontSize: 10, color: C.textDim }}>INDICES + STOCKS: FINNHUB VIA CF WORKER · CRYPTO: COINGECKO · REFRESH: 60S</span>
         <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>
     </div>
