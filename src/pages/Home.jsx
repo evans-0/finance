@@ -26,7 +26,36 @@ const CALCS = [
   { to: '/calculators/options',   icon: '⚖️', name: 'Options P&L',        desc: 'Options payoff analysis' },
 ]
 
+const QUOTES = [
+  { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+  { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" },
+  { text: "Price is what you pay. Value is what you get.", author: "Warren Buffett" },
+  { text: "Compound interest is the eighth wonder of the world. He who understands it, earns it. He who doesn't, pays it.", author: "Albert Einstein" },
+  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+  { text: "In investing, what is comfortable is rarely profitable.", author: "Robert Arnott" },
+  { text: "The market is a pendulum that forever swings between unsustainable optimism and unjustified pessimism.", author: "Benjamin Graham" },
+  { text: "Time in the market beats timing the market.", author: "Unknown" },
+  { text: "Risk comes from not knowing what you are doing.", author: "Warren Buffett" },
+  { text: "Bulls make money. Bears make money. Pigs get slaughtered.", author: "Wall Street Proverb" },
+]
+
 export default function Home() {
+  const [quoteIdx, setQuoteIdx] = useState(0)
+  const [fade, setFade] = useState(true)
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setFade(false)
+      setTimeout(() => {
+        setQuoteIdx(i => (i + 1) % QUOTES.length)
+        setFade(true)
+      }, 400)
+    }, 5000)
+    return () => clearInterval(t)
+  }, [])
+
+  const q = QUOTES[quoteIdx]
+
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
@@ -106,6 +135,31 @@ export default function Home() {
                   <div style={{ fontSize: 11, color: C.textSec }}>{c.desc}</div>
                 </div>
               </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+
+      {/* Quote section */}
+      <div style={{ padding: '60px 24px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+          <div style={{ fontSize: 24, color: C.textDim, marginBottom: 20, opacity: 0.4 }}>"</div>
+          <div style={{
+            fontSize: 16, color: C.text, lineHeight: 1.8, marginBottom: 20,
+            transition: 'opacity 0.4s',
+            opacity: fade ? 1 : 0,
+            fontStyle: 'italic',
+          }}>
+            {q.text}
+          </div>
+          <div style={{ fontSize: 11, color: C.amber, letterSpacing: 1.5, opacity: fade ? 1 : 0, transition: 'opacity 0.4s' }}>
+            — {q.author}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 20 }}>
+            {QUOTES.map((_, i) => (
+              <div key={i} onClick={() => { setQuoteIdx(i); setFade(true) }}
+                style={{ width: i === quoteIdx ? 20 : 6, height: 6, borderRadius: 3, background: i === quoteIdx ? C.amber : C.textDim, cursor: 'pointer', transition: 'all 0.3s' }} />
             ))}
           </div>
         </div>
