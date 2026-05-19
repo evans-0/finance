@@ -1,8 +1,14 @@
+// Twelve Data free tier: 800 credits/day, 8 req/min
+// 8 stocks × 15-min cache = ~384 credits/day — stays well within limits
+// Individual requests only (batch format is unreliable on free tier)
+
 const WATCHLIST = [
-  "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
-  "HINDUNILVR", "SBIN", "BHARTIARTL", "WIPRO", "ITC",
+  "RELIANCE", "TCS", "INFY", "HDFCBANK",
+  "ICICIBANK", "SBIN", "BHARTIARTL", "ITC",
 ]
-const CACHE_TTL = 60
+
+const WATCHLIST_CACHE_TTL = 900  // 15 minutes — conservative to protect daily limit
+const SEARCH_CACHE_TTL    = 120  // 2 minutes for individual searches
 
 function corsHeaders(origin, allowed) {
   return {
@@ -12,12 +18,20 @@ function corsHeaders(origin, allowed) {
   }
 }
 
-function parseTwelveQuote(symbol, q) {
+async function fetchQuote(symbol, apiKey) {
+  const r = await fetch(
+    `https://api.twelvedata.com/quote?symbol=${symbol}&exchange=NSE&apikey=${apiKey}`
+  )
+  if (!r.ok) return null
+  const q = await r.json()
   if (!q || q.status === "error" || q.code) return null
+
   const price = parseFloat(q.close) || parseFloat(q.previous_close) || 0
   if (!price) return null
   const prev = parseFloat(q.previous_close) || price
-  const pct  = q.percent_change ? parseFloat(q.percent_change) : prev ? ((price - prev) / prev) * 100 : 0
+  const pct  = q.percent_change ? parseFloat(q.percent_change)
+    : prev ? ((price - prev) / prev) * 100 : 0
+
   return {
     symbol, name: q.name || symbol,
     price: +price.toFixed(2), change: +(price - prev).toFixed(2),
@@ -26,18 +40,9 @@ function parseTwelveQuote(symbol, q) {
   }
 }
 
-async function fetchIndividual(symbol, apiKey) {
-  const r = await fetch(
-    `https://api.twelvedata.com/quote?symbol=${symbol}&exchange=NSE&apikey=${apiKey}`
-  )
-  if (!r.ok) return null
-  const q = await r.json()
-  return parseTwelveQuote(symbol, q)
-}
-
 async function fetchYahooQuote(symbol) {
-  const yahooSym = symbol.endsWith(".NS") ? symbol : `${symbol}.NS`
   try {
+    const yahooSym = symbol.endsWith(".NS") ? symbol : `${symbol}.NS`
     const r = await fetch(
       `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(yahooSym)}`,
       { headers: { "User-Agent": "Mozilla/5.0" } }
@@ -78,7 +83,7 @@ export async function onRequest({ request, env, waitUntil }) {
   const { searchParams } = new URL(request.url)
   const rawSymbol = searchParams.get("symbol")
 
-  // ── Single symbol (search) ────────────────────────────────────────────────────
+  // ── Single symbol lookup (search) ────────────────────────────────────────────
   if (rawSymbol) {
     const symbol = rawSymbol.trim().toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 25)
     if (!symbol) return new Response(JSON.stringify({ error: "Invalid symbol" }), {
@@ -90,7 +95,7 @@ export async function onRequest({ request, env, waitUntil }) {
     if (cached) {
       const data = await cached.json()
       return new Response(JSON.stringify(data), {
-        headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "HIT", ...cors },
+        headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${SEARCH_CACHE_TTL}`, "X-Cache": "HIT", ...cors },
       })
     }
 
@@ -101,55 +106,37 @@ export async function onRequest({ request, env, waitUntil }) {
 
     const body     = JSON.stringify([result])
     const response = new Response(body, {
-      headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "MISS", ...cors },
+      headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${SEARCH_CACHE_TTL}`, "X-Cache": "MISS", ...cors },
     })
     waitUntil(caches.default.put(cacheKey, response.clone()))
     return response
   }
 
-  // ── Watchlist: try batch first, fall back to individual requests ──────────────
+  // ── Watchlist — 8 individual requests, staggered to stay under rate limit ─────
   const cache    = caches.default
-  const cacheKey = new Request("https://cache.mktvision.internal/indian-v6")
+  const cacheKey = new Request("https://cache.mktvision.internal/indian-v7")
   const cached   = await cache.match(cacheKey)
   if (cached) {
     const data = await cached.json()
     return new Response(JSON.stringify(data), {
-      headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "HIT", ...cors },
+      headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${WATCHLIST_CACHE_TTL}`, "X-Cache": "HIT", ...cors },
     })
   }
 
-  let results = []
+  // Fire 4 + 4 with a gap — stays within 8/min rate limit
+  const half    = Math.ceil(WATCHLIST.length / 2)
+  const batchA  = await Promise.all(WATCHLIST.slice(0, half).map(s => fetchQuote(s, env.TWELVEDATA_KEY)))
+  await new Promise(r => setTimeout(r, 500))
+  const batchB  = await Promise.all(WATCHLIST.slice(half).map(s => fetchQuote(s, env.TWELVEDATA_KEY)))
+  const results = [...batchA, ...batchB].filter(Boolean)
 
-  // Try batch first (1 API call)
-  try {
-    const r = await fetch(
-      `https://api.twelvedata.com/quote?symbol=${WATCHLIST.join(",")}&exchange=NSE&apikey=${env.TWELVEDATA_KEY}`
-    )
-    if (r.ok) {
-      const data = await r.json()
-      results = WATCHLIST
-        .map(sym => parseTwelveQuote(sym, data[sym] || (data.symbol === sym ? data : null)))
-        .filter(Boolean)
-    }
-  } catch {}
-
-  // Fall back to individual requests for any missing stocks
-  if (results.length < WATCHLIST.length) {
-    const fetched  = new Set(results.map(r => r.symbol))
-    const missing  = WATCHLIST.filter(s => !fetched.has(s))
-    const fallbacks = await Promise.all(missing.map(s => fetchIndividual(s, env.TWELVEDATA_KEY)))
-    results.push(...fallbacks.filter(Boolean))
-  }
-
-  if (!results.length) {
-    return new Response(JSON.stringify({ error: "Service unavailable" }), {
-      status: 502, headers: { "Content-Type": "application/json", ...cors },
-    })
-  }
+  if (!results.length) return new Response(JSON.stringify({ error: "Service unavailable" }), {
+    status: 502, headers: { "Content-Type": "application/json", ...cors },
+  })
 
   const body     = JSON.stringify(results)
   const response = new Response(body, {
-    headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${CACHE_TTL}`, "X-Cache": "MISS", ...cors },
+    headers: { "Content-Type": "application/json", "Cache-Control": `public, max-age=${WATCHLIST_CACHE_TTL}`, "X-Cache": "MISS", ...cors },
   })
   waitUntil(cache.put(cacheKey, response.clone()))
   return response
