@@ -18,11 +18,12 @@ function TickerStrip() {
 
   const fetchTickers = async () => {
     try {
-      const [etfs, crypto, indian] = await Promise.all([
-        fetch('/api/stocks?symbols=SPY,QQQ,GLD').then(r => r.json()),
-        fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&order=market_cap_desc').then(r => r.json()),
-        fetch('/api/indian').then(r => r.json()).catch(() => []),
+      const [etfs, crypto, indianRaw] = await Promise.all([
+        fetch('/api/stocks?symbols=SPY,QQQ,GLD').then(r => r.json()).catch(() => []),
+        fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&order=market_cap_desc').then(r => r.json()).catch(() => []),
+        fetch('/api/indian').then(r => r.ok ? r.json() : []).catch(() => []),
       ])
+      const indian = Array.isArray(indianRaw) ? indianRaw : []
 
       const map = {}
 
