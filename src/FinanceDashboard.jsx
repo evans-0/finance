@@ -108,11 +108,13 @@ function Stat({ label, value, loading }) {
   )
 }
 
-function SectionHeader({ label, status, error }) {
+function SectionHeader({ label, status, error, wsStatus }) {
+  const color = wsStatus === 'connected' ? C.green : error ? C.red : wsStatus === 'connecting' ? C.amber : C.amber
+  const text  = wsStatus === 'connected' ? 'WS LIVE' : error ? 'ERROR' : wsStatus === 'connecting' ? 'LOADING' : status
   return (
     <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>{label}</span>
-      <span style={{ fontSize: 9, color: error ? C.red : C.green }}>● {error ? "ERROR" : status}</span>
+      <span style={{ fontSize: 9, color: color }}>● {text}</span>
     </div>
   )
 }
@@ -134,8 +136,10 @@ export default function FinanceDashboard() {
   const [newsLoading, setNewsLoading]     = useState(false)
   const [time, setTime]                   = useState(new Date())
   const [lastUpdated, setLastUpdated]     = useState(null)
+  const [wsStatus,     setWsStatus]       = useState('connecting')
 
   const [searchQuery, setSearchQuery]     = useState("")
+  const wsRef = useRef(null)
   const [searchResults, setSearchResults] = useState([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchOpen, setSearchOpen]       = useState(false)
@@ -451,7 +455,7 @@ export default function FinanceDashboard() {
             )}
           </div>
 
-          <SectionHeader label="EQUITIES" status="LIVE" error={stocksError} />
+          <SectionHeader label="EQUITIES" status="LIVE" error={stocksError} wsStatus={wsStatus} />
           {stocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={setSelected} />)}
 
           <SectionHeader label="INDIA · NSE" status="LIVE" error={indianError} />
