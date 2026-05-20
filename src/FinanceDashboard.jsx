@@ -198,6 +198,80 @@ export default function FinanceDashboard() {
     } catch {}
   }, [])
 
+  // WebSocket for real-time US stock prices
+  useEffect(() => {
+    let ws = null
+    let retryTimer = null
+
+    const connect = async () => {
+      try {
+        setWsStatus('connecting')
+        const r = await fetch('/api/wstoken')
+        if (!r.ok) throw new Error('token fetch failed')
+        const { token } = await r.json()
+        if (!token) throw new Error('no token')
+
+        ws = new WebSocket('wss://ws.finnhub.io?token=' + token)
+        wsRef.current = ws
+
+        ws.onopen = () => {
+          setWsStatus('connected')
+          STOCK_META.forEach(s => {
+            ws.send(JSON.stringify({ type: 'subscribe', symbol: s.symbol }))
+          })
+        }
+
+        ws.onmessage = (event) => {
+          const msg = JSON.parse(event.data)
+          if (msg.type !== 'trade' || !msg.data) return
+          setStocks(prev => {
+            let changed = false
+            const next = prev.map(stock => {
+              const trade = msg.data.find(t => t.s === stock.symbol)
+              if (!trade || stock.price === null) return stock
+              const newPrice = +trade.p.toFixed(2)
+              if (newPrice === stock.price) return stock
+              changed = true
+              const flash = newPrice > stock.price ? 'up' : 'down'
+              return { ...stock, price: newPrice, flash }
+            })
+            if (changed) {
+              // Clear flash after 700ms
+              setTimeout(() => {
+                setStocks(s => s.map(x => x.flash ? { ...x, flash: null } : x))
+              }, 700)
+            }
+            return changed ? next : prev
+          })
+        }
+
+        ws.onclose = () => {
+          setWsStatus('disconnected')
+          retryTimer = setTimeout(connect, 5000)
+        }
+
+        ws.onerror = () => ws.close()
+
+      } catch {
+        setWsStatus('disconnected')
+        retryTimer = setTimeout(connect, 8000)
+      }
+    }
+
+    connect()
+
+    return () => {
+      clearTimeout(retryTimer)
+      if (wsRef.current) {
+        STOCK_META.forEach(s => {
+          if (wsRef.current.readyState === WebSocket.OPEN)
+            wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbol: s.symbol }))
+        })
+        wsRef.current.close()
+      }
+    }
+  }, [])
+
   const fetchIndices = useCallback(async () => {
     try {
       const r = await fetch("/api/indices")
