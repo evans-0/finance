@@ -57,6 +57,13 @@ const CALCULATORS = [
     desc: 'Track assets and liabilities to know your true financial position. Visualise allocation with charts.',
     tags: ['Wealth', 'Personal Finance', 'Planning'],
   },
+  {
+    to: '/calculators/creditcard',
+    icon: String.fromCodePoint(0x1F4B3),
+    name: 'Credit Card Calculator',
+    desc: 'See the true cost of carrying a balance. Understand why 2%/month is actually 26.82% per year.',
+    tags: ['Credit Card', 'Debt', 'Financial Literacy'],
+  },
 ]
 
 export default function CalculatorsHub() {
