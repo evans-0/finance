@@ -10,19 +10,23 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 
 ## Features
 
+### Homepage
+- **Live ticker strip** — S&P 500, NASDAQ 100, BTC, ETH, Gold updating every 60 seconds
+- **Rotating finance quotes** — curated quotes from Buffett, Munger, Graham and others
+
 ### Markets Terminal
 - **Live US equities** — real-time quotes for AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN via Finnhub
-- **WebSocket prices** — US stock prices update tick-by-tick via Finnhub WebSocket during market hours. Rows flash green/red on price change
-- **Real historical charts** — 5D, 1M, 3M, 6M, 1Y and custom date range via Polygon.io. Hourly candles for 5D, daily for longer ranges
+- **WebSocket prices** — US stock prices update tick-by-tick during market hours. Rows flash green/red on price change
+- **Real historical charts** — 5D, 1M, 3M, 6M, 1Y and custom date range via Polygon.io
 - **Live Indian NSE stocks** — top NSE stocks with ₹ prices via Twelve Data
 - **Live crypto** — top 8 by market cap with 30-day charts via CoinGecko
 - **Live market indices** — S&P 500, NASDAQ, DOW, VIX via ETF proxies
 - **Universal search** — search any US ticker or NSE stock in one box
-- **Market news** — latest headlines per asset via Bing News RSS with Finnhub fallback
+- **Market news** — latest headlines per asset via Bing News RSS
 - **Mobile responsive** — tap a stock to see full detail view, back button to return to list
 - **Auto-refresh** — all data refreshes every 60 seconds
 
-### Financial Calculators (12 tools)
+### Financial Calculators (11 tools)
 
 | Calculator | Description |
 |---|---|
@@ -37,7 +41,6 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **Inflation Impact** | Purchasing power decay, goal inflator, everyday items table |
 | **FD vs Mutual Fund** | Post-tax, inflation-adjusted comparison with breakeven CAGR |
 | **ULIP vs Term + MF** | Why mixing insurance with investment costs you lakhs |
-| **Buy vs Rent** | *(coming soon)* |
 
 ---
 
@@ -49,7 +52,7 @@ Browser
    ├── /api/wstoken                      ──▶  Cloudflare Worker  ──▶  (serves Finnhub key securely)
    ├── /api/stocks?symbols=AAPL,MSFT     ──▶  Cloudflare Worker  ──▶  Finnhub REST API
    ├── /api/indices                       ──▶  Cloudflare Worker  ──▶  Finnhub API (ETF proxies)
-   ├── /api/indian?symbol=RELIANCE        ──▶  Cloudflare Worker  ──▶  Twelve Data API
+   ├── /api/indian                        ──▶  Cloudflare Worker  ──▶  Twelve Data API
    ├── /api/search?q=apple                ──▶  Cloudflare Worker  ──▶  Finnhub + Twelve Data
    ├── /api/chart?symbol=AAPL&range=1Y    ──▶  Cloudflare Worker  ──▶  Polygon.io API
    ├── /api/news?symbol=AAPL              ──▶  Cloudflare Worker  ──▶  Bing News RSS / Finnhub
@@ -177,7 +180,7 @@ npm run dev
 - **Indian stock refresh rate** — NSE prices update every 15 minutes to stay within Twelve Data's 800 credits/day free tier limit.
 - **Index absolute values** — Finnhub free tier returns zero for `^GSPC` etc. ETF proxies (SPY/QQQ/DIA) show accurate percentage change only.
 - **Polygon.io rate limit** — free tier allows 5 API calls/minute. Chart requests are debounced and cached to stay within limits.
-- **WebSocket market hours** — Finnhub WebSocket only streams trade data during US market hours (9:30 AM–4 PM ET / 7 PM–1:30 AM IST). Outside these hours prices update via REST polling.
+- **WebSocket market hours** — Finnhub WebSocket only streams during US market hours (9:30 AM–4 PM ET / 7 PM–1:30 AM IST).
 
 ---
 
