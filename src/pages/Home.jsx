@@ -26,10 +26,11 @@ function TickerStrip() {
 
       const map = {}
 
-      // ETF proxies
-      for (const sym of ['SPY', 'QQQ', 'GLD']) {
-        const s = etfs[sym]
-        if (s?.dp != null) map[sym] = +s.dp.toFixed(2)
+      // ETF proxies — Worker returns array not object
+      if (Array.isArray(etfs)) {
+        for (const s of etfs) {
+          if (s?.symbol && s?.pct != null) map[s.symbol] = +s.pct.toFixed(2)
+        }
       }
 
       // Crypto
