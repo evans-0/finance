@@ -1,6 +1,6 @@
 # MktVision — Markets Terminal & Financial Calculators
 
-A Bloomberg-style real-time markets dashboard combined with a financial literacy hub. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
+A Bloomberg-style real-time markets terminal combined with a financial literacy hub. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
 
 > **Live:** [mkt-vision.com](https://mkt-vision.com) · **Terminal:** [mkt-vision.com/dashboard](https://mkt-vision.com/dashboard) · **Calculators:** [mkt-vision.com/calculators](https://mkt-vision.com/calculators)
 
@@ -12,17 +12,17 @@ A Bloomberg-style real-time markets dashboard combined with a financial literacy
 
 ### Markets Terminal
 - **Live US equities** — real-time quotes for AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN via Finnhub
-- **Live Indian NSE stocks** — top 8 NSE stocks with ₹ prices via Twelve Data
-- **Live crypto** — top 8 by market cap with 30-day price charts via CoinGecko
-- **Live market indices** — S&P 500, NASDAQ, DOW, VIX percentage changes via ETF proxies
+- **WebSocket prices** — US stock prices update tick-by-tick via Finnhub WebSocket during market hours. Rows flash green/red on price change
+- **Real historical charts** — 5D, 1M, 3M, 6M, 1Y and custom date range via Polygon.io. Hourly candles for 5D, daily for longer ranges
+- **Live Indian NSE stocks** — top NSE stocks with ₹ prices via Twelve Data
+- **Live crypto** — top 8 by market cap with 30-day charts via CoinGecko
+- **Live market indices** — S&P 500, NASDAQ, DOW, VIX via ETF proxies
 - **Universal search** — search any US ticker or NSE stock in one box
-- **30-day price charts** — area charts for all assets using Recharts
-- **Market news** — latest headlines per selected asset via Finnhub
+- **Market news** — latest headlines per asset via Bing News RSS with Finnhub fallback
+- **Mobile responsive** — tap a stock to see full detail view, back button to return to list
 - **Auto-refresh** — all data refreshes every 60 seconds
 
-> **Note:** 30-day stock charts are simulated — Finnhub historical data requires a paid plan. Current prices, % change, high/low and all other data is live.
-
-### Financial Calculators (10 tools)
+### Financial Calculators (12 tools)
 
 | Calculator | Description |
 |---|---|
@@ -36,6 +36,8 @@ A Bloomberg-style real-time markets dashboard combined with a financial literacy
 | **Credit Card** | True cost of carrying a balance — minimum payment trap |
 | **Inflation Impact** | Purchasing power decay, goal inflator, everyday items table |
 | **FD vs Mutual Fund** | Post-tax, inflation-adjusted comparison with breakeven CAGR |
+| **ULIP vs Term + MF** | Why mixing insurance with investment costs you lakhs |
+| **Buy vs Rent** | *(coming soon)* |
 
 ---
 
@@ -44,12 +46,15 @@ A Bloomberg-style real-time markets dashboard combined with a financial literacy
 ```
 Browser
    │
-   ├── /api/stocks?symbols=AAPL,MSFT    ──▶  Cloudflare Worker  ──▶  Finnhub API
-   ├── /api/indices                      ──▶  Cloudflare Worker  ──▶  Finnhub API (ETF proxies)
-   ├── /api/indian?symbol=RELIANCE       ──▶  Cloudflare Worker  ──▶  Twelve Data API
-   ├── /api/search?q=apple               ──▶  Cloudflare Worker  ──▶  Finnhub + Twelve Data
-   ├── /api/news?symbol=AAPL             ──▶  Cloudflare Worker  ──▶  Finnhub News API
-   └── CoinGecko API                     ──▶  Direct (no key needed)
+   ├── /api/wstoken                      ──▶  Cloudflare Worker  ──▶  (serves Finnhub key securely)
+   ├── /api/stocks?symbols=AAPL,MSFT     ──▶  Cloudflare Worker  ──▶  Finnhub REST API
+   ├── /api/indices                       ──▶  Cloudflare Worker  ──▶  Finnhub API (ETF proxies)
+   ├── /api/indian?symbol=RELIANCE        ──▶  Cloudflare Worker  ──▶  Twelve Data API
+   ├── /api/search?q=apple                ──▶  Cloudflare Worker  ──▶  Finnhub + Twelve Data
+   ├── /api/chart?symbol=AAPL&range=1Y    ──▶  Cloudflare Worker  ──▶  Polygon.io API
+   ├── /api/news?symbol=AAPL              ──▶  Cloudflare Worker  ──▶  Bing News RSS / Finnhub
+   ├── wss://ws.finnhub.io                ──▶  Direct WebSocket   ──▶  Finnhub WebSocket
+   └── CoinGecko API                      ──▶  Direct (no key needed)
 ```
 
 API keys live exclusively in Cloudflare's environment variables — never shipped in the client bundle.
@@ -65,15 +70,19 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 | Hosting | Cloudflare Pages |
 | API proxy | Cloudflare Pages Functions (Workers) |
 | US stock data | [Finnhub](https://finnhub.io) (free tier) |
+| Real-time prices | [Finnhub WebSocket](https://finnhub.io/docs/api/websocket-trades) |
+| Historical charts | [Polygon.io](https://polygon.io) (free tier) |
 | Indian NSE data | [Twelve Data](https://twelvedata.com) (free tier) |
 | Crypto data | [CoinGecko](https://coingecko.com) (public API) |
+| Market news | Bing News RSS |
 
 ---
 
 ## Security
 
 - **No API keys in the frontend bundle** — all keys are server-side in Cloudflare Workers
-- **Origin locking** — Worker rejects requests from any domain other than `mkt-vision.com`
+- **WebSocket key** — served via `/api/wstoken` Worker at runtime, never hardcoded
+- **Origin locking** — Workers reject requests from any domain other than `mkt-vision.com`
 - **Input sanitization** — all symbol inputs sanitized and validated before reaching external APIs
 - **Server-side caching** — Cloudflare Workers Cache API prevents rate limit abuse
 - **Secrets** — keys stored as encrypted Secrets in Cloudflare, never visible after creation
@@ -89,10 +98,13 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 │       ├── indices.js     # Market indices → Finnhub (ETF proxies)
 │       ├── indian.js      # NSE stock quotes → Twelve Data
 │       ├── search.js      # Symbol search → Finnhub + Twelve Data
-│       └── news.js        # Market news → Finnhub
+│       ├── chart.js       # Historical OHLC → Polygon.io
+│       ├── news.js        # Market news → Bing RSS / Finnhub
+│       └── wstoken.js     # Finnhub WebSocket key endpoint
 ├── src/
 │   ├── components/
-│   │   └── Navbar.jsx
+│   │   ├── Navbar.jsx
+│   │   └── ErrorBoundary.jsx
 │   ├── pages/
 │   │   ├── Home.jsx
 │   │   ├── Dashboard.jsx
@@ -107,10 +119,13 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 │   │       ├── NetWorth.jsx
 │   │       ├── CreditCard.jsx
 │   │       ├── Inflation.jsx
-│   │       └── FDvsMF.jsx
+│   │       ├── FDvsMF.jsx
+│   │       └── ULIPvsTermMF.jsx
 │   ├── App.jsx
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx
+├── public/
+│   └── favicon.ico
 ├── index.html
 ├── package.json
 └── vite.config.js
@@ -126,6 +141,7 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 - A [Cloudflare](https://cloudflare.com) account (free)
 - A [Finnhub](https://finnhub.io) API key (free)
 - A [Twelve Data](https://twelvedata.com) API key (free)
+- A [Polygon.io](https://polygon.io) API key (free)
 
 ### Local development
 
@@ -147,6 +163,7 @@ npm run dev
 |---|---|---|
 | `FINNHUB_KEY` | Secret | Your Finnhub API key |
 | `TWELVEDATA_KEY` | Secret | Your Twelve Data API key |
+| `POLYGON_KEY` | Secret | Your Polygon.io API key |
 | `ALLOWED_ORIGIN` | Plaintext | `https://mkt-vision.com` |
 
 5. Redeploy — Cloudflare auto-deploys on every `git push`
@@ -155,10 +172,12 @@ npm run dev
 
 ## Known Limitations
 
-- **Stock chart data is simulated** — Finnhub historical candles require a paid plan. Charts use a seeded random walk from the live price.
+- **NSE historical charts** — Twelve Data free tier doesn't include historical OHLC. NSE charts use a simulated price path from the current live price.
 - **NSE search coverage** — Twelve Data free tier covers major NSE stocks. Less liquid tickers may not be available.
 - **Indian stock refresh rate** — NSE prices update every 15 minutes to stay within Twelve Data's 800 credits/day free tier limit.
 - **Index absolute values** — Finnhub free tier returns zero for `^GSPC` etc. ETF proxies (SPY/QQQ/DIA) show accurate percentage change only.
+- **Polygon.io rate limit** — free tier allows 5 API calls/minute. Chart requests are debounced and cached to stay within limits.
+- **WebSocket market hours** — Finnhub WebSocket only streams trade data during US market hours (9:30 AM–4 PM ET / 7 PM–1:30 AM IST). Outside these hours prices update via REST polling.
 
 ---
 
