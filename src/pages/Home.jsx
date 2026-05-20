@@ -16,7 +16,7 @@ function TickerStrip() {
   const [tickers, setTickers] = useState(TICKER_ORDER.map(sym => ({ sym, pct: null })))
   const timer = useRef(null)
 
-  const fetchTickers = async () => {
+  const fetchTickers = async (retryIndian = false) => {
     try {
       const [etfs, crypto, indianRaw] = await Promise.all([
         fetch('/api/stocks?symbols=SPY,QQQ,GLD').then(r => r.json()).catch(() => []),
@@ -24,6 +24,10 @@ function TickerStrip() {
         fetch('/api/indian').then(r => r.ok ? r.json() : []).catch(() => []),
       ])
       const indian = Array.isArray(indianRaw) ? indianRaw : []
+      // If Indian data is empty and this isn't already a retry, try again after 4s
+      if (!retryIndian && indian.length === 0) {
+        setTimeout(() => fetchTickers(true), 4000)
+      }
 
       const map = {}
 
