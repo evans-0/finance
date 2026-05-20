@@ -10,8 +10,18 @@ const C = {
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
 const INR = '\u20b9'
 const fmt = n => INR + Math.round(n).toLocaleString('en-IN')
+const fmtIN = n => {
+  if (!n || n === 0) return '0'
+  const s = Math.round(Math.abs(n)).toString()
+  if (s.length <= 3) return s
+  const last3 = s.slice(-3)
+  const rest  = s.slice(0, -3)
+  const parts = []
+  for (let i = rest.length; i > 0; i -= 2) parts.unshift(rest.slice(Math.max(0, i - 2), i))
+  return parts.join(',') + ',' + last3
+}
 
-function InputField({ label, value, onChange, min, max, step, suffix, disabled }) {
+function InputField({ label, value, onChange, min, max, step, suffix, disabled, isCurrency }) {
   return (
     <div style={{ marginBottom: 20, opacity: disabled ? 0.4 : 1 }}>
       <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 6 }}>{label}</label>
@@ -20,7 +30,8 @@ function InputField({ label, value, onChange, min, max, step, suffix, disabled }
           style={{ flex: 1, background: C.bg, border: '1px solid ' + C.border, color: C.text, padding: '8px 12px', fontSize: 13, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
         {suffix && <span style={{ fontSize: 13, color: C.textSec }}>{suffix}</span>}
       </div>
-      {!disabled && <input type="range" value={value} onChange={e => onChange(Number(e.target.value))} min={min} max={max} step={step} style={{ width: '100%', marginTop: 6, accentColor: C.amber }} />}
+      {isCurrency && value > 0 && <div style={{ fontSize: 11, color: C.amber, marginTop: 4, letterSpacing: 0.5 }}>{INR}{fmtIN(value)}</div>}
+      {!disabled && <input type="range" value={value} onChange={e => onChange(Number(e.target.value))} min={min} max={max} step={step} style={{ width: '100%', marginTop: isCurrency && value > 0 ? 4 : 6, accentColor: C.amber }} />}
     </div>
   )
 }
@@ -57,7 +68,7 @@ export default function SIP() {
   const [monthly,       setMonthly]       = useState(5000)
   const [rate,          setRate]          = useState(12)
   const [years,         setYears]         = useState(10)
-  const [expenseRatio,  setExpenseRatio]  = useState(0)
+  const [expenseRatio,  setExpenseRatio]  = useState(0.3)
   const [stepUpEnabled, setStepUpEnabled] = useState(false)
   const [stepUp,        setStepUp]        = useState(10)
   const [lumpsum,       setLumpsum]       = useState(0)
@@ -94,11 +105,11 @@ export default function SIP() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
           <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
             <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>INPUTS</div>
-            <InputField label={'MONTHLY INVESTMENT (' + INR + ')'} value={monthly} onChange={setMonthly} min={500}  max={200000} step={500}  />
+            <InputField label={'MONTHLY INVESTMENT (' + INR + ')'} value={monthly} onChange={setMonthly} min={500}  max={200000} step={500}  isCurrency />
             <InputField label="EXPECTED ANNUAL RETURN"             value={rate}    onChange={setRate}    min={1}    max={30}     step={0.5}  suffix="%" />
             <InputField label="TIME PERIOD"                        value={years}   onChange={setYears}   min={1}    max={40}     step={1}    suffix="YRS" />
             <InputField label="EXPENSE RATIO"               value={expenseRatio}   onChange={setExpenseRatio} min={0} max={3} step={0.05} suffix="%" />
-            <InputField label={'EXISTING LUMPSUM (' + INR + ') (optional)'} value={lumpsum} onChange={setLumpsum} min={0} max={10000000} step={10000} />
+            <InputField label={'EXISTING LUMPSUM (' + INR + ') (optional)'} value={lumpsum} onChange={setLumpsum} min={0} max={10000000} step={10000} isCurrency />
             {expenseRatio > 0 && (
               <div style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: 10, marginBottom: 16, fontSize: 10, color: C.textSec }}>
                 EFFECTIVE RETURN: <span style={{ color: C.amber }}>{Math.max(0, rate - expenseRatio).toFixed(2)}% p.a.</span> after {expenseRatio}% expense ratio
