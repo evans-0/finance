@@ -64,6 +64,13 @@ const CALCULATORS = [
     desc: 'See the true cost of carrying a balance. Understand why 2%/month is actually 26.82% per year.',
     tags: ['Credit Card', 'Debt', 'Financial Literacy'],
   },
+  {
+    to: '/calculators/inflation',
+    icon: String.fromCodePoint(0x1F4C9),
+    name: 'Inflation Impact',
+    desc: 'See how inflation silently erodes your purchasing power. Understand real returns and goal inflation.',
+    tags: ['Inflation', 'Purchasing Power', 'Financial Literacy'],
+  },
 ]
 
 export default function CalculatorsHub() {

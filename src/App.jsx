@@ -10,6 +10,7 @@ import Portfolio from './pages/calculators/Portfolio'
 import Options from './pages/calculators/Options'
 import NetWorth from './pages/calculators/NetWorth'
 import CreditCard from './pages/calculators/CreditCard'
+import Inflation from './pages/calculators/Inflation'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
       <Route path="/calculators/options"   element={<Options />} />
       <Route path="/calculators/networth"  element={<NetWorth />} />
       <Route path="/calculators/creditcard" element={<CreditCard />} />
+      <Route path="/calculators/inflation"   element={<Inflation />} />
     </Routes>
   )
 }
