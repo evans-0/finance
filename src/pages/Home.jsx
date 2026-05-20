@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Navbar from '../components/Navbar'
 
 const C = {
@@ -8,6 +8,64 @@ const C = {
   text: '#c8d8f0', textSec: '#506888', textDim: '#1e3050',
 }
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
+
+const TICKER_LABELS = { SPY: 'S&P 500', QQQ: 'NASDAQ 100', GLD: 'GOLD', BTC: 'BTC', ETH: 'ETH', NIFTYBEES: 'NIFTY 50' }
+const TICKER_ORDER = ['SPY', 'QQQ', 'NIFTYBEES', 'BTC', 'GLD', 'ETH']
+
+function TickerStrip() {
+  const [tickers, setTickers] = useState(TICKER_ORDER.map(sym => ({ sym, pct: null })))
+  const timer = useRef(null)
+
+  const fetchTickers = async () => {
+    try {
+      const [etfs, crypto, nifty] = await Promise.all([
+        fetch('/api/stocks?symbols=SPY,QQQ,GLD').then(r => r.json()),
+        fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&order=market_cap_desc').then(r => r.json()),
+        fetch('/api/indian?symbol=NIFTYBEES').then(r => r.json()).catch(() => null),
+      ])
+
+      const map = {}
+
+      // ETF proxies
+      for (const sym of ['SPY', 'QQQ', 'GLD']) {
+        const s = etfs[sym]
+        if (s?.dp != null) map[sym] = +s.dp.toFixed(2)
+      }
+
+      // Crypto
+      if (Array.isArray(crypto)) {
+        const btc = crypto.find(c => c.id === 'bitcoin')
+        const eth = crypto.find(c => c.id === 'ethereum')
+        if (btc?.price_change_percentage_24h != null) map['BTC'] = +btc.price_change_percentage_24h.toFixed(2)
+        if (eth?.price_change_percentage_24h != null) map['ETH'] = +eth.price_change_percentage_24h.toFixed(2)
+      }
+
+      // Nifty 50 via NIFTYBEES ETF
+      if (nifty?.pct != null) map['NIFTYBEES'] = +nifty.pct.toFixed(2)
+
+      setTickers(TICKER_ORDER.map(sym => ({ sym, pct: map[sym] ?? null })))
+    } catch {}
+  }
+
+  useEffect(() => {
+    fetchTickers()
+    timer.current = setInterval(fetchTickers, 60000)
+    return () => clearInterval(timer.current)
+  }, [])
+
+  return (
+    <div style={{ background: C.panel, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '10px 24px', display: 'flex', gap: 28, overflowX: 'auto', justifyContent: 'center', flexWrap: 'wrap' }}>
+      {tickers.map(({ sym, pct }) => (
+        <span key={sym} style={{ fontSize: 11, whiteSpace: 'nowrap' }}>
+          <span style={{ color: C.textSec }}>{TICKER_LABELS[sym]}&nbsp;</span>
+          <span style={{ color: pct == null ? C.textSec : pct >= 0 ? C.green : C.red }}>
+            {pct == null ? '...' : (pct >= 0 ? '+' : '') + pct + '%'}
+          </span>
+        </span>
+      ))}
+    </div>
+  )
+}
 
 const FEATURES = [
   { icon: '📈', title: 'Live US Equities', desc: 'Real-time quotes for AAPL, MSFT, NVDA, TSLA and more via Finnhub. Prices refresh every 60 seconds.' },
@@ -61,6 +119,8 @@ export default function Home() {
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
 
+      <TickerStrip />
+
       {/* Hero */}
       <div style={{ textAlign: 'center', padding: '80px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
         <div style={{ fontSize: 11, color: C.amber, letterSpacing: 3, marginBottom: 20 }}>MARKETS TERMINAL</div>
@@ -90,15 +150,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Live ticker strip */}
-      <div style={{ background: C.panel, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '10px 24px', display: 'flex', gap: 32, overflowX: 'auto', justifyContent: 'center', flexWrap: 'wrap' }}>
-        {[['AAPL', '+0.80%', true], ['BTC', '-0.18%', false], ['NIFTY 50', '+0.42%', true], ['ETH', '+0.54%', true], ['MSFT', '+0.38%', true], ['RELIANCE', '+1.2%', true]].map(([sym, pct, up]) => (
-          <span key={sym} style={{ fontSize: 11, whiteSpace: 'nowrap' }}>
-            <span style={{ color: C.textSec }}>{sym}&nbsp;</span>
-            <span style={{ color: up ? C.green : C.red }}>{pct}</span>
-          </span>
-        ))}
-      </div>
 
       {/* Features grid */}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '70px 24px' }}>
