@@ -160,7 +160,7 @@ export default function NetWorth() {
                     <Pie data={assetPieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={2}>
                       {assetPieData.map((_, i) => <Cell key={i} fill={ASSET_COLORS[i % ASSET_COLORS.length]} />)}
                     </Pie>
-                    <Tooltip formatter={v => [fmt(v), 'Value']} contentStyle={{ background: C.panel, border: '1px solid ' + C.border, fontFamily: MONO, fontSize: 11 }} />
+                    <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={{ background: '#0a1828', border: '1px solid ' + C.border, fontFamily: MONO, fontSize: 11 }} labelStyle={{ color: '#c8d8f0' }} itemStyle={{ color: '#c8d8f0' }} />
                     <Legend wrapperStyle={{ fontSize: 10, fontFamily: MONO }} />
                   </PieChart>
                 </ResponsiveContainer>
@@ -174,7 +174,7 @@ export default function NetWorth() {
                     <Pie data={liabilityPieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={2}>
                       {liabilityPieData.map((_, i) => <Cell key={i} fill={LIABILITY_COLORS[i % LIABILITY_COLORS.length]} />)}
                     </Pie>
-                    <Tooltip formatter={v => [fmt(v), 'Amount']} contentStyle={{ background: C.panel, border: '1px solid ' + C.border, fontFamily: MONO, fontSize: 11 }} />
+                    <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={{ background: '#0a1828', border: '1px solid ' + C.border, fontFamily: MONO, fontSize: 11 }} labelStyle={{ color: '#c8d8f0' }} itemStyle={{ color: '#c8d8f0' }} />
                     <Legend wrapperStyle={{ fontSize: 10, fontFamily: MONO }} />
                   </PieChart>
                 </ResponsiveContainer>
