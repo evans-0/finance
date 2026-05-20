@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import Navbar from '../components/Navbar'
 
 const C = {
@@ -88,6 +89,14 @@ const CALCULATORS = [
 ]
 
 export default function CalculatorsHub() {
+  const [query, setQuery] = useState('')
+  const filtered = CALCULATORS.filter(c =>
+    query === '' ||
+    c.name.toLowerCase().includes(query.toLowerCase()) ||
+    c.desc.toLowerCase().includes(query.toLowerCase()) ||
+    c.tags.some(t => t.toLowerCase().includes(query.toLowerCase()))
+  )
+
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
@@ -99,8 +108,27 @@ export default function CalculatorsHub() {
             Seven calculators for investors and traders. Plan investments, analyse trades, and make better financial decisions.
           </p>
         </div>
+        {/* Search */}
+        <div style={{ position: 'relative', marginBottom: 24 }}>
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search calculators..."
+            style={{ width: '100%', background: C.panel, border: `1px solid ${query ? C.amber : C.border}`, color: C.text, padding: '10px 40px 10px 16px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }}
+          />
+          {query
+            ? <span onClick={() => setQuery('')} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: C.textSec, fontSize: 16, lineHeight: 1 }}>×</span>
+            : <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: C.textSec, fontSize: 12 }}>🔍</span>
+          }
+        </div>
+        {filtered.length === 0 && (
+          <div style={{ fontSize: 12, color: C.textSec, textAlign: 'center', padding: '40px 0' }}>
+            No calculators found for "{query}"
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
-          {CALCULATORS.map(calc => (
+          {filtered.map(calc => (
             <Link key={calc.to} to={calc.to} style={{ textDecoration: 'none' }}>
               <div style={{
                 background: C.panel, border: '1px solid ' + C.border, borderRadius: 4,
