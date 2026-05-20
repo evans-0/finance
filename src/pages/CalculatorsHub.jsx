@@ -71,6 +71,13 @@ const CALCULATORS = [
     desc: 'See how inflation silently erodes your purchasing power. Understand real returns and goal inflation.',
     tags: ['Inflation', 'Purchasing Power', 'Financial Literacy'],
   },
+  {
+    to: '/calculators/fdvsmf',
+    icon: String.fromCodePoint(0x1F4CA),
+    name: 'FD vs Mutual Fund',
+    desc: 'Post-tax, inflation-adjusted comparison. See why FD tax drag makes a massive difference over 10+ years.',
+    tags: ['FD', 'Mutual Fund', 'Tax', 'Comparison'],
+  },
 ]
 
 export default function CalculatorsHub() {
