@@ -56,8 +56,8 @@ function calcFD(principal, rate, years, taxRate, inflation) {
 function calcMF(principal, cagr, years, inflation) {
   const maturity   = principal * Math.pow(1 + cagr / 100, years)
   const gain       = maturity - principal
-  const taxableGain = Math.max(0, gain - 100000)      // LTCG exemption ₹1L
-  const tax        = taxableGain * 0.10
+  const taxableGain = Math.max(0, gain - 125000)      // LTCG exemption ₹1.25L (Budget 2024)
+  const tax        = taxableGain * 0.125                 // 12.5% LTCG rate
   const postTax    = maturity - tax
   const realReturn = ((1 + cagr / 100) / (1 + inflation / 100) - 1) * 100
   const realValue  = principal * Math.pow(1 + realReturn / 100, years)
@@ -235,7 +235,7 @@ export default function FDvsMF() {
             {[
               ['Tax drag on FD', 'FD interest is added to your income every year and taxed at your slab rate. In the 30% slab, a 7% FD effectively yields only 4.9%.'],
               ['MF tax advantage', 'Equity MF gains are taxed only when you sell, at a flat 10% LTCG. The untaxed gains compound freely until redemption.'],
-              ['The 1 lakh exemption', 'First ₹1 lakh of long-term capital gains each year is tax-free. Strategic redemption and reinvestment can minimize tax further.'],
+              ['The 1 lakh exemption', 'First ₹1.25 lakh of long-term capital gains each year is tax-free (Budget 2024). Strategic redemption and reinvestment can minimize tax further.'],
               ['Risk vs Return', 'FD returns are guaranteed. MF returns are not — market can deliver less than expected. Higher potential return comes with volatility.'],
             ].map(([title, desc]) => (
               <div key={title} style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: 12 }}>

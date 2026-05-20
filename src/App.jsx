@@ -12,6 +12,7 @@ import NetWorth from './pages/calculators/NetWorth'
 import CreditCard from './pages/calculators/CreditCard'
 import Inflation from './pages/calculators/Inflation'
 import FDvsMF from './pages/calculators/FDvsMF'
+import ULIPvsTermMF from './pages/calculators/ULIPvsTermMF'
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/calculators/creditcard" element={<CreditCard />} />
       <Route path="/calculators/inflation"   element={<Inflation />} />
       <Route path="/calculators/fdvsmf"      element={<FDvsMF />} />
+      <Route path="/calculators/ulipvstermmf" element={<ULIPvsTermMF />} />
     </Routes>
   )
 }

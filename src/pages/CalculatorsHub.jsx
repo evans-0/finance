@@ -78,6 +78,13 @@ const CALCULATORS = [
     desc: 'Post-tax, inflation-adjusted comparison. See why FD tax drag makes a massive difference over 10+ years.',
     tags: ['FD', 'Mutual Fund', 'Tax', 'Comparison'],
   },
+  {
+    to: '/calculators/ulipvstermmf',
+    icon: String.fromCodePoint(0x1F6E1),
+    name: 'ULIP vs Term + MF',
+    desc: 'See why mixing insurance with investment costs you lakhs. Compare ULIP charges vs buying them separately.',
+    tags: ['ULIP', 'Term Insurance', 'Financial Literacy'],
+  },
 ]
 
 export default function CalculatorsHub() {
