@@ -144,6 +144,8 @@ export default function FinanceDashboard() {
   const [searchQuery, setSearchQuery]     = useState("")
   const wsRef     = useRef(null)
   const chartTimer = useRef(null)
+  const [isMobile,   setIsMobile]   = useState(window.innerWidth < 768)
+  const [showDetail, setShowDetail] = useState(false)
   const [searchResults, setSearchResults] = useState([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchOpen, setSearchOpen]       = useState(false)
@@ -204,6 +206,12 @@ export default function FinanceDashboard() {
         })
       }
     } catch {}
+  }, [])
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
   }, [])
 
   // WebSocket for real-time US stock prices
@@ -442,7 +450,7 @@ export default function FinanceDashboard() {
     <div style={{ background: C.bg, fontFamily: MONO, color: C.text, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
       {/* Header */}
-      <div style={{ background: C.panel, borderBottom: `1px solid ${C.border}`, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+      <div style={{ background: C.panel, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "8px 12px" : "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ color: C.amber, fontWeight: 700, fontSize: 15, letterSpacing: 3 }}>▐ MKTVISION</span>
           <span style={{ color: C.borderBright, fontSize: 20 }}>|</span>
@@ -473,7 +481,7 @@ export default function FinanceDashboard() {
       <div style={{ display: "flex", flex: 1 }}>
 
         {/* Sidebar */}
-        <div style={{ width: 210, minWidth: 210, borderRight: `1px solid ${C.border}`, background: C.panel, display: "flex", flexDirection: "column", overflowY: "auto" }}>
+        <div style={{ width: isMobile ? '100%' : 210, minWidth: isMobile ? '100%' : 210, borderRight: isMobile ? 'none' : `1px solid ${C.border}`, background: C.panel, display: isMobile && showDetail ? 'none' : "flex", flexDirection: "column", overflowY: "auto" }}>
 
           {/* Search */}
           <div ref={searchRef} style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, position: "relative" }}>
@@ -503,27 +511,32 @@ export default function FinanceDashboard() {
           </div>
 
           <SectionHeader label="EQUITIES" status="LIVE" error={stocksError} wsStatus={wsStatus} />
-          {stocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={setSelected} />)}
+          {stocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={a => { setSelected(a); if (isMobile) setShowDetail(true) }} />)}
 
           <SectionHeader label="INDIA · NSE" status="LIVE" error={indianError} />
           {indianLoading
             ? <div style={{ padding: "16px 12px", fontSize: 11, color: C.textDim, textAlign: "center" }}>fetching...</div>
-            : indianStocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={setSelected} />)
+            : indianStocks.map(s => <WatchRow key={s.id} asset={s} selected={selected?.id === s.id} onSelect={a => { setSelected(a); if (isMobile) setShowDetail(true) }} />)
           }
 
           <SectionHeader label="CRYPTO" status="LIVE" error={cryptoError} />
           {cryptoLoading
             ? <div style={{ padding: "16px 12px", fontSize: 11, color: C.textDim, textAlign: "center" }}>fetching...</div>
-            : cryptos.map(c => <WatchRow key={c.id} asset={c} selected={selected?.id === c.id} onSelect={setSelected} />)
+            : cryptos.map(c => <WatchRow key={c.id} asset={c} selected={selected?.id === c.id} onSelect={a => { setSelected(a); if (isMobile) setShowDetail(true) }} />)
           }
         </div>
 
         {/* Main */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div style={{ flex: 1, display: isMobile && !showDetail ? "none" : "flex", flexDirection: "column", minWidth: 0 }}>
 
           {/* Asset info */}
           <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "flex-end", gap: 32, flexWrap: "wrap" }}>
             <div>
+              {isMobile && (
+                <button onClick={() => setShowDetail(false)} style={{ background: 'none', border: `1px solid ${C.border}`, color: C.amber, padding: '4px 10px', fontSize: 10, fontFamily: MONO, cursor: 'pointer', borderRadius: 2, marginBottom: 10, letterSpacing: 1 }}>
+                  ← BACK
+                </button>
+              )}
               <div style={{ fontSize: 10, color: C.textSec, marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontWeight: 600, color: C.text }}>{selected?.name || "—"}</span>
                 {isIndian && <span style={{ fontSize: 9, color: C.amber }}>NSE</span>}
@@ -554,7 +567,7 @@ export default function FinanceDashboard() {
               {lastUpdated && <span style={{ fontSize: 9, color: C.textDim }}>UPDATED {lastUpdated.toLocaleTimeString("en-US", { hour12: false })}</span>}
             </div>
             {selected?.type === "stock" && (
-              <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 12, alignItems: "center", overflowX: "auto", paddingBottom: 4 }}>
                 {['5D','1M','3M','6M','1Y','CUSTOM'].map(r => (
                   <button key={r} onClick={() => setChartRange(r)} style={{
                     background: chartRange === r ? C.amber : C.bg,
@@ -652,7 +665,7 @@ export default function FinanceDashboard() {
                     <div style={{ fontSize: 10, color: u2 ? C.green : C.red, marginTop: 2 }}>
                       {a.stockLoading ? "..." : `${u2 ? "▲" : "▼"} ${Math.abs(p2 || 0).toFixed(2)}%`}
                     </div>
-                  </div>
+              </div>
                 )
               })}
             </div>
@@ -661,9 +674,9 @@ export default function FinanceDashboard() {
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px",kground: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
+      <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
         <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
-        <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
+        <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION EACT + RECHARTS</span>
       </div>
     </div>
   )
