@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import CalculatorsHub from './pages/CalculatorsHub'
@@ -16,6 +17,7 @@ import ULIPvsTermMF from './pages/calculators/ULIPvsTermMF'
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <Routes>
       <Route path="/"                      element={<Home />} />
       <Route path="/dashboard"             element={<Dashboard />} />
@@ -32,5 +34,6 @@ export default function App() {
       <Route path="/calculators/fdvsmf"      element={<FDvsMF />} />
       <Route path="/calculators/ulipvstermmf" element={<ULIPvsTermMF />} />
     </Routes>
+    </ErrorBoundary>
   )
 }

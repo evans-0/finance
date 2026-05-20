@@ -262,13 +262,18 @@ export default function FinanceDashboard() {
 
     return () => {
       clearTimeout(retryTimer)
-      if (wsRef.current) {
-        STOCK_META.forEach(s => {
-          if (wsRef.current.readyState === WebSocket.OPEN)
-            wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbol: s.symbol }))
-        })
-        wsRef.current.close()
-      }
+      try {
+        if (wsRef.current) {
+          STOCK_META.forEach(s => {
+            try {
+              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN)
+                wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbol: s.symbol }))
+            } catch (_) {}
+          })
+          wsRef.current.close()
+          wsRef.current = null
+        }
+      } catch (_) {}
     }
   }, [])
 
@@ -366,7 +371,7 @@ export default function FinanceDashboard() {
     fetch(`/api/news?symbol=${symbol}&type=${type}&name=${name}`)
       .then(r => r.json())
       .then(d => setNews(d.articles || []))
-      .catch(() => setNews([]))
+      .catch(e => { if (e?.name !== 'AbortError') setNews([]) })
       .finally(() => setNewsLoading(false))
   }, [selected?.id])
 
