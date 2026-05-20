@@ -132,6 +132,9 @@ export default function FinanceDashboard() {
   const [cryptoLoading, setCryptoLoading] = useState(true)
   const [cryptoError, setCryptoError]     = useState(false)
   const [chartLoading, setChartLoading]   = useState(false)
+  const [chartRange,   setChartRange]     = useState('1M')
+  const [customFrom,   setCustomFrom]     = useState('')
+  const [customTo,     setCustomTo]       = useState('')
   const [news, setNews]                   = useState([])
   const [newsLoading, setNewsLoading]     = useState(false)
   const [time, setTime]                   = useState(new Date())
@@ -363,16 +366,21 @@ export default function FinanceDashboard() {
 
     if (selected.type === "stock") {
       // Real historical data via Polygon.io
-      fetch(`/api/chart?symbol=${selected.symbol}`, { signal: ctrl.signal })
+      const rangeParam = chartRange === 'CUSTOM' && customFrom && customTo
+        ? `range=CUSTOM&from=${customFrom}&to=${customTo}`
+        : `range=${chartRange}`
+      fetch(`/api/chart?symbol=${selected.symbol}&${rangeParam}`, { signal: ctrl.signal })
         .then(r => r.json())
         .then(d => {
           if (d.candles && d.candles.length > 0) {
+            const isHourly = d.timespan === 'hour'
             setChart(d.candles.map(c => ({
-              t: new Date(c.t).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+              t: isHourly
+                ? new Date(c.t).toLocaleTimeString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+                : new Date(c.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
               p: c.c, o: c.o, h: c.h, l: c.l
             })))
           } else {
-            // fallback to mock if Polygon returns empty
             setChart(mkMockChart(selected.price || 150))
           }
         })
@@ -395,7 +403,7 @@ export default function FinanceDashboard() {
       .catch(() => setChart(mkMockChart(selected.current_price || 1)))
       .finally(() => setChartLoading(false))
     return () => ctrl.abort()
-  }, [selected?.id])
+  }, [selected?.id, chartRange, customFrom, customTo])
 
   // Fetch news when selection changes
   useEffect(() => {
@@ -539,6 +547,28 @@ export default function FinanceDashboard() {
               <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>30-DAY PRICE CHART</span>
               {lastUpdated && <span style={{ fontSize: 9, color: C.textDim }}>UPDATED {lastUpdated.toLocaleTimeString("en-US", { hour12: false })}</span>}
             </div>
+            {selected?.type === "stock" && (
+              <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+                {['5D','1M','3M','6M','1Y','CUSTOM'].map(r => (
+                  <button key={r} onClick={() => setChartRange(r)} style={{
+                    background: chartRange === r ? C.amber : C.bg,
+                    color: chartRange === r ? '#020c18' : C.textSec,
+                    border: `1px solid ${chartRange === r ? C.amber : C.border}`,
+                    padding: '3px 10px', fontSize: 10, fontFamily: 'monospace',
+                    cursor: 'pointer', borderRadius: 2, fontWeight: chartRange === r ? 700 : 400,
+                  }}>{r}</button>
+                ))}
+                {chartRange === 'CUSTOM' && (
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
+                      style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.text, padding: '3px 8px', fontSize: 10, fontFamily: 'monospace', borderRadius: 2, outline: 'none' }} />
+                    <span style={{ fontSize: 10, color: C.textSec }}>to</span>
+                    <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)}
+                      style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.text, padding: '3px 8px', fontSize: 10, fontFamily: 'monospace', borderRadius: 2, outline: 'none' }} />
+                  </div>
+                )}
+              </div>
+            )}
             {chartLoading
               ? <div style={{ height: 240, display: "flex", alignItems: "center", justifyContent: "center", color: C.textDim, fontSize: 12 }}>loading chart...</div>
               : (
