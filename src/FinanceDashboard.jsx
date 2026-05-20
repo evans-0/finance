@@ -361,8 +361,9 @@ export default function FinanceDashboard() {
     setNewsLoading(true)
     setNews([])
     const type   = selected.type === "crypto" ? "crypto" : selected.type === "indian" ? "indian" : "stock"
-    const symbol = selected.type === "stock" ? selected.symbol : ""
-    fetch(`/api/news?symbol=${symbol}&type=${type}`)
+    const symbol = selected.symbol || selected.id || ""
+    const name   = encodeURIComponent(selected.name || selected.symbol || "")
+    fetch(`/api/news?symbol=${symbol}&type=${type}&name=${name}`)
       .then(r => r.json())
       .then(d => setNews(d.articles || []))
       .catch(() => setNews([]))
