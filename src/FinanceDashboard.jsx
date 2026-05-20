@@ -240,12 +240,20 @@ export default function FinanceDashboard() {
               return { ...stock, price: newPrice, flash }
             })
             if (changed) {
-              // Clear flash after 700ms
               setTimeout(() => {
                 setStocks(s => s.map(x => x.flash ? { ...x, flash: null } : x))
               }, 700)
             }
             return changed ? next : prev
+          })
+          // Also update the main window if the selected stock changed
+          setSelected(prev => {
+            if (!prev || prev.type !== 'stock') return prev
+            const trade = msg.data.find(t => t.s === prev.symbol)
+            if (!trade) return prev
+            const newPrice = +trade.p.toFixed(2)
+            if (newPrice === prev.price) return prev
+            return { ...prev, price: newPrice }
           })
         }
 
