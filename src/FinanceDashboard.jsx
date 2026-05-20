@@ -644,7 +644,8 @@ export default function FinanceDashboard() {
                   >
                     <div style={{ fontSize: 11, fontWeight: 600, color: selected?.id === a.id ? C.amber : C.text }}>{(a.symbol || "").toUpperCase()}</div>
                     <div style={{ fontSize: 10, color: u2 ? C.green : C.red, marginTop: 2 }}>
-                      {a.stockLoading ? "..." : `${u2 ? "▲" : "▼"} ${Math.abs(p2 || 0).toFixed(2)}                    </div>
+                      {a.stockLoading ? "..." : `${u2 ? "▲" : "▼"} ${Math.abs(p2 || 0).toFixed(2)}%`}
+                    </div>
                   </div>
                 )
               })}
@@ -656,7 +657,7 @@ export default function FinanceDashboard() {
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
         <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
-        <span style={{ntSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
+        <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>
     </div>
   )
