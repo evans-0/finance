@@ -60,16 +60,21 @@ export default function SIP() {
   const [expenseRatio,  setExpenseRatio]  = useState(0)
   const [stepUpEnabled, setStepUpEnabled] = useState(false)
   const [stepUp,        setStepUp]        = useState(10)
+  const [lumpsum,       setLumpsum]       = useState(0)
 
-  const { futureValue, invested } = calcSIP(monthly, rate, years, stepUp, stepUpEnabled, expenseRatio)
-  const returns = futureValue - invested
+  const lumpsumFV = lumpsum > 0 ? lumpsum * Math.pow(1 + Math.max(0, rate - expenseRatio) / 100, years) : 0
+  const { futureValue: sipFV, invested } = calcSIP(monthly, rate, years, stepUp, stepUpEnabled, expenseRatio)
+  const futureValue = sipFV + lumpsumFV
+  const totalInvested = invested + lumpsum
+  const returns = futureValue - totalInvested
 
   const chartData = Array.from({ length: years }, (_, i) => {
     const yr     = i + 1
     const normal = calcSIP(monthly, rate, yr, stepUp, false,         expenseRatio)
     const step   = calcSIP(monthly, rate, yr, stepUp, stepUpEnabled, expenseRatio)
-    const row    = { year: 'Yr ' + yr, invested: Math.round(step.invested), value: Math.round(step.futureValue) }
-    if (stepUpEnabled) row.noStepUp = Math.round(normal.futureValue)
+    const lumpsumAtYr = lumpsum > 0 ? lumpsum * Math.pow(1 + Math.max(0, rate - expenseRatio) / 100, yr) : 0
+    const row    = { year: 'Yr ' + yr, invested: Math.round(step.invested + lumpsum), value: Math.round(step.futureValue + lumpsumAtYr) }
+    if (stepUpEnabled) row.noStepUp = Math.round(normal.futureValue + lumpsumAtYr)
     return row
   })
 
@@ -93,6 +98,7 @@ export default function SIP() {
             <InputField label="EXPECTED ANNUAL RETURN"             value={rate}    onChange={setRate}    min={1}    max={30}     step={0.5}  suffix="%" />
             <InputField label="TIME PERIOD"                        value={years}   onChange={setYears}   min={1}    max={40}     step={1}    suffix="YRS" />
             <InputField label="EXPENSE RATIO"               value={expenseRatio}   onChange={setExpenseRatio} min={0} max={3} step={0.05} suffix="%" />
+            <InputField label={'EXISTING LUMPSUM (' + INR + ') (optional)'} value={lumpsum} onChange={setLumpsum} min={0} max={10000000} step={10000} />
             {expenseRatio > 0 && (
               <div style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: 10, marginBottom: 16, fontSize: 10, color: C.textSec }}>
                 EFFECTIVE RETURN: <span style={{ color: C.amber }}>{Math.max(0, rate - expenseRatio).toFixed(2)}% p.a.</span> after {expenseRatio}% expense ratio
@@ -106,7 +112,7 @@ export default function SIP() {
             <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24, marginBottom: 20 }}>
               <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>RESULTS</div>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-                {[['INVESTED AMOUNT', fmt(invested)], ['ESTIMATED RETURNS', fmt(returns)]].map(([l, v]) => (
+                {[['INVESTED AMOUNT', fmt(totalInvested)], ['ESTIMATED RETURNS', fmt(returns)]].map(([l, v]) => (
                   <div key={l} style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: '14px', flex: 1 }}>
                     <div style={{ fontSize: 9, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>{l}</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{v}</div>
@@ -119,9 +125,9 @@ export default function SIP() {
               </div>
               <div style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: 12 }}>
                 <div style={{ fontSize: 10, color: C.textSec, marginBottom: 4 }}>WEALTH GAIN RATIO</div>
-                <div style={{ fontSize: 22, color: C.green, fontWeight: 700 }}>{(futureValue / invested).toFixed(2)}x</div>
+                <div style={{ fontSize: 22, color: C.green, fontWeight: 700 }}>{(futureValue / totalInvested).toFixed(2)}x</div>
                 <div style={{ fontSize: 10, color: C.textDim, marginTop: 4 }}>
-                  {fmt(monthly)}/mo{stepUpEnabled ? ' + ' + stepUp + '% step-up' : ''} for {years}yr at {rate}%{expenseRatio > 0 ? ' (net ' + Math.max(0, rate - expenseRatio).toFixed(2) + '%)' : ''}
+                  {fmt(monthly)}/mo{stepUpEnabled ? ' + ' + stepUp + '% step-up' : ''}{lumpsum > 0 ? ' + ' + fmt(lumpsum) + ' lumpsum' : ''} for {years}yr at {rate}%{expenseRatio > 0 ? ' (net ' + Math.max(0, rate - expenseRatio).toFixed(2) + '%)' : ''}
                 </div>
               </div>
             </div>
