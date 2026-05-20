@@ -357,20 +357,45 @@ export default function FinanceDashboard() {
 
   useEffect(() => {
     if (!selected) return
+    const ctrl = new AbortController()
     setChartLoading(true)
-    if (selected.type === "stock" || selected.type === "indian") {
+    setChart([])
+
+    if (selected.type === "stock") {
+      // Real historical data via Polygon.io
+      fetch(`/api/chart?symbol=${selected.symbol}`, { signal: ctrl.signal })
+        .then(r => r.json())
+        .then(d => {
+          if (d.candles && d.candles.length > 0) {
+            setChart(d.candles.map(c => ({
+              t: new Date(c.t).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+              p: c.c, o: c.o, h: c.h, l: c.l
+            })))
+          } else {
+            // fallback to mock if Polygon returns empty
+            setChart(mkMockChart(selected.price || 150))
+          }
+        })
+        .catch(() => setChart(mkMockChart(selected.price || 150)))
+        .finally(() => setChartLoading(false))
+      return () => ctrl.abort()
+    }
+
+    if (selected.type === "indian") {
+      // NSE historical not available on free tier — use mock
       const base = selected.price || 150
       const timer = setTimeout(() => { setChart(mkMockChart(base)); setChartLoading(false) }, 200)
       return () => clearTimeout(timer)
     }
-    const ctrl = new AbortController()
+
+    // Crypto: CoinGecko
     fetch(`https://api.coingecko.com/api/v3/coins/${selected.id}/market_chart?vs_currency=usd&days=30&interval=daily`, { signal: ctrl.signal })
       .then(r => r.json())
       .then(d => setChart(d.prices.map(([ts, p]) => ({ t: new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" }), p: +p.toFixed(6) }))))
       .catch(() => setChart(mkMockChart(selected.current_price || 1)))
       .finally(() => setChartLoading(false))
     return () => ctrl.abort()
-  }, [selected])
+  }, [selected?.id])
 
   // Fetch news when selection changes
   useEffect(() => {
