@@ -109,7 +109,7 @@ export default function CreditCard() {
 
         {/* Education banner */}
         <div style={{ background: '#1a0a0a', border: '1px solid ' + C.red, borderRadius: 4, padding: '14px 16px', marginBottom: 28, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-          <span style={{ fontSize: 18 }}>\u26a0\ufe0f</span>
+          <span style={{ fontSize: 18 }}>{String.fromCodePoint(0x26A0)}</span>
           <div style={{ fontSize: 11, color: '#ffaaaa', lineHeight: 1.7 }}>
             <strong style={{ color: C.red }}>2% per month sounds small.</strong> It is actually {effectiveAnnualRate}% per year after compounding.
             Most people only pay the minimum — which barely covers the interest and keeps you in debt for years.
@@ -142,7 +142,7 @@ export default function CreditCard() {
 
             {!canPayOff && (
               <div style={{ background: '#1a0505', border: '1px solid ' + C.red, borderRadius: 3, padding: 10, marginTop: 12, fontSize: 11, color: C.red }}>
-                \u26a0\ufe0f Your payment ({fmt(customPay)}) is less than the monthly interest ({fmt(interestOnly)}). The debt will NEVER be cleared — it will keep growing.
+                {String.fromCodePoint(0x26A0)} Your payment ({fmt(customPay)}) is less than the monthly interest ({fmt(interestOnly)}). The debt will NEVER be cleared — it will keep growing.
               </div>
             )}
           </div>
