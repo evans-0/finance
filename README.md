@@ -1,8 +1,8 @@
-# MktVision - Markets Terminal
+# MktVision — Markets Terminal & Financial Calculators
 
-A Bloomberg-style real-time markets dashboard with financial calculators. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
+A Bloomberg-style real-time markets dashboard combined with a financial literacy hub. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
 
-> **Live:** [mkt-vision.com](https://mkt-vision.com) · **Terminal:** [mkt-vision.com/dashboard](https://mkt-vision.com/dashboard)
+> **Live:** [mkt-vision.com](https://mkt-vision.com) · **Terminal:** [mkt-vision.com/dashboard](https://mkt-vision.com/dashboard) · **Calculators:** [mkt-vision.com/calculators](https://mkt-vision.com/calculators)
 
 ![MktVision Dashboard](screenshot.png)
 
@@ -17,17 +17,25 @@ A Bloomberg-style real-time markets dashboard with financial calculators. Built 
 - **Live market indices** — S&P 500, NASDAQ, DOW, VIX percentage changes via ETF proxies
 - **Universal search** — search any US ticker or NSE stock in one box
 - **30-day price charts** — area charts for all assets using Recharts
+- **Market news** — latest headlines per selected asset via Finnhub
 - **Auto-refresh** — all data refreshes every 60 seconds
 
 > **Note:** 30-day stock charts are simulated — Finnhub historical data requires a paid plan. Current prices, % change, high/low and all other data is live.
 
-### Financial Calculators
-- **SIP Calculator** — future value of systematic investments with growth chart
-- **EMI Calculator** — loan repayments with yearly amortization breakdown
-- **Compound Interest** — compare annual, quarterly and monthly compounding
-- **Stock Returns** — P&L, absolute return and CAGR including brokerage costs
-- **Portfolio Allocator** — visualise holdings with a pie chart
-- **Options P&L** — call/put payoff diagram with breakeven and key levels
+### Financial Calculators (10 tools)
+
+| Calculator | Description |
+|---|---|
+| **SIP** | Future value with step-up SIP, expense ratio and lumpsum |
+| **EMI** | Loan repayments with yearly amortization breakdown |
+| **Compound Interest** | Compare annual, quarterly and monthly compounding |
+| **Stock Returns** | P&L, absolute return and CAGR including brokerage |
+| **Portfolio Allocator** | Holdings visualisation with pie chart |
+| **Options P&L** | Call/put payoff diagram with breakeven and key levels |
+| **Net Worth** | Assets vs liabilities with allocation charts |
+| **Credit Card** | True cost of carrying a balance — minimum payment trap |
+| **Inflation Impact** | Purchasing power decay, goal inflator, everyday items table |
+| **FD vs Mutual Fund** | Post-tax, inflation-adjusted comparison with breakeven CAGR |
 
 ---
 
@@ -95,7 +103,11 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 │   │       ├── Compound.jsx
 │   │       ├── StockReturn.jsx
 │   │       ├── Portfolio.jsx
-│   │       └── Options.jsx
+│   │       ├── Options.jsx
+│   │       ├── NetWorth.jsx
+│   │       ├── CreditCard.jsx
+│   │       ├── Inflation.jsx
+│   │       └── FDvsMF.jsx
 │   ├── App.jsx
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx
