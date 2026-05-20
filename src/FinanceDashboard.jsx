@@ -142,7 +142,8 @@ export default function FinanceDashboard() {
   const [wsStatus,     setWsStatus]       = useState('connecting')
 
   const [searchQuery, setSearchQuery]     = useState("")
-  const wsRef = useRef(null)
+  const wsRef     = useRef(null)
+  const chartTimer = useRef(null)
   const [searchResults, setSearchResults] = useState([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchOpen, setSearchOpen]       = useState(false)
@@ -360,7 +361,10 @@ export default function FinanceDashboard() {
 
   useEffect(() => {
     if (!selected) return
+    clearTimeout(chartTimer.current)
     const ctrl = new AbortController()
+
+    chartTimer.current = setTimeout(() => {
     setChartLoading(true)
     setChart([])
 
@@ -402,7 +406,9 @@ export default function FinanceDashboard() {
       .then(d => setChart(d.prices.map(([ts, p]) => ({ t: new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" }), p: +p.toFixed(6) }))))
       .catch(() => setChart(mkMockChart(selected.current_price || 1)))
       .finally(() => setChartLoading(false))
-    return () => ctrl.abort()
+    }, 400) // debounce — wait 400ms before firing Polygon request
+
+    return () => { clearTimeout(chartTimer.current); ctrl.abort() }
   }, [selected?.id, chartRange, customFrom, customTo])
 
   // Fetch news when selection changes
@@ -655,7 +661,7 @@ export default function FinanceDashboard() {
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
+      <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px",kground: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
         <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
         <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>

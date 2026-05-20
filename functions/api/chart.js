@@ -1,4 +1,4 @@
-const CACHE_TIMES = { '5D': 300, '1M': 3600, '3M': 7200, '6M': 14400, '1Y': 86400 }
+const CACHE_TIMES = { '5D': 900, '1M': 7200, '3M': 21600, '6M': 43200, '1Y': 86400 }
 
 function corsHeaders(origin, allowed) {
   return {
