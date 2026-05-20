@@ -10,45 +10,52 @@ const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
 const CALCULATORS = [
   {
     to: '/calculators/sip',
-    icon: '📅',
+    icon: '\ud83d\udcc5',
     name: 'SIP Calculator',
-    desc: 'Calculate the future value of your systematic investment plan. See how small monthly investments grow over time.',
+    desc: 'Calculate the future value of your systematic investment plan. Includes step-up and expense ratio.',
     tags: ['Investing', 'Mutual Funds', 'Long Term'],
   },
   {
     to: '/calculators/emi',
-    icon: '🏦',
+    icon: '\ud83c\udfe6',
     name: 'EMI Calculator',
     desc: 'Calculate your monthly loan repayments for home, car, or personal loans. Understand total interest payable.',
     tags: ['Loans', 'Debt', 'Banking'],
   },
   {
     to: '/calculators/compound',
-    icon: '📈',
+    icon: '\ud83d\udcc8',
     name: 'Compound Interest',
     desc: 'See the power of compounding across different frequencies. Compare annual, quarterly and monthly compounding.',
     tags: ['Growth', 'Savings', 'FD/RD'],
   },
   {
     to: '/calculators/returns',
-    icon: '💹',
+    icon: '\ud83d\udcb9',
     name: 'Stock Returns',
     desc: 'Analyse trade performance including brokerage, taxes. Calculate absolute return, CAGR and profit/loss.',
     tags: ['Stocks', 'Trading', 'P&L'],
   },
   {
     to: '/calculators/portfolio',
-    icon: '🥧',
+    icon: '\ud83e\udd67',
     name: 'Portfolio Allocator',
     desc: 'Enter your holdings and visualise allocation. See which stocks dominate your portfolio and rebalance.',
     tags: ['Portfolio', 'Allocation', 'Diversification'],
   },
   {
     to: '/calculators/options',
-    icon: '⚖️',
+    icon: '\u2696\ufe0f',
     name: 'Options P&L',
     desc: 'Calculate call and put option payoffs at expiry. Find breakeven points and max profit/loss scenarios.',
     tags: ['Derivatives', 'Options', 'F&O'],
+  },
+  {
+    to: '/calculators/networth',
+    icon: '\ud83d\udcb0',
+    name: 'Net Worth Calculator',
+    desc: 'Track assets and liabilities to know your true financial position. Visualise allocation with charts.',
+    tags: ['Wealth', 'Personal Finance', 'Planning'],
   },
 ]
 
@@ -61,14 +68,14 @@ export default function CalculatorsHub() {
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 10 }}>CALCULATORS</div>
           <h1 style={{ fontSize: 28, fontWeight: 700, color: C.text, marginBottom: 10 }}>Financial Calculators</h1>
           <p style={{ fontSize: 12, color: C.textSec, lineHeight: 1.8 }}>
-            Six calculators for investors and traders. Plan investments, analyse trades, and make better financial decisions.
+            Seven calculators for investors and traders. Plan investments, analyse trades, and make better financial decisions.
           </p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
           {CALCULATORS.map(calc => (
             <Link key={calc.to} to={calc.to} style={{ textDecoration: 'none' }}>
               <div style={{
-                background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4,
+                background: C.panel, border: '1px solid ' + C.border, borderRadius: 4,
                 padding: '24px', height: '100%', boxSizing: 'border-box', cursor: 'pointer',
                 transition: 'border-color 0.15s',
               }}
@@ -81,7 +88,7 @@ export default function CalculatorsHub() {
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {calc.tags.map(tag => (
                     <span key={tag} style={{
-                      fontSize: 9, color: C.textSec, border: `1px solid ${C.border}`,
+                      fontSize: 9, color: C.textSec, border: '1px solid ' + C.border,
                       padding: '2px 6px', borderRadius: 2, letterSpacing: 0.5,
                     }}>{tag}</span>
                   ))}

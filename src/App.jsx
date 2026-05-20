@@ -8,6 +8,7 @@ import Compound from './pages/calculators/Compound'
 import StockReturn from './pages/calculators/StockReturn'
 import Portfolio from './pages/calculators/Portfolio'
 import Options from './pages/calculators/Options'
+import NetWorth from './pages/calculators/NetWorth'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
       <Route path="/calculators/returns"   element={<StockReturn />} />
       <Route path="/calculators/portfolio" element={<Portfolio />} />
       <Route path="/calculators/options"   element={<Options />} />
+      <Route path="/calculators/networth"  element={<NetWorth />} />
     </Routes>
   )
 }
