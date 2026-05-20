@@ -9,25 +9,19 @@ const C = {
 }
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
 
-const TICKER_LABELS = { SPY: 'S&P 500', QQQ: 'NASDAQ 100', GLD: 'GOLD', BTC: 'BTC', ETH: 'ETH', RELIANCE: 'RELIANCE', HDFCBANK: 'HDFC BANK' }
-const TICKER_ORDER = ['SPY', 'QQQ', 'BTC', 'ETH', 'RELIANCE', 'HDFCBANK', 'GLD']
+const TICKER_LABELS = { SPY: 'S&P 500', QQQ: 'NASDAQ 100', GLD: 'GOLD', BTC: 'BTC', ETH: 'ETH' }
+const TICKER_ORDER = ['SPY', 'QQQ', 'BTC', 'ETH', 'GLD']
 
 function TickerStrip() {
   const [tickers, setTickers] = useState(TICKER_ORDER.map(sym => ({ sym, pct: null })))
   const timer = useRef(null)
 
-  const fetchTickers = async (retryIndian = false) => {
+  const fetchTickers = async () => {
     try {
       const [etfs, crypto, indianRaw] = await Promise.all([
         fetch('/api/stocks?symbols=SPY,QQQ,GLD').then(r => r.json()).catch(() => []),
         fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&order=market_cap_desc').then(r => r.json()).catch(() => []),
-        fetch('/api/indian').then(r => r.ok ? r.json() : []).catch(() => []),
       ])
-      const indian = Array.isArray(indianRaw) ? indianRaw : []
-      // If Indian data is empty and this isn't already a retry, try again after 4s
-      if (!retryIndian && indian.length === 0) {
-        setTimeout(() => fetchTickers(true), 4000)
-      }
 
       const map = {}
 
@@ -46,12 +40,7 @@ function TickerStrip() {
         if (eth?.price_change_percentage_24h != null) map['ETH'] = +eth.price_change_percentage_24h.toFixed(2)
       }
 
-      // Indian stocks from batch endpoint
-      if (Array.isArray(indian)) {
-        for (const s of indian) {
-          if (s?.symbol && s?.pct != null) map[s.symbol] = +s.pct.toFixed(2)
-        }
-      }
+
 
       setTickers(TICKER_ORDER.map(sym => ({ sym, pct: map[sym] ?? null })))
     } catch {}
