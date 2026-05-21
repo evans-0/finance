@@ -3,8 +3,7 @@
 // Individual requests only (batch format is unreliable on free tier)
 
 const WATCHLIST = [
-  "RELIANCE", "TCS", "INFY", "HDFCBANK",
-  "ICICIBANK", "SBIN", "BHARTIARTL", "ITC",
+  "INFY",
 ]
 
 const WATCHLIST_CACHE_TTL = 900  // 15 minutes — conservative to protect daily limit
@@ -114,7 +113,7 @@ export async function onRequest({ request, env, waitUntil }) {
 
   // ── Watchlist — 8 individual requests, staggered to stay under rate limit ─────
   const cache    = caches.default
-  const cacheKey = new Request("https://cache.mktvision.internal/indian-v9")
+  const cacheKey = new Request("https://cache.mktvision.internal/indian-v10")
   const cached   = await cache.match(cacheKey)
   if (cached) {
     const data = await cached.json()
@@ -125,17 +124,8 @@ export async function onRequest({ request, env, waitUntil }) {
 
   // Fire 4 + 4 with a gap — stays within 8/min rate limit
   const half    = Math.ceil(WATCHLIST.length / 2)
-  const batchA = []
-  for (const s of WATCHLIST.slice(0, half)) {
-    batchA.push(await fetchQuote(s, env.TWELVEDATA_KEY))
-    await new Promise(r => setTimeout(r, 150))
-  }
-  await new Promise(r => setTimeout(r, 1200))
+  const batchA = await Promise.all(WATCHLIST.map(s => fetchQuote(s, env.TWELVEDATA_KEY)))
   const batchB = []
-  for (const s of WATCHLIST.slice(half)) {
-    batchB.push(await fetchQuote(s, env.TWELVEDATA_KEY))
-    await new Promise(r => setTimeout(r, 150))
-  }
   const results = [...batchA, ...batchB].filter(Boolean)
 
   if (!results.length) return new Response(JSON.stringify({ error: "Service unavailable" }), {
