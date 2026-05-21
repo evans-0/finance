@@ -26,10 +26,10 @@ async function fetchQuote(symbol, apiKey) {
   const q = await r.json()
   if (!q || q.status === "error" || q.code) return null
 
-  const price = parseFloat(q.close) || parseFloat(q.previous_close) || 0
+  const price = parseFloat(q.close) || parseFloat(q.previous_close) || parseFloat(q.last_price) || parseFloat(q.price) || 0
   if (!price) return null
   const prev = parseFloat(q.previous_close) || price
-  const pct  = q.percent_change ? parseFloat(q.percent_change)
+  const pct  = q.percent_change && q.percent_change !== 'N/A' ? parseFloat(q.percent_change)
     : prev ? ((price - prev) / prev) * 100 : 0
 
   return {
@@ -114,7 +114,7 @@ export async function onRequest({ request, env, waitUntil }) {
 
   // ── Watchlist — 8 individual requests, staggered to stay under rate limit ─────
   const cache    = caches.default
-  const cacheKey = new Request("https://cache.mktvision.internal/indian-v7")
+  const cacheKey = new Request("https://cache.mktvision.internal/indian-v9")
   const cached   = await cache.match(cacheKey)
   if (cached) {
     const data = await cached.json()
@@ -125,9 +125,17 @@ export async function onRequest({ request, env, waitUntil }) {
 
   // Fire 4 + 4 with a gap — stays within 8/min rate limit
   const half    = Math.ceil(WATCHLIST.length / 2)
-  const batchA  = await Promise.all(WATCHLIST.slice(0, half).map(s => fetchQuote(s, env.TWELVEDATA_KEY)))
-  await new Promise(r => setTimeout(r, 500))
-  const batchB  = await Promise.all(WATCHLIST.slice(half).map(s => fetchQuote(s, env.TWELVEDATA_KEY)))
+  const batchA = []
+  for (const s of WATCHLIST.slice(0, half)) {
+    batchA.push(await fetchQuote(s, env.TWELVEDATA_KEY))
+    await new Promise(r => setTimeout(r, 150))
+  }
+  await new Promise(r => setTimeout(r, 1200))
+  const batchB = []
+  for (const s of WATCHLIST.slice(half)) {
+    batchB.push(await fetchQuote(s, env.TWELVEDATA_KEY))
+    await new Promise(r => setTimeout(r, 150))
+  }
   const results = [...batchA, ...batchB].filter(Boolean)
 
   if (!results.length) return new Response(JSON.stringify({ error: "Service unavailable" }), {
