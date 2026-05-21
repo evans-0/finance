@@ -563,7 +563,11 @@ export default function FinanceDashboard() {
           {/* Chart */}
           <div style={{ flex: 1, padding: "16px 16px 8px", minHeight: 280 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-              <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>30-DAY PRICE CHART</span>
+              <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>
+                {selected?.type === 'stock'
+                  ? ({ '5D': '5-DAY', '1M': '1-MONTH', '3M': '3-MONTH', '6M': '6-MONTH', '1Y': '1-YEAR', 'CUSTOM': 'CUSTOM' }[chartRange] || '30-DAY') + ' PRICE CHART'
+                  : '30-DAY PRICE CHART'}
+              </span>
               {lastUpdated && <span style={{ fontSize: 9, color: C.textDim }}>UPDATED {lastUpdated.toLocaleTimeString("en-US", { hour12: false })}</span>}
             </div>
             {selected?.type === "stock" && (
@@ -665,7 +669,7 @@ export default function FinanceDashboard() {
                     <div style={{ fontSize: 10, color: u2 ? C.green : C.red, marginTop: 2 }}>
                       {a.stockLoading ? "..." : `${u2 ? "▲" : "▼"} ${Math.abs(p2 || 0).toFixed(2)}%`}
                     </div>
-              </div>
+                  </div>
                 )
               })}
             </div>
@@ -675,8 +679,8 @@ export default function FinanceDashboard() {
 
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
-        <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
-        <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION EACT + RECHARTS</span>
+        <span style={{ fontSize: 10, color: C.tim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
+        <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>
     </div>
   )
