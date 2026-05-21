@@ -452,10 +452,9 @@ export default function FinanceDashboard() {
       {/* Header */}
       <div style={{ background: C.panel, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "8px 12px" : "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ color: C.amber, fontWeight: 700, fontSize: 15, letterSpacing: 3 }}>▐ MKTVISION</span>
+          <Link to="/" style={{ color: C.amber, fontWeight: 700, fontSize: 15, letterSpacing: 3, textDecoration: "none" }}>▐ MKTVISION</Link>
           <span style={{ color: C.borderBright, fontSize: 20 }}>|</span>
           <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 2 }}>MARKETS TERMINAL</span>
-          <Link to="/" style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, textDecoration: "none", marginLeft: 8 }}>HOME</Link>
           <Link to="/calculators" style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, textDecoration: "none" }}>CALCULATORS</Link>
         </div>
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
@@ -679,7 +678,7 @@ export default function FinanceDashboard() {
 
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
-        <span style={{ fontSize: 10, color: C.tim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
+        <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
         <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>
     </div>
