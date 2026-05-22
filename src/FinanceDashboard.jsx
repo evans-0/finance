@@ -131,7 +131,8 @@ export default function FinanceDashboard() {
   const [indianLoading, setIndianLoading] = useState(true)
   const [cryptoLoading, setCryptoLoading] = useState(true)
   const [cryptoError, setCryptoError]     = useState(false)
-  const [chartLoading, setChartLoading]   = useState(false)
+  const [chartLoading,   setChartLoading]  = useState(false)
+  const [isSimulated,   setIsSimulated]   = useState(false)
   const [chartRange,   setChartRange]     = useState('1M')
   const [customFrom,   setCustomFrom]     = useState('')
   const [customTo,     setCustomTo]       = useState('')
@@ -392,11 +393,13 @@ export default function FinanceDashboard() {
                 : new Date(c.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
               p: c.c, o: c.o, h: c.h, l: c.l
             })))
+            setIsSimulated(false)
           } else {
             setChart(mkMockChart(selected.price || 150))
+            setIsSimulated(true)
           }
         })
-        .catch(() => setChart(mkMockChart(selected.price || 150)))
+        .catch(() => { setChart(mkMockChart(selected.price || 150)); setIsSimulated(true) })
         .finally(() => setChartLoading(false))
       return () => ctrl.abort()
     }
@@ -404,15 +407,15 @@ export default function FinanceDashboard() {
     if (selected.type === "indian") {
       // NSE historical not available on free tier — use mock
       const base = selected.price || 150
-      const timer = setTimeout(() => { setChart(mkMockChart(base)); setChartLoading(false) }, 200)
+      const timer = setTimeout(() => { setChart(mkMockChart(base)); setIsSimulated(true); setChartLoading(false) }, 200)
       return () => clearTimeout(timer)
     }
 
     // Crypto: CoinGecko
     fetch(`https://api.coingecko.com/api/v3/coins/${selected.id}/market_chart?vs_currency=usd&days=30&interval=daily`, { signal: ctrl.signal })
       .then(r => r.json())
-      .then(d => setChart(d.prices.map(([ts, p]) => ({ t: new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" }), p: +p.toFixed(6) }))))
-      .catch(() => setChart(mkMockChart(selected.current_price || 1)))
+      .then(d => { setChart(d.prices.map(([ts, p]) => ({ t: new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" }), p: +p.toFixed(6) }))); setIsSimulated(false) })
+      .catch(() => { setChart(mkMockChart(selected.current_price || 1)); setIsSimulated(true) })
       .finally(() => setChartLoading(false))
     }, 400) // debounce — wait 400ms before firing Polygon request
 
@@ -456,6 +459,7 @@ export default function FinanceDashboard() {
           <span style={{ color: C.borderBright, fontSize: 20 }}>|</span>
           <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 2 }}>MARKETS TERMINAL</span>
           <Link to="/calculators" style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, textDecoration: "none" }}>CALCULATORS</Link>
+          <Link to="/glossary" style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, textDecoration: "none" }}>GLOSSARY</Link>
         </div>
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
           {(indices.length ? indices : [
@@ -567,7 +571,8 @@ export default function FinanceDashboard() {
                   ? ({ '5D': '5-DAY', '1M': '1-MONTH', '3M': '3-MONTH', '6M': '6-MONTH', '1Y': '1-YEAR', 'CUSTOM': 'CUSTOM' }[chartRange] || '30-DAY') + ' PRICE CHART'
                   : '30-DAY PRICE CHART'}
               </span>
-              {lastUpdated && <span style={{ fontSize: 9, color: C.textDim }}>UPDATED {lastUpdated.toLocaleTimeString("en-US", { hour12: false })}</span>}
+              {isSimulated && <span style={{ fontSize: 9, color: C.amber, background: '#1a1200', border: '1px solid #3a2800', padding: '2px 6px', borderRadius: 2, letterSpacing: 1 }}>SIMULATED</span>}
+              {lastUpdated && !isSimulated && <span style={{ fontSize: 9, color: C.textDim }}>UPDATED {lastUpdated.toLocaleTimeString("en-US", { hour12: false })}</span>}
             </div>
             {selected?.type === "stock" && (
               <div style={{ display: "flex", gap: 6, marginBottom: 12, alignItems: "center", overflowX: "auto", paddingBottom: 4 }}>
