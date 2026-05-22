@@ -19,6 +19,7 @@ export default function Navbar() {
       <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
         <Link to="/dashboard" style={{ color: isActive('/dashboard') ? C.amber : C.textSec, fontSize: 10, textDecoration: 'none', letterSpacing: 1.5, fontWeight: 500, borderBottom: `1px solid ${isActive('/dashboard') ? C.amber : 'transparent'}` }}>TERMINAL</Link>
         <Link to="/calculators" style={{ color: isActive('/calculators') ? C.amber : C.textSec, fontSize: 10, textDecoration: 'none', letterSpacing: 1.5, fontWeight: 500, borderBottom: `1px solid ${isActive('/calculators') ? C.amber : 'transparent'}` }}>CALC</Link>
+        <Link to="/glossary" style={{ color: isActive('/glossary') ? C.amber : C.textSec, fontSize: 10, textDecoration: 'none', letterSpacing: 1.5, fontWeight: 500, borderBottom: `1px solid ${isActive('/glossary') ? C.amber : 'transparent'}` }}>GLOSSARY</Link>
         <a href="https://github.com/evans-0/finance" target="_blank" rel="noopener noreferrer" style={{ color: C.textSec, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
           <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
             <path d={GH_PATH} />
