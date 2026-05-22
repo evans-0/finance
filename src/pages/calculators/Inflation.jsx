@@ -91,7 +91,7 @@ export default function Inflation() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(12px, 3vw, 24px)' }}>
         <Link to="/calculators" style={{ fontSize: 11, color: C.textSec, textDecoration: 'none', letterSpacing: 1 }}>back to CALCULATORS</Link>
         <div style={{ marginTop: 24, marginBottom: 12 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 8 }}>CALCULATOR</div>
@@ -109,7 +109,7 @@ export default function Inflation() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 28 }}>
           {/* Inputs */}
           <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
             <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>INPUTS</div>
@@ -187,7 +187,7 @@ export default function Inflation() {
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24, marginTop: 24 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 1.5, marginBottom: 4 }}>GOAL COST INFLATOR</div>
           <div style={{ fontSize: 10, color: C.textDim, marginBottom: 20 }}>How much will something cost in the future?</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 20 }}>
             <div>
               <InputField label={'CURRENT COST (' + INR + ')'} value={goalCost} onChange={setGoalCost} min={1000} max={50000000} step={10000} />
               <InputField label="YEARS FROM NOW" value={goalYears} onChange={setGoalYears} min={1} max={30} step={1} suffix="YRS" />
@@ -215,7 +215,7 @@ export default function Inflation() {
         {/* Common items table */}
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24, marginTop: 24 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 1.5, marginBottom: 16 }}>EVERYDAY ITEMS — TODAY vs {goalYears} YEARS AT {inflation}% INFLATION</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', overflowX: 'auto', gap: 0 }}>
             {['ITEM', 'TODAY', 'IN ' + goalYears + ' YEARS', 'INCREASE'].map(h => (
               <div key={h} style={{ fontSize: 9, color: C.textDim, padding: '6px 8px', borderBottom: '1px solid ' + C.border, letterSpacing: 0.5 }}>{h}</div>
             ))}

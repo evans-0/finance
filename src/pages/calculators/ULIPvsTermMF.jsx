@@ -140,7 +140,7 @@ export default function ULIPvsTermMF() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
-      <div style={{ maxWidth: 1050, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 1050, margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(12px, 3vw, 24px)' }}>
         <Link to="/calculators" style={{ fontSize: 11, color: C.textSec, textDecoration: 'none', letterSpacing: 1 }}>back to CALCULATORS</Link>
         <div style={{ marginTop: 24, marginBottom: 12 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 8 }}>CALCULATOR</div>
@@ -158,7 +158,7 @@ export default function ULIPvsTermMF() {
         </div>
 
         {/* Inputs */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 20, marginBottom: 24 }}>
           {/* Common */}
           <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 20 }}>
             <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 16 }}>YOUR DETAILS</div>
@@ -254,7 +254,7 @@ export default function ULIPvsTermMF() {
         {/* Key facts */}
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 20 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 1.5, marginBottom: 16 }}>WHY TERM + MF ALMOST ALWAYS WINS</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 10 }}>
             {[
               ['ULIP charges are layered', 'Premium allocation charge, fund management charge, mortality charge and policy admin charge all compound against you. Total charges over 20 years can exceed the original investment.'],
               ['Term insurance is cheap', 'A ₹1 Cr term cover for a 30-year-old costs under ₹10,000/year. ULIPs bundle expensive insurance you are overpaying for.'],

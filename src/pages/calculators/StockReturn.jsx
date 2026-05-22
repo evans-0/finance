@@ -59,7 +59,7 @@ export default function StockReturn() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(12px, 3vw, 24px)' }}>
         <Link to="/calculators" style={{ fontSize: 11, color: C.textSec, textDecoration: 'none', letterSpacing: 1 }}>← CALCULATORS</Link>
         <div style={{ marginTop: 24, marginBottom: 36 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 8 }}>CALCULATOR</div>
@@ -67,14 +67,14 @@ export default function StockReturn() {
           <p style={{ fontSize: 12, color: C.textSec }}>Analyse trade performance including brokerage costs and CAGR</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 28 }}>
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
             <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>TRADE DETAILS</div>
             <InputField label="BUY PRICE"    value={buyPrice}  onChange={setBuyPrice}  min={0.01} step={0.5}  prefix="₹" />
             <InputField label="SELL PRICE"   value={sellPrice} onChange={setSellPrice} min={0.01} step={0.5}  prefix="₹" />
             <InputField label="QUANTITY"     value={qty}       onChange={setQty}       min={1}    step={1}              />
             <InputField label="BROKERAGE"    value={brokerage} onChange={setBrokerage} min={0}    step={0.01} suffix="%" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 6 }}>BUY DATE</label>
                 <input type="date" value={buyDate} onChange={e => setBuyDate(e.target.value)}

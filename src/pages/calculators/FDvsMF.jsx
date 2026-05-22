@@ -105,7 +105,7 @@ export default function FDvsMF() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
-      <div style={{ maxWidth: 1050, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 1050, margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(12px, 3vw, 24px)' }}>
         <Link to="/calculators" style={{ fontSize: 11, color: C.textSec, textDecoration: 'none', letterSpacing: 1 }}>back to CALCULATORS</Link>
         <div style={{ marginTop: 24, marginBottom: 12 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 8 }}>CALCULATOR</div>
@@ -121,7 +121,7 @@ export default function FDvsMF() {
         </div>
 
         {/* Inputs */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 20, marginBottom: 24 }}>
           {/* Common */}
           <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 20 }}>
             <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 16 }}>COMMON</div>
@@ -136,7 +136,7 @@ export default function FDvsMF() {
             <InputField label="FD INTEREST RATE" value={fdRate} onChange={setFdRate} min={3} max={10} step={0.25} suffix="% p.a." color={C.blue} hint="SBI: 6.5-7%" />
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 8 }}>INCOME TAX SLAB</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 6 }}>
                 {TAX_SLABS.map(t => (
                   <button key={t} onClick={() => setTaxSlab(t)} style={{
                     background: taxSlab === t ? C.blue : C.bg, color: taxSlab === t ? '#fff' : C.textSec,
@@ -231,7 +231,7 @@ export default function FDvsMF() {
         {/* Key insights */}
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 20 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 1.5, marginBottom: 16 }}>KEY INSIGHTS</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 10 }}>
             {[
               ['Tax drag on FD', 'FD interest is added to your income every year and taxed at your slab rate. In the 30% slab, a 7% FD effectively yields only 4.9%.'],
               ['MF tax advantage', 'Equity MF gains are taxed only when you sell, at a flat 10% LTCG. The untaxed gains compound freely until redemption.'],

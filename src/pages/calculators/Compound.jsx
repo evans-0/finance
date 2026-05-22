@@ -58,7 +58,7 @@ export default function Compound() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(12px, 3vw, 24px)' }}>
         <Link to="/calculators" style={{ fontSize: 11, color: C.textSec, textDecoration: 'none', letterSpacing: 1 }}>← CALCULATORS</Link>
         <div style={{ marginTop: 24, marginBottom: 36 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 8 }}>CALCULATOR</div>
@@ -66,7 +66,7 @@ export default function Compound() {
           <p style={{ fontSize: 12, color: C.textSec }}>See the power of compounding across different frequencies</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 28 }}>
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
             <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 24 }}>INPUTS</div>
             <InputField label="PRINCIPAL AMOUNT"    value={principal} onChange={setPrincipal} min={1000}  max={10000000} step={1000} prefix="₹" />
@@ -74,7 +74,7 @@ export default function Compound() {
             <InputField label="TIME PERIOD"          value={years}    onChange={setYears}     min={1}     max={40}       step={1}    suffix="YRS" />
             <div style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 8 }}>COMPOUNDING FREQUENCY</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 8 }}>
                 {FREQUENCIES.map(f => (
                   <button key={f.n} onClick={() => setFreq(f.n)}
                     style={{ background: freq === f.n ? C.amber : C.bg, color: freq === f.n ? '#020c18' : C.textSec, border: `1px solid ${freq === f.n ? C.amber : C.border}`, padding: '8px', fontSize: 10, fontFamily: MONO, cursor: 'pointer', borderRadius: 3, letterSpacing: 0.5 }}>
@@ -91,7 +91,7 @@ export default function Compound() {
               <div style={{ fontSize: 10, color: C.textSec, marginBottom: 6 }}>FINAL AMOUNT</div>
               <div style={{ fontSize: 32, fontWeight: 700, color: C.amber }}>{fmt(finalAmount)}</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 12 }}>
               {[['PRINCIPAL', fmt(principal)], ['INTEREST EARNED', fmt(totalInt)], ['GROWTH', (finalAmount / principal).toFixed(2) + 'x'], ['EFFECTIVE RATE', ((Math.pow(1 + rate / 100 / freq, freq) - 1) * 100).toFixed(2) + '%']].map(([l, v]) => (
                 <div key={l} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: 12 }}>
                   <div style={{ fontSize: 9, color: C.textSec, marginBottom: 4 }}>{l}</div>
