@@ -54,8 +54,15 @@ const FLOW_STEPS = [
 ]
 
 function OrderFlow() {
-  const [active, setActive] = useState(-1)
+  const [active,  setActive]  = useState(-1)
   const [running, setRunning] = useState(false)
+  const [mobile,  setMobile]  = useState(window.innerWidth < 600)
+
+  useEffect(() => {
+    const onResize = () => setMobile(window.innerWidth < 600)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const run = () => {
     if (running) return
@@ -72,28 +79,48 @@ function OrderFlow() {
   return (
     <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
       <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>WHAT HAPPENS WHEN YOU CLICK "BUY"</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexWrap: 'wrap', marginBottom: 24 }}>
-        {FLOW_STEPS.map((step, i) => (
-          <div key={step.id} style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{
-              textAlign: 'center', padding: '12px 16px', borderRadius: 4, minWidth: 100,
-              background: active >= i ? step.color + '22' : C.bg,
-              border: `1px solid ${active >= i ? step.color : C.border}`,
-              transition: 'all 0.3s',
-            }}>
-              <div style={{ fontSize: 20, marginBottom: 4 }}>{step.icon}</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: active >= i ? step.color : C.textSec }}>{step.label}</div>
-              <div style={{ fontSize: 9, color: C.textSec, marginTop: 2 }}>{step.sub}</div>
-            </div>
-            {i < FLOW_STEPS.length - 1 && (
-              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, width: 32 }}>
-                <div style={{ flex: 1, height: 2, background: active > i ? C.green : C.border, transition: 'background 0.3s' }} />
-                <div style={{ fontSize: 10, color: active > i ? C.green : C.border, lineHeight: 1, transition: 'color 0.3s', marginLeft: -1 }}>▶</div>
+      {/* Desktop: horizontal row */}
+      {!mobile && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 24 }}>
+          {FLOW_STEPS.map((step, i) => (
+            <div key={step.id} style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ textAlign: 'center', padding: '12px 16px', borderRadius: 4, minWidth: 100, background: active >= i ? step.color + '22' : C.bg, border: `1px solid ${active >= i ? step.color : C.border}`, transition: 'all 0.3s' }}>
+                <div style={{ fontSize: 20, marginBottom: 4 }}>{step.icon}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: active >= i ? step.color : C.textSec }}>{step.label}</div>
+                <div style={{ fontSize: 9, color: C.textSec, marginTop: 2 }}>{step.sub}</div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              {i < FLOW_STEPS.length - 1 && (
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, width: 32 }}>
+                  <div style={{ flex: 1, height: 2, background: active > i ? C.green : C.border, transition: 'background 0.3s' }} />
+                  <div style={{ fontSize: 10, color: active > i ? C.green : C.border, lineHeight: 1, transition: 'color 0.3s', marginLeft: -1 }}>▶</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Mobile: vertical column */}
+      {mobile && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0, marginBottom: 24 }}>
+          {FLOW_STEPS.map((step, i) => (
+            <div key={step.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '10px 12px', borderRadius: 4, background: active >= i ? step.color + '22' : C.bg, border: `1px solid ${active >= i ? step.color : C.border}`, transition: 'all 0.3s' }}>
+                <span style={{ fontSize: 20 }}>{step.icon}</span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: active >= i ? step.color : C.textSec }}>{step.label}</div>
+                  <div style={{ fontSize: 10, color: C.textSec }}>{step.sub}</div>
+                </div>
+              </div>
+              {i < FLOW_STEPS.length - 1 && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: 28 }}>
+                  <div style={{ width: 2, flex: 1, background: active > i ? C.green : C.border, transition: 'background 0.3s' }} />
+                  <div style={{ fontSize: 10, color: active > i ? C.green : C.border, lineHeight: 1, transition: 'color 0.3s' }}>▼</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       <button onClick={run} disabled={running} style={{
         background: running ? C.bg : C.amber, color: running ? C.textSec : '#020c18',
         border: `1px solid ${running ? C.border : C.amber}`, padding: '8px 20px',
