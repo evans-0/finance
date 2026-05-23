@@ -11,6 +11,7 @@ import Portfolio from './pages/calculators/Portfolio'
 import Options from './pages/calculators/Options'
 import NetWorth from './pages/calculators/NetWorth'
 import Glossary from './pages/Glossary'
+import HowMarketsWork from './pages/HowMarketsWork'
 import CreditCard from './pages/calculators/CreditCard'
 import Inflation from './pages/calculators/Inflation'
 import FDvsMF from './pages/calculators/FDvsMF'
@@ -31,6 +32,7 @@ export default function App() {
       <Route path="/calculators/options"   element={<Options />} />
       <Route path="/calculators/networth"  element={<NetWorth />} />
       <Route path="/glossary"               element={<Glossary />} />
+      <Route path="/how-markets-work"       element={<HowMarketsWork />} />
       <Route path="/calculators/creditcard" element={<CreditCard />} />
       <Route path="/calculators/inflation"   element={<Inflation />} />
       <Route path="/calculators/fdvsmf"      element={<FDvsMF />} />
