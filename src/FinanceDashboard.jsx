@@ -682,7 +682,7 @@ export default function FinanceDashboard() {
         </div>
       </div>
 
-      {/* Foot/}
+      {/* Footer */}
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "5px 16px", background: C.panel, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
         <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
         <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
