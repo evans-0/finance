@@ -1,10 +1,10 @@
-# MktVision — Markets Terminal & Financial Calculators
-
-[![Deployed on Cloudflare Pages](https://img.shields.io/badge/deployed-cloudflare%20pages-orange?logo=cloudflare&logoColor=white)](https://mkt-vision.com)
+# MktVision — Markets Terminal & Financial Hub
 
 A Bloomberg-style real-time markets terminal combined with a financial literacy hub. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
 
-> **Live:** [mkt-vision.com](https://mkt-vision.com) · **Terminal:** [mkt-vision.com/dashboard](https://mkt-vision.com/dashboard) · **Calculators:** [mkt-vision.com/calculators](https://mkt-vision.com/calculators)
+> **Live:** [mkt-vision.com](https://mkt-vision.com) · **Terminal:** [mkt-vision.com/dashboard](https://mkt-vision.com/dashboard)
+
+[![Deployed on Cloudflare Pages](https://img.shields.io/badge/deployed-cloudflare%20pages-orange?logo=cloudflare&logoColor=white)](https://mkt-vision.com)
 
 ![MktVision Dashboard](screenshot.png)
 
@@ -13,36 +13,47 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 ## Features
 
 ### Homepage
-- **Live ticker strip** — S&P 500, NASDAQ 100, BTC, ETH, Gold updating every 60 seconds
-- **Rotating finance quotes** — curated quotes from Buffett, Munger, Graham and others
+- Live ticker — S&P 500, NASDAQ 100, BTC, ETH, Gold updating every 60 seconds
+- Rotating finance quotes from Buffett, Munger, Graham and others
 
-### Markets Terminal
-- **Live US equities** — real-time quotes for AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN via Finnhub
-- **WebSocket prices** — US stock prices update tick-by-tick during market hours. Rows flash green/red on price change
-- **Real historical charts** — 5D, 1M, 3M, 6M, 1Y and custom date range via Polygon.io
-- **Live Indian NSE stocks** — top NSE stocks with ₹ prices via Twelve Data
+### Markets Terminal (`/dashboard`)
+- **Live US equities** — AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN via Finnhub
+- **WebSocket prices** — tick-by-tick updates during US market hours (7 PM–1:30 AM IST). Rows flash green/red on price change
+- **Real historical charts** — 5D (hourly), 1M, 3M, 6M, 1Y, Custom via Polygon.io. SIMULATED badge on non-real charts
+- **Live Indian NSE** — INFY via Twelve Data (free tier limitation)
 - **Live crypto** — top 8 by market cap with 30-day charts via CoinGecko
-- **Live market indices** — S&P 500, NASDAQ, DOW, VIX via ETF proxies
-- **Universal search** — search any US ticker or NSE stock in one box
-- **Market news** — latest headlines per asset via Bing News RSS
-- **Mobile responsive** — tap a stock to see full detail view, back button to return to list
-- **Auto-refresh** — all data refreshes every 60 seconds
+- **Market indices** — S&P 500, NASDAQ, DOW, VIX via ETF proxies (SPY/QQQ/DIA)
+- **Universal search** — US ticker (Finnhub) + NSE (Twelve Data) in one box
+- **Market news** — Bing RSS with Finnhub fallback
+- **Mobile responsive** — tap stock → full detail, ← BACK to list
 
-### Financial Calculators (11 tools)
+### Financial Calculators (`/calculators`)
 
-| Calculator | Description |
+| Calculator | Key Features |
 |---|---|
-| **SIP** | Future value with step-up SIP, expense ratio and lumpsum |
-| **EMI** | Loan repayments with yearly amortization breakdown |
-| **Compound Interest** | Compare annual, quarterly and monthly compounding |
-| **Stock Returns** | P&L, absolute return and CAGR including brokerage |
-| **Portfolio Allocator** | Holdings visualisation with pie chart |
-| **Options P&L** | Call/put payoff diagram with breakeven and key levels |
-| **Net Worth** | Assets vs liabilities with allocation charts |
-| **Credit Card** | True cost of carrying a balance — minimum payment trap |
-| **Inflation Impact** | Purchasing power decay, goal inflator, everyday items table |
-| **FD vs Mutual Fund** | Post-tax, inflation-adjusted comparison with breakeven CAGR |
-| **ULIP vs Term + MF** | Why mixing insurance with investment costs you lakhs |
+| **SIP** | Step-up SIP, expense ratio, lumpsum, growth chart |
+| **EMI** | Loan repayments, yearly amortization chart |
+| **Compound Interest** | Compare 4 compounding frequencies |
+| **Stock Returns** | P&L, absolute return, CAGR, brokerage |
+| **Portfolio Allocator** | Holdings pie chart |
+| **Options P&L** | Call/put payoff diagram, breakeven |
+| **Net Worth** | Assets vs liabilities, allocation charts |
+| **Credit Card** | Minimum payment trap, true cost of debt |
+| **Inflation Impact** | Purchasing power decay, goal inflator |
+| **FD vs Mutual Fund** | Post-tax, inflation-adjusted, breakeven CAGR |
+| **ULIP vs Term + MF** | Charges breakdown, mortality cost by age |
+
+### Financial Education
+- **Glossary** (`/glossary`) — 62 terms across 8 categories, searchable
+- **How Markets Work** (`/how-markets-work`) — 3-tab interactive explainer:
+  - *Equity Market* — order flow animation, order book, supply/demand slider, order types, market hours
+  - *Bond Market* — yield vs price demo, bond types in India, RBI's role
+  - *Derivatives* — futures vs options, interactive payoff builder, margins, SEBI risk data
+
+### Mutual Fund NAV (`/mf-nav`)
+- Search any Indian mutual fund by name
+- NAV data from AMFI — covers all registered fund houses
+- Updated daily after market close, cached 24 hours
 
 ---
 
@@ -51,18 +62,19 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 ```
 Browser
    │
-   ├── /api/wstoken                      ──▶  Cloudflare Worker  ──▶  (serves Finnhub key securely)
-   ├── /api/stocks?symbols=AAPL,MSFT     ──▶  Cloudflare Worker  ──▶  Finnhub REST API
-   ├── /api/indices                       ──▶  Cloudflare Worker  ──▶  Finnhub API (ETF proxies)
-   ├── /api/indian                        ──▶  Cloudflare Worker  ──▶  Twelve Data API
-   ├── /api/search?q=apple                ──▶  Cloudflare Worker  ──▶  Finnhub + Twelve Data
-   ├── /api/chart?symbol=AAPL&range=1Y    ──▶  Cloudflare Worker  ──▶  Polygon.io API
-   ├── /api/news?symbol=AAPL              ──▶  Cloudflare Worker  ──▶  Bing News RSS / Finnhub
-   ├── wss://ws.finnhub.io                ──▶  Direct WebSocket   ──▶  Finnhub WebSocket
-   └── CoinGecko API                      ──▶  Direct (no key needed)
+   ├── /api/wstoken                     ──▶  Cloudflare Worker  ──▶  (serves Finnhub key at runtime)
+   ├── /api/stocks?symbols=AAPL,MSFT    ──▶  Cloudflare Worker  ──▶  Finnhub REST
+   ├── /api/indices                      ──▶  Cloudflare Worker  ──▶  Finnhub (ETF proxies)
+   ├── /api/indian                       ──▶  Cloudflare Worker  ──▶  Twelve Data
+   ├── /api/search?q=apple               ──▶  Cloudflare Worker  ──▶  Finnhub + Twelve Data
+   ├── /api/chart?symbol=AAPL&range=1Y   ──▶  Cloudflare Worker  ──▶  Polygon.io
+   ├── /api/news?symbol=AAPL             ──▶  Cloudflare Worker  ──▶  Bing RSS / Finnhub
+   ├── /api/mfnav?q=mirae                ──▶  Cloudflare Worker  ──▶  AMFI portal
+   ├── wss://ws.finnhub.io               ──▶  Direct WebSocket   ──▶  Finnhub
+   └── CoinGecko                         ──▶  Direct (no key)
 ```
 
-API keys live exclusively in Cloudflare's environment variables — never shipped in the client bundle.
+All API keys live exclusively in Cloudflare encrypted Secrets — never in the client bundle.
 
 ---
 
@@ -70,85 +82,69 @@ API keys live exclusively in Cloudflare's environment variables — never shippe
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, React Router v6, Recharts |
-| Build | Vite |
+| Frontend | React 18, React Router v6 (lazy-loaded), Recharts |
+| Build | Vite (code-split, main bundle ~197KB) |
 | Hosting | Cloudflare Pages |
 | API proxy | Cloudflare Pages Functions (Workers) |
-| US stock data | [Finnhub](https://finnhub.io) (free tier) |
-| Real-time prices | [Finnhub WebSocket](https://finnhub.io/docs/api/websocket-trades) |
-| Historical charts | [Polygon.io](https://polygon.io) (free tier) |
-| Indian NSE data | [Twelve Data](https://twelvedata.com) (free tier) |
-| Crypto data | [CoinGecko](https://coingecko.com) (public API) |
-| Market news | Bing News RSS |
+| US stocks | [Finnhub](https://finnhub.io) (free tier) |
+| Real-time | Finnhub WebSocket |
+| Charts | [Polygon.io](https://polygon.io) (free tier) |
+| Indian NSE | [Twelve Data](https://twelvedata.com) (free tier) |
+| Crypto | [CoinGecko](https://coingecko.com) (public) |
+| MF NAV | [AMFI](https://www.amfiindia.com) (public) |
+| News | Bing News RSS |
 
 ---
 
 ## Security
 
-- **No API keys in the frontend bundle** — all keys are server-side in Cloudflare Workers
-- **WebSocket key** — served via `/api/wstoken` Worker at runtime, never hardcoded
-- **Origin locking** — Workers reject requests from any domain other than `mkt-vision.com`
-- **Input sanitization** — all symbol inputs sanitized and validated before reaching external APIs
-- **Server-side caching** — Cloudflare Workers Cache API prevents rate limit abuse
-- **Secrets** — keys stored as encrypted Secrets in Cloudflare, never visible after creation
+- No API keys in the frontend bundle
+- WebSocket key served via `/api/wstoken` at runtime
+- Origin locking — Workers reject non-`mkt-vision.com` requests
+- Input sanitization on all Worker symbol params
+- Server-side caching prevents rate limit abuse
+- GPG-signed commits
 
 ---
 
 ## Project Structure
 
 ```
-├── functions/
-│   └── api/
-│       ├── stocks.js      # US equity quotes → Finnhub
-│       ├── indices.js     # Market indices → Finnhub (ETF proxies)
-│       ├── indian.js      # NSE stock quotes → Twelve Data
-│       ├── search.js      # Symbol search → Finnhub + Twelve Data
-│       ├── chart.js       # Historical OHLC → Polygon.io
-│       ├── news.js        # Market news → Bing RSS / Finnhub
-│       └── wstoken.js     # Finnhub WebSocket key endpoint
+├── functions/api/
+│   ├── stocks.js       # US equities → Finnhub
+│   ├── indices.js      # Indices → Finnhub ETF proxies
+│   ├── indian.js       # NSE → Twelve Data
+│   ├── search.js       # Symbol search → Finnhub + Twelve Data
+│   ├── chart.js        # OHLC → Polygon.io
+│   ├── news.js         # News → Bing RSS / Finnhub
+│   ├── wstoken.js      # Finnhub WebSocket key endpoint
+│   └── mfnav.js        # MF NAV → AMFI portal
 ├── src/
 │   ├── components/
-│   │   ├── Navbar.jsx
+│   │   ├── Navbar.jsx          # Mobile sidebar + desktop links
 │   │   └── ErrorBoundary.jsx
 │   ├── pages/
 │   │   ├── Home.jsx
 │   │   ├── Dashboard.jsx
 │   │   ├── CalculatorsHub.jsx
+│   │   ├── Glossary.jsx
+│   │   ├── HowMarketsWork.jsx
+│   │   ├── MFNav.jsx
 │   │   └── calculators/
-│   │       ├── SIP.jsx
-│   │       ├── EMI.jsx
-│   │       ├── Compound.jsx
-│   │       ├── StockReturn.jsx
-│   │       ├── Portfolio.jsx
-│   │       ├── Options.jsx
-│   │       ├── NetWorth.jsx
-│   │       ├── CreditCard.jsx
-│   │       ├── Inflation.jsx
-│   │       ├── FDvsMF.jsx
-│   │       └── ULIPvsTermMF.jsx
-│   ├── App.jsx
+│   │       ├── SIP.jsx · EMI.jsx · Compound.jsx
+│   │       ├── StockReturn.jsx · Portfolio.jsx · Options.jsx
+│   │       ├── NetWorth.jsx · CreditCard.jsx · Inflation.jsx
+│   │       ├── FDvsMF.jsx · ULIPvsTermMF.jsx
+│   ├── App.jsx          # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx
-├── public/
-│   └── favicon.ico
-├── index.html
-├── package.json
-└── vite.config.js
+├── public/favicon.ico
+└── index.html
 ```
 
 ---
 
 ## Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org) 18+
-- A [Cloudflare](https://cloudflare.com) account (free)
-- A [Finnhub](https://finnhub.io) API key (free)
-- A [Twelve Data](https://twelvedata.com) API key (free)
-- A [Polygon.io](https://polygon.io) API key (free)
-
-### Local development
 
 ```bash
 git clone https://github.com/evans-0/finance
@@ -159,30 +155,26 @@ npm run dev
 
 ### Deployment
 
-1. Push to GitHub
-2. Connect repo to [Cloudflare Pages](https://pages.cloudflare.com)
-3. Build command: `npm run build` · Output directory: `dist`
-4. Add environment variables under **Settings → Environment Variables**:
+1. Push to GitHub → Cloudflare auto-deploys
+2. Environment variables under **Settings → Environment Variables**:
 
 | Variable | Type | Value |
 |---|---|---|
-| `FINNHUB_KEY` | Secret | Your Finnhub API key |
-| `TWELVEDATA_KEY` | Secret | Your Twelve Data API key |
-| `POLYGON_KEY` | Secret | Your Polygon.io API key |
+| `FINNHUB_KEY` | Secret | Finnhub API key |
+| `TWELVEDATA_KEY` | Secret | Twelve Data API key |
+| `POLYGON_KEY` | Secret | Polygon.io API key |
 | `ALLOWED_ORIGIN` | Plaintext | `https://mkt-vision.com` |
-
-5. Redeploy — Cloudflare auto-deploys on every `git push`
 
 ---
 
 ## Known Limitations
 
-- **NSE historical charts** — Twelve Data free tier doesn't include historical OHLC. NSE charts use a simulated price path from the current live price.
-- **NSE search coverage** — Twelve Data free tier covers major NSE stocks. Less liquid tickers may not be available.
-- **Indian stock refresh rate** — NSE prices update every 15 minutes to stay within Twelve Data's 800 credits/day free tier limit.
-- **Index absolute values** — Finnhub free tier returns zero for `^GSPC` etc. ETF proxies (SPY/QQQ/DIA) show accurate percentage change only.
-- **Polygon.io rate limit** — free tier allows 5 API calls/minute. Chart requests are debounced and cached to stay within limits.
-- **WebSocket market hours** — Finnhub WebSocket only streams during US market hours (9:30 AM–4 PM ET / 7 PM–1:30 AM IST).
+- **NSE stocks** — only INFY works reliably on Twelve Data free tier
+- **NSE historical charts** — simulated (paid plan required)
+- **Index absolute values** — ETF proxies show % change only
+- **Polygon rate limit** — 5 calls/min free tier; requests debounced + cached
+- **WebSocket** — US market hours only (9:30 AM–4 PM ET / 7 PM–1:30 AM IST)
+- **SGB** — primary issuance stopped Feb 2024; secondary market (NSE/BSE) only
 
 ---
 
