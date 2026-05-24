@@ -535,12 +535,12 @@ function PayoffBuilder() {
 function DerivativesMarket() {
   return (
     <>
-      <Section subtitle="01 — WHAT IS A DERIVATIVE" tle="Contracts whose value comes from something else">
-        <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
+      <Section subtitle="01 — WHAT IS A DERIVATIVE" title="Contracts whose value comes from something else">
+        iv style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
           <p style={{ fontSize: 11, color: C.textSec, lineHeight: 1.9, marginBottom: 20 }}>
-            A derivative is a financial contract whose value is <span style={{ color: C.amber }}>derived from an underlying asset</span> — a stock, index, commodity, or currency. You are not buying the asset itself. You are buying a contract about its fute price.
+            A derivative is a financial contract whose value is <span style={{ color: C.amber }}>derived from an underlying asset</span> — a stock, index, commodity, or currency. You are not buying the asset itself. You are buying a contract about its future price.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 12 }}>
             {[{ name: 'Futures', icon: String.fromCodePoint(0x1F4CB), color: C.blue, desc: 'A legal obligation to buy or sell at a set price on a future date. Both buyer and seller MUST fulfil the contract.', example: 'You agree to buy 1 lot of Nifty at 22,000 on expiry regardless of where Nifty actually trades.' },
               { name: 'Options', icon: String.fromCodePoint(0x2696) + String.fromCodePoint(0xFE0F), color: C.purple, desc: 'The right (not obligation) to buy or sell at a set price before expiry. Buyer pays a premium. Seller collects it.', example: 'You buy the right to purchase Nifty at 22,000. If Nifty hits 23,000, you profit 1,000 minus premium.' },
             ].map(d => (
@@ -563,7 +563,7 @@ function DerivativesMarket() {
       <Section subtitle="02 — FUTURES vs OPTIONS" title="Key differences at a glance">
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
           <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: MONO, fontSize: 11 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse fontFamily: MONO, fontSize: 11 }}>
               <thead>
                 <tr>
                   {['', 'Futures', 'Options'].map((h, i) => (
@@ -578,8 +578,8 @@ function DerivativesMarket() {
                   ['Max profit (buyer)', 'Unlimited', 'Unlimited (calls)'],
                   ['Leverage', 'Very high', 'High via premium'],
                   ['Best used for', 'Hedging large positions', 'Defined risk bets'],
-                ].map(([label, fut, opt]) => (
-                  <tr key={label} style={{ background: ri % 2 === 0 ? C.bg : 'transparent' }}>
+                ].map(([label, fut, opt], ri) => (
+                  <tr key={label} style={{ background % 2 === 0 ? C.bg : 'transparent' }}>
                     <td style={{ padding: '10px 12px', borderBottom: '1px solid ' + C.border, color: C.textSec, fontWeight: 600 }}>{label}</td>
                     <td style={{ padding: '10px 12px', borderBottom: '1px solid ' + C.border, color: C.text }}>{fut}</td>
                     <td style={{ padding: '10px 12px', borderBottom: '1px solid ' + C.border, color: C.text }}>{opt}</td>
@@ -597,8 +597,8 @@ function DerivativesMarket() {
 
       <Section subtitle="04 — HOW MARGINS WORK" title="Leverage — the double-edged sword">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 16 }}>
-          {[{ title: 'What is margin?',: C.amber, content: 'In F&O you do not pay the full contract value. You pay a fraction called margin — typically 10-20%. This creates leverage. Nifty lot = 25 units x 22,000 = 5.5 lakh contract. Margin needed: ~1.1 lakh (20%). A 1% Nifty move = 5,500 gain/loss. That is a 5% move on your margin in one day.', warn: false },
-            { title: 'Margin call', color: C.red, content: 'If your position moves against you and balance falls below maintenance margin, your broker demands you top up immediately — hey square off your position at a loss. Margin calls can wipe out your entire capital in a single volatile session.', warn: true },
+          {[{ title: 'What is margin?', color: C.amber, content: 'In F&O you do not pay the full contraue. You pay a fraction called margin — typically 10-20%. This creates leverage. Nifty lot = 25 units x 22,000 = 5.5 lakh contract. Margin needed: ~1.1 lakh (20%). A 1% Nifty move = 5,500 gain/loss. That is a 5% move on your margin in one day.', warn: false },
+            { title: 'Margin call', color: C.red, content: 'If your position moves against you and balance falls below maintenance margin, your broker demands you top up immediately — or they square off your position at a loss. Margin calls can wipt your entire capital in a single volatile session.', warn: true },
           ].map(item => (
             <div key={item.title} style={{ background: C.panel, border: '1px solid ' + item.color + '44', borderRadius: 4, padding: 20 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: item.color, marginBottom: 12 }}>{item.title}</div>
@@ -610,8 +610,8 @@ function DerivativesMarket() {
       </Section>
 
       <Section subtitle="05 — THE RISK REALITY" title="Why 90% of retail F&O traders lose money">
-        <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, pad: 24 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: 12, marginBottom: 20 }}>
+        <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
+          <div style={{ display: 'grid', gridTemplalumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: 12, marginBottom: 20 }}>
             {[['89%', 'Retail F&O traders lose money', C.red, 'SEBI Study 2023'],
               ['93%', 'Loss-making in options', C.red, 'SEBI Study 2024'],
               ['7.1M', 'Unique retail F&O traders', C.amber, 'NSE Data'],
@@ -626,20 +626,20 @@ function DerivativesMarket() {
           </div>
           <p style={{ fontSize: 11, color: C.textSec, lineHeight: 1.9 }}>
             <strong style={{ color: C.amber }}>Why do most retail traders lose?</strong>{' '}
-            Options sellers are institutions and prop desks with massive capital, algorithms, and risk systems. Retail buyers are paying premium to sophisticated sellers who do this professionally. The odds are structurally against you. Derivatives were designed for hedging — using them for speculation without deep knowledge is closero gambling.
+            Options sellers are institutions and prop desks with massive capital, algorithms, and risk systems. Retail buyers are paying premium to sophisticated sellers who do this professionally. The odds are structurally against you. Derivatives were designed for hedging — using them for speculation without deep knowledge is closer to gambling.
           </p>
         </div>
       </Section>
 
-      <Section subtitle="06 — LEGITIMATE USE CASES" title="When derivatives actually make sense">
+    <Section subtitle="06 — LEGITIMATE USE CASES" title="When derivatives actually make sense">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {[{ icon: String.fromCodePoint(0x1F6E1), title: 'Hedging a portfolio', color: C.green, desc: 'You hold 10 lakh of Nifty stocks. Before budget day you buy Nifty put options. If the market crashes, your puts profit and offset losses. This is what derivatives were desied for.' },
-            { icon: String.fromCodePoint(0x1F4B1), title: 'Currency hedging', color: C.blue, desc: 'An IT company earns in USD but pays salaries in INR. They use USD/INR futures to lock in the exchange rate and eliminate currency risk. Every large exporter does this.' },
+          {[{ icon: String.fromCodePoint(0x1F6E1), title: 'Hedging a portfolio', color: C.green, desc: 'You hold 10 lakh of Nifty stocks. Before budget day you buy Nifty put options. If the market crashes, your puts profit and offset losses. This is what derivatives were designed for.' },
+            { icon: String.fromCodePoint(0x1F4B1),itle: 'Currency hedging', color: C.blue, desc: 'An IT company earns in USD but pays salaries in INR. They use USD/INR futures to lock in the exchange rate and eliminate currency risk. Every large exporter does this.' },
             { icon: String.fromCodePoint(0x1F33E), title: 'Commodity hedging', color: C.amber, desc: 'A flour mill buys wheat futures to lock in input costs 3 months ahead. An airline buys crude oil futures to stabilise fuel costs. These are the real business needs derivatives were built for.' },
             { icon: String.fromCodePoint(0x26A0), title: 'Speculation — high risk', color: C.red, desc: 'Betting on short-term market direction with leverage. SEBI data shows 89% of retail traders lose. If you do this, use only money you can afford to lose entirely.' },
           ].map(item => (
-            <div key={item.title} style={{ background: C.panel, border: '1px solid ' + item.color + '33', borderRadius: 3, padding: 16, display'flex', gap: 16, alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 24, flexShrink: 0 }}>{item.icon}</span>
+            <div key={item.title} style={{ background: C.panel, border: '1px solid ' + item.color + '33', borderRadius: 3, padding: 16, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <sn style={{ fontSize: 24, flexShrink: 0 }}>{item.icon}</span>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: item.color, marginBottom: 6 }}>{item.title}</div>
                 <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7 }}>{item.desc}</div>
@@ -652,7 +652,7 @@ function DerivativesMarket() {
   )
 }
 
-// ── Main page ─────────â───────────────────────────────────────────────
+// ── Main page ───────────────────────────────────────────────────────────────
 export default function HowMarketsWork() {
   const [market, setMarket] = useState('equity')
 
@@ -666,17 +666,17 @@ export default function HowMarketsWork() {
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 12 }}>EXPLAINER</div>
           <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16, lineHeight: 1.2 }}>How Markets Work</h1>
           <p style={{ fontSize: 13, color: C.textSec, lineHeight: 1.9, maxWidth: 640 }}>
-            Every second, millions of trades happen across NSE and BSE. Here's what actually happens when you click "Buy" — from your phone to the exchangand back.
+            Every second, millions of trades happen across NSE and BSE. Here's what actually happens when you click "Buy" — from your phone to the exchange and back.
           </p>
-          {/* Scale stats */}
+          {/* Scale sts */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginTop: 32 }}>
             {[
               { label: 'Daily NSE turnover', value: 1200000, prefix: '₹', suffix: ' Cr' },
               { label: 'Orders per second', value: 15000, suffix: '+' },
               { label: 'Listed companies', value: 2200, suffix: '+' },
-              { label: 'Settlement', value: 1, prefix: 'T+', suffix: ' day' 
+              { label: 'Settlement', value: 1, prefix: 'T+', suffix: ' day' },
             ].map(s => (
-              <div key={s.label} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+              <div k={s.label} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
                 <div style={{ fontSize: 20, fontWeight: 700, color: C.amber }}>
                   <Counter to={s.value} prefix={s.prefix || ''} suffix={s.suffix || ''} duration={1500} />
                 </div>
@@ -702,16 +702,16 @@ export default function HowMarketsWork() {
         {/* 1. Order flow */}
         <Section id="order-flow" subtitle="01 — TRADE LIFECYCLE" title="What happens when you click Buy?">
           <OrderFlow />
-          <div style={{arginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, neHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
             Your order travels from your app → broker's system → NSE's matching engine in milliseconds. The engine finds a seller willing to sell at your price. Both sides are confirmed, and on T+1 (next trading day) the shares land in your demat account and money leaves your account.
           </div>
         </Section>
 
         {/* 2. Order book */}
-     Section id="order-book" subtitle="02 — BID & ASK" title="The Order Book — where buyers meet sellers">
+        <Section id="order-book" subtitle="02 — BID" title="The Order Book — where buyers meet sellers">
           <OrderBook />
           <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
-            The order book shows all pending buy (bid) and sell (ask) orders. The difference between the lowest ask and highest bid is the <span style={{ color: C.amber }}>spread</span>. Liquid stocks like RNCE have spreads of ₹0.05. Illiquid small-caps can have spreads of ₹5–10, meaning you lose money the moment you buy.
+            The order book shows all pending buy (bid) and sell (ask) orders. The difference between the lowest ask and highest bid is the <span style={{ color: C.amber }}>spread</span>. Liquid stocks like RELIANCE have spreads of ₹0.05. Illiquid small-caan have spreads of ₹5–10, meaning you lose money the moment you buy.
           </div>
         </Section>
 
@@ -719,15 +719,15 @@ export default function HowMarketsWork() {
         <Section id="price-movement" subtitle="03 — PRICE DISCOVERY" title="How prices actually move">
           <SupplyDemand />
           <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
-            ove purely from supply and demand imbalance. More people wanting to buy than sell = price goes up. A large sell order can temporarily push the price down. News, earnings, and macro events all shift the buyer/seller balance instantly.
+            Prices move purely from supply and demand imbalance people wanting to buy than sell = price goes up. A large sell order can temporarily push the price down. News, earnings, and macro events all shift the buyer/seller balance instantly.
           </div>
         </Section>
 
         {/* 4. Order types */}
         <Section id="order-types" subtitle="04 — ORDER TYPES" title="Market order vs Limit order vs Stop Loss">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {ORDERYPES.map(o => (
-              <div key={o.type} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+            {ORDER_TYPES.map(o => (
+              <div key={o.typestyle={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                     <span style={{ fontSize: 20 }}>{o.icon}</span>
@@ -738,14 +738,15 @@ export default function HowMarketsWork() {
                 <div>
                   <div style={{ fontSize: 9, color: C.green, letterSpacing: 1, marginBottom: 6 }}>PROS</div>
                   {o.pros.map(p => <div key={p} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✓ {p}</div>)}
-                  <div style={{ fontSize: 9, color: C.red, letterSpacing: 1, marginBottom: 6, margiop: 10 }}>CONS</div>
-                  {o.cons.map(c => <div key={c} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✗ {c}</div>)}
+                  <div style={{ fontSize: 9, color: C.red, letterSpacing: 1, marginBottom: 6, marginTop: 10 }}>CONS</div>
+                  {o.consap(c => <div key={c} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✗ {c}</div>)}
                 </div>
                 <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: 12 }}>
                   <div style={{ fontSize: 9, color: C.amber, letterSpacing: 1, marginBottom: 6 }}>EXAMPLE</div>
-                  <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7, fontStyle: 'italic' }}>{o.example}</div>               </div>
+                  <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7, fontStyle: 'italic' }}>{o.example}</div>
+                </div>
               </div>
-            ))}
+          ))}
           </div>
         </Section>
 
@@ -753,7 +754,7 @@ export default function HowMarketsWork() {
         <Section id="participants" subtitle="05 — WHO'S TRADING" title="Market participants and their role">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {PARTICIPANTS.map(p => (
-              <div key={p.name} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16, display: 'grid', gridTemplateColus: 'auto 1fr minmax(60px, auto)', gap: 16, alignItems: 'center' }}>
+              <div key={p.name} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16, display: 'grid', gridTemplateColumns: 'auto 1fr minmax(60px, auto)', gap: 16, aliItems: 'center' }}>
                 <span style={{ fontSize: 24 }}>{p.icon}</span>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: p.color, marginBottom: 4 }}>{p.name}</div>
@@ -771,7 +772,7 @@ export default function HowMarketsWork() {
         {/* 6. Trading hours */}
         <Section id="trading-hours" subtitle="06 — MARKET HOURS" title="NSE trading hours (IST)">
           <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 'clamp(12px, 3vw, 24px)', maxWidth: '100%' }}>
-            iv style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', flexDirection: 'cumn' }}>
               {HOURS.map((h, i) => (
                 <div key={h.time} style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
                   {/* Left column: dot + line */}
