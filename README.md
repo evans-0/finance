@@ -1,6 +1,6 @@
 # MktVision — Markets Terminal & Financial Calculators
 
-[![Deploy Status](https://img.shields.io/github/deployments/evans-0/finance/production?label=cloudflare&logo=cloudflare&logoColor=white)](https://mkt-vision.com)
+[![Deploy Status](https://img.shields.io/github/deployments/evans-0/finance/Production?label=cloudflare&logo=cloudflare&logoColor=white)](https://mkt-vision.com)
 
 A Bloomberg-style real-time markets terminal combined with a financial literacy hub. Built with React, deployed on Cloudflare Pages with serverless Workers proxying live financial data.
 
