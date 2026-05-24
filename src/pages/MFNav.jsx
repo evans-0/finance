@@ -11,12 +11,7 @@ const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
 const INR  = '\u20b9'
 
 const fmtNAV = n => INR + parseFloat(n).toFixed(4)
-const fmtDate = d => {
-  if (!d) return ''
-  const parts = d.split('-')
-  if (parts.length === 3) return parts[0] + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(parts[1])-1] + ' ' + parts[2]
-  return d
-}
+const fmtDate = d => d ? d.trim() : ''
 
 // Clean up fund name for display
 const cleanName = name => name
