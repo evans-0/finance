@@ -90,7 +90,7 @@ export default function MFNav() {
             type="text"
             value={query}
             onChange={onInput}
-            placeholder="Search by fund name e.g. Mirae Asset Large Cap Direct Growth..."
+            placeholder="Search by fund name e.g. Mirae Asset Large Cap Direct Growth..." aria-label="Search mutual funds by name"
             autoFocus
             style={{
               width: '100%', background: C.panel, border: `1px solid ${query.length >= 3 ? C.amber : C.border}`,
@@ -136,9 +136,9 @@ export default function MFNav() {
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6, alignItems: 'center' }}>
-                        <span style={{ fontSize: 9, color: type.color, border: `1px solid ${type.color}44`, padding: '1px 6px', borderRadius: 2, letterSpacing: 0.5 }}>{type.label}</span>
-                        {plan && <span style={{ fontSize: 9, color: C.textSec, border: `1px solid ${C.border}`, padding: '1px 6px', borderRadius: 2, letterSpacing: 0.5 }}>{plan}</span>}
-                        <span style={{ fontSize: 9, color: C.textDim }}>#{fund.code}</span>
+                        <span style={{ fontSize: 11, color: type.color, border: `1px solid ${type.color}44`, padding: '1px 6px', borderRadius: 2, letterSpacing: 0.5 }}>{type.label}</span>
+                        {plan && <span style={{ fontSize: 11, color: C.textSec, border: `1px solid ${C.border}`, padding: '1px 6px', borderRadius: 2, letterSpacing: 0.5 }}>{plan}</span>}
+                        <span style={{ fontSize: 11, color: C.textDim }}>#{fund.code}</span>
                       </div>
                       <div style={{ fontSize: 12, color: C.text, lineHeight: 1.5 }}>{cleanName(fund.name)}</div>
                     </div>

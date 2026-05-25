@@ -63,7 +63,7 @@ export default function Portfolio() {
             {/* Header */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.5fr 1fr auto', gap: 8, marginBottom: 8 }}>
               {['SYMBOL', 'QTY', 'PRICE', 'VALUE', ''].map(h => (
-                <span key={h} style={{ fontSize: 9, color: C.textDim, letterSpacing: 0.5 }}>{h}</span>
+                <span key={h} style={{ fontSize: 11, color: C.textDim, letterSpacing: 0.5 }}>{h}</span>
               ))}
             </div>
 

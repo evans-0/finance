@@ -102,7 +102,7 @@ function WatchRow({ asset, selected, onSelect }) {
 function Stat({ label, value, loading }) {
   return (
     <div style={{ minWidth: 80 }}>
-      <div style={{ fontSize: 9, color: C.textSec, marginBottom: 3, letterSpacing: 1 }}>{label}</div>
+      <div style={{ fontSize: 11, color: C.textSec, marginBottom: 3, letterSpacing: 1 }}>{label}</div>
       <div style={{ fontSize: 12, color: loading ? C.textDim : C.text, fontWeight: 500 }}>{loading ? "..." : value}</div>
     </div>
   )
@@ -114,7 +114,7 @@ function SectionHeader({ label, status, error, wsStatus }) {
   return (
     <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>{label}</span>
-      <span style={{ fontSize: 9, color: color }}>● {text}</span>
+      <span style={{ fontSize: 11, color: color }}>● {text}</span>
     </div>
   )
 }
@@ -543,8 +543,8 @@ export default function FinanceDashboard() {
               )}
               <div style={{ fontSize: 10, color: C.textSec, marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontWeight: 600, color: C.text }}>{selected?.name || "—"}</span>
-                {isIndian && <span style={{ fontSize: 9, color: C.amber }}>NSE</span>}
-                <span style={{ fontSize: 9, color: C.green }}>● LIVE</span>
+                {isIndian && <span style={{ fontSize: 11, color: C.amber }}>NSE</span>}
+                <span style={{ fontSize: 11, color: C.green }}>● LIVE</span>
               </div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                 {isStockLoading
@@ -572,8 +572,8 @@ export default function FinanceDashboard() {
                   ? ({ '5D': '5-DAY', '1M': '1-MONTH', '3M': '3-MONTH', '6M': '6-MONTH', '1Y': '1-YEAR', 'CUSTOM': 'CUSTOM' }[chartRange] || '30-DAY') + ' PRICE CHART'
                   : '30-DAY PRICE CHART'}
               </span>
-              {isSimulated && <span style={{ fontSize: 9, color: C.amber, background: '#1a1200', border: '1px solid #3a2800', padding: '2px 6px', borderRadius: 2, letterSpacing: 1 }}>SIMULATED</span>}
-              {lastUpdated && !isSimulated && <span style={{ fontSize: 9, color: C.textDim }}>UPDATED {lastUpdated.toLocaleTimeString("en-US", { hour12: false })}</span>}
+              {isSimulated && <span style={{ fontSize: 11, color: C.amber, background: '#1a1200', border: '1px solid #3a2800', padding: '2px 6px', borderRadius: 2, letterSpacing: 1 }}>SIMULATED</span>}
+              {lastUpdated && !isSimulated && <span style={{ fontSize: 11, color: C.textDim }}>UPDATED {lastUpdated.toLocaleTimeString("en-US", { hour12: false })}</span>}
             </div>
             {selected?.type === "stock" && (
               <div style={{ display: "flex", gap: 6, marginBottom: 12, alignItems: "center", overflowX: "auto", paddingBottom: 4 }}>
@@ -676,7 +676,7 @@ export default function FinanceDashboard() {
                     </div>
                   </div>
                 )
-              })}
+           )}
             </div>
           </div>
         </div>
@@ -687,6 +687,6 @@ export default function FinanceDashboard() {
         <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
         <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>
-    </div>
+</div>
   )
 }

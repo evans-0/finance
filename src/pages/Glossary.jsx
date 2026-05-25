@@ -113,10 +113,10 @@ export default function Glossary() {
 
         {/* Search */}
         <div style={{ position: 'relative', marginBottom: 16 }}>
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search terms..."
+          <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search terms..." aria-label="Search financial glossary"
             style={{ width: '100%', background: C.panel, border: `1px solid ${query ? C.amber : C.border}`, color: C.text, padding: '10px 40px 10px 16px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }} />
           {query
-            ? <span onClick={() => setQuery('')} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: C.textSec, fontSize: 18 }}>×</span>
+            ? <button onClick={() => setQuery('')} aria-label='Clear search' style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: C.textSec, fontSize: 18, background: 'none', border: 'none', padding: 0 }}>×</button>
             : <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: C.textSec, fontSize: 12 }}>🔍</span>
           }
         </div>
@@ -151,7 +151,7 @@ export default function Glossary() {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
                 <span style={{ fontSize: 14, fontWeight: 700, color: C.amber }}>{t.term}</span>
                 {t.full !== t.term && <span style={{ fontSize: 11, color: C.textSec }}>{t.full}</span>}
-                <span style={{ marginLeft: 'auto', fontSize: 9, color: C.textDim, border: `1px solid ${C.border}`, padding: '2px 6px', borderRadius: 2, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{t.category}</span>
+                <span style={{ marginLeft: 'auto', fontSize: 11, color: C.textDim, border: `1px solid ${C.border}`, padding: '2px 6px', borderRadius: 2, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{t.category}</span>
               </div>
               <p style={{ fontSize: 12, color: C.text, lineHeight: 1.8, margin: 0 }}>{t.definition}</p>
             </div>

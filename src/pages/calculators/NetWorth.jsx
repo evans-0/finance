@@ -103,19 +103,19 @@ export default function NetWorth() {
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 40, marginTop: 16 }}>
             <div>
-              <div style={{ fontSize: 9, color: C.textSec, marginBottom: 4 }}>TOTAL ASSETS</div>
+              <div style={{ fontSize: 11, color: C.textSec, marginBottom: 4 }}>TOTAL ASSETS</div>
               <div style={{ fontSize: 16, fontWeight: 600, color: C.green }}>{fmt(totalAssets)}</div>
             </div>
             <div style={{ width: 1, background: C.border }} />
             <div>
-              <div style={{ fontSize: 9, color: C.textSec, marginBottom: 4 }}>TOTAL LIABILITIES</div>
+              <div style={{ fontSize: 11, color: C.textSec, marginBottom: 4 }}>TOTAL LIABILITIES</div>
               <div style={{ fontSize: 16, fontWeight: 600, color: C.red }}>{fmt(totalLiabilities)}</div>
             </div>
             {totalAssets > 0 && (
               <>
                 <div style={{ width: 1, background: C.border }} />
                 <div>
-                  <div style={{ fontSize: 9, color: C.textSec, marginBottom: 4 }}>DEBT TO ASSET RATIO</div>
+                  <div style={{ fontSize: 11, color: C.textSec, marginBottom: 4 }}>DEBT TO ASSET RATIO</div>
                   <div style={{ fontSize: 16, fontWeight: 600, color: totalLiabilities / totalAssets > 0.5 ? C.red : C.amber }}>
                     {(totalLiabilities / totalAssets * 100).toFixed(1)}%
                   </div>

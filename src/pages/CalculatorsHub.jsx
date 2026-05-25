@@ -114,11 +114,11 @@ export default function CalculatorsHub() {
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search calculators..."
+            placeholder="Search calculators..." aria-label="Search calculators"
             style={{ width: '100%', background: C.panel, border: `1px solid ${query ? C.amber : C.border}`, color: C.text, padding: '10px 40px 10px 16px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }}
           />
           {query
-            ? <span onClick={() => setQuery('')} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: C.textSec, fontSize: 16, lineHeight: 1 }}>×</span>
+            ? <button onClick={() => setQuery('')} aria-label='Clear search' style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: C.textSec, fontSize: 16, background: 'none', border: 'none', padding: 0 }}>×</button>
             : <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: C.textSec, fontSize: 12 }}>🔍</span>
           }
         </div>
@@ -144,7 +144,7 @@ export default function CalculatorsHub() {
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {calc.tags.map(tag => (
                     <span key={tag} style={{
-                      fontSize: 9, color: C.textSec, border: '1px solid ' + C.border,
+                      fontSize: 11, color: C.textSec, border: '1px solid ' + C.border,
                       padding: '2px 6px', borderRadius: 2, letterSpacing: 0.5,
                     }}>{tag}</span>
                   ))}

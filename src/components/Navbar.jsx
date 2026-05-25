@@ -46,13 +46,13 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
-          <a href="https://github.com/evans-0/finance" target="_blank" rel="noopener noreferrer" style={{ color: C.textSec, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <a href="https://github.com/evans-0/finance" target="_blank" rel="noopener noreferrer" aria-label="View source on GitHub" style={{ color: C.textSec, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
             <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor"><path d={GH_PATH} /></svg>
           </a>
         </div>
 
         {/* Hamburger — mobile only */}
-        <button onClick={() => setOpen(v => !v)} aria-label="Menu"
+        <button onClick={() => setOpen(v => !v)} aria-label={open ? 'Close menu' : 'Open menu'}
           style={{ display: 'none', background: 'none', border: `1px solid ${C.border}`, color: C.textSec, padding: '6px 10px', cursor: 'pointer', borderRadius: 3, fontFamily: MONO, fontSize: 14, lineHeight: 1 }}
           className="hamburger">
           {open ? '✕' : '☰'}

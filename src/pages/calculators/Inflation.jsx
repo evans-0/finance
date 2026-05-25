@@ -46,7 +46,7 @@ function InputField({ label, value, onChange, min, max, step, suffix, hint }) {
 function StatBox({ label, value, color, sub }) {
   return (
     <div style={{ background: C.bg, border: '1px solid ' + (color ? color : C.border), borderRadius: 3, padding: '14px 16px', flex: 1 }}>
-      <div style={{ fontSize: 9, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 11, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 17, fontWeight: 700, color: color || C.text }}>{value}</div>
       {sub && <div style={{ fontSize: 10, color: C.textDim, marginTop: 3 }}>{sub}</div>}
     </div>
@@ -194,7 +194,7 @@ export default function Inflation() {
               <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                 {COMMON_ITEMS.map(item => (
                   <button key={item.name} onClick={() => setGoalCost(item.price)}
-                    style={{ background: C.bg, border: '1px solid ' + C.border, color: C.textSec, padding: '4px 8px', fontSize: 9, fontFamily: MONO, cursor: 'pointer', borderRadius: 2, letterSpacing: 0.3, whiteSpace: 'nowrap' }}>
+                    style={{ background: C.bg, border: '1px solid ' + C.border, color: C.textSec, padding: '4px 8px', fontSize: 11, fontFamily: MONO, cursor: 'pointer', borderRadius: 2, letterSpacing: 0.3, whiteSpace: 'nowrap' }}>
                     {item.name}
                   </button>
                 ))}
@@ -217,7 +217,7 @@ export default function Inflation() {
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 1.5, marginBottom: 16 }}>EVERYDAY ITEMS — TODAY vs {goalYears} YEARS AT {inflation}% INFLATION</div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', overflowX: 'auto', gap: 0 }}>
             {['ITEM', 'TODAY', 'IN ' + goalYears + ' YEARS', 'INCREASE'].map(h => (
-              <div key={h} style={{ fontSize: 9, color: C.textDim, padding: '6px 8px', borderBottom: '1px solid ' + C.border, letterSpacing: 0.5 }}>{h}</div>
+              <div key={h} style={{ fontSize: 11, color: C.textDim, padding: '6px 8px', borderBottom: '1px solid ' + C.border, letterSpacing: 0.5 }}>{h}</div>
             ))}
             {COMMON_ITEMS.map(item => {
               const future = Math.round(item.price * Math.pow(1 + inflation / 100, goalYears))

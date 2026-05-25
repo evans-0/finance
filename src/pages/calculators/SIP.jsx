@@ -125,13 +125,13 @@ export default function SIP() {
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
                 {[['INVESTED AMOUNT', fmt(totalInvested)], ['ESTIMATED RETURNS', fmt(returns)]].map(([l, v]) => (
                   <div key={l} style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: '14px', flex: 1 }}>
-                    <div style={{ fontSize: 9, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>{l}</div>
+                    <div style={{ fontSize: 11, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>{l}</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{v}</div>
                   </div>
                 ))}
               </div>
               <div style={{ background: C.bg, border: '1px solid ' + C.amber, borderRadius: 3, padding: '16px', marginBottom: 12 }}>
-                <div style={{ fontSize: 9, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>TOTAL VALUE</div>
+                <div style={{ fontSize: 11, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>TOTAL VALUE</div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: C.amber }}>{fmt(futureValue)}</div>
               </div>
               <div style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: 12 }}>

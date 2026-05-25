@@ -82,7 +82,7 @@ export default function EMI() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: 12 }}>
               {[['PRINCIPAL', fmt(principal), false], ['TOTAL INTEREST', fmt(totalInt), true], ['TOTAL PAYMENT', fmt(totalPay), false], ['INTEREST RATIO', (totalInt / totalPay * 100).toFixed(1) + '%', true]].map(([l, v, warn]) => (
                 <div key={l} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: 12 }}>
-                  <div style={{ fontSize: 9, color: C.textSec, marginBottom: 4 }}>{l}</div>
+                  <div style={{ fontSize: 11, color: C.textSec, marginBottom: 4 }}>{l}</div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: warn ? C.red : C.text }}>{v}</div>
                 </div>
               ))}

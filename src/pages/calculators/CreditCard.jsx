@@ -60,7 +60,7 @@ function InputField({ label, value, onChange, min, max, step, suffix, hint }) {
 function StatBox({ label, value, color, sub }) {
   return (
     <div style={{ background: C.bg, border: '1px solid ' + (color === C.red ? C.red : C.border), borderRadius: 3, padding: '14px 16px', flex: 1, minWidth: 130 }}>
-      <div style={{ fontSize: 9, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 11, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 16, fontWeight: 700, color: color || C.text }}>{value}</div>
       {sub && <div style={{ fontSize: 10, color: C.textDim, marginTop: 3 }}>{sub}</div>}
     </div>
