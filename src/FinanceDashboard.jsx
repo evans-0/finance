@@ -110,7 +110,7 @@ function Stat({ label, value, loading }) {
 
 function SectionHeader({ label, status, error, wsStatus }) {
   const color = wsStatus === 'connected' ? C.green : error ? C.red : wsStatus === 'connecting' ? C.amber : C.amber
-  const text  = wsStatus === 'connected' ? 'WS LIVE' : error ? 'ERROR' : wsStatus === 'connecting' ? 'LOADING' : status
+  const text  = error ? 'ERROR' : status
   return (
     <div style={{ padding: "6px 12px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <span style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5 }}>{label}</span>
@@ -215,92 +215,6 @@ export default function FinanceDashboard() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  // WebSocket for real-time US stock prices
-  useEffect(() => {
-    let ws = null
-    let retryTimer = null
-
-    const connect = async () => {
-      try {
-        setWsStatus('connecting')
-        const r = await fetch('/api/wstoken')
-        if (!r.ok) throw new Error('token fetch failed')
-        const { token } = await r.json()
-        if (!token) throw new Error('no token')
-
-        ws = new WebSocket('wss://ws.finnhub.io?token=' + token)
-        wsRef.current = ws
-
-        ws.onopen = () => {
-          setWsStatus('connected')
-          STOCK_META.forEach(s => {
-            ws.send(JSON.stringify({ type: 'subscribe', symbol: s.symbol }))
-          })
-        }
-
-        ws.onmessage = (event) => {
-          const msg = JSON.parse(event.data)
-          if (msg.type !== 'trade' || !msg.data) return
-          setStocks(prev => {
-            let changed = false
-            const next = prev.map(stock => {
-              const trade = msg.data.find(t => t.s === stock.symbol)
-              if (!trade || stock.price === null) return stock
-              const newPrice = +trade.p.toFixed(2)
-              if (newPrice === stock.price) return stock
-              changed = true
-              const flash = newPrice > stock.price ? 'up' : 'down'
-              return { ...stock, price: newPrice, flash }
-            })
-            if (changed) {
-              setTimeout(() => {
-                setStocks(s => s.map(x => x.flash ? { ...x, flash: null } : x))
-              }, 700)
-            }
-            return changed ? next : prev
-          })
-          // Also update the main window if the selected stock changed
-          setSelected(prev => {
-            if (!prev || prev.type !== 'stock') return prev
-            const trade = msg.data.find(t => t.s === prev.symbol)
-            if (!trade) return prev
-            const newPrice = +trade.p.toFixed(2)
-            if (newPrice === prev.price) return prev
-            return { ...prev, price: newPrice }
-          })
-        }
-
-        ws.onclose = () => {
-          setWsStatus('disconnected')
-          retryTimer = setTimeout(connect, 5000)
-        }
-
-        ws.onerror = () => ws.close()
-
-      } catch {
-        setWsStatus('disconnected')
-        retryTimer = setTimeout(connect, 8000)
-      }
-    }
-
-    connect()
-
-    return () => {
-      clearTimeout(retryTimer)
-      try {
-        if (wsRef.current) {
-          STOCK_META.forEach(s => {
-            try {
-              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN)
-                wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbol: s.symbol }))
-            } catch (_) {}
-          })
-          wsRef.current.close()
-          wsRef.current = null
-        }
-      } catch (_) {}
-    }
-  }, [])
 
   const fetchIndices = useCallback(async () => {
     try {
@@ -676,7 +590,7 @@ export default function FinanceDashboard() {
                     </div>
                   </div>
                 )
-           )}
+              })}
             </div>
           </div>
         </div>
@@ -687,6 +601,6 @@ export default function FinanceDashboard() {
         <span style={{ fontSize: 10, color: C.textDim }}>US: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · REFRESH: 60S</span>
         <span style={{ fontSize: 10, color: C.textDim }}>MKTVISION · REACT + RECHARTS</span>
       </div>
-</div>
+    </div>
   )
 }
