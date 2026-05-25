@@ -8,6 +8,8 @@ const C = {
   text: '#c8d8f0', textSec: '#506888', textDim: '#1e3050',
 }
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
+// Emoji font stack — flag emojis don't render in monospace on Windows
+const EMOJI = "'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif"
 
 const TICKER_LABELS = { SPY: 'S&P 500', QQQ: 'NASDAQ 100', GLD: 'GOLD', BTC: 'BTC', ETH: 'ETH' }
 const TICKER_ORDER = ['SPY', 'QQQ', 'BTC', 'ETH', 'GLD']
@@ -18,29 +20,26 @@ function TickerStrip() {
 
   const fetchTickers = async () => {
     try {
-      const [etfs, crypto, indianRaw] = await Promise.all([
+      // FIX: removed dead `indianRaw` — only 2 promises in the array
+      const [etfs, crypto] = await Promise.all([
         fetch('/api/stocks?symbols=SPY,QQQ,GLD').then(r => r.json()).catch(() => []),
         fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&order=market_cap_desc').then(r => r.json()).catch(() => []),
       ])
 
       const map = {}
 
-      // ETF proxies — Worker returns array not object
       if (Array.isArray(etfs)) {
         for (const s of etfs) {
           if (s?.symbol && s?.pct != null) map[s.symbol] = +s.pct.toFixed(2)
         }
       }
 
-      // Crypto
       if (Array.isArray(crypto)) {
         const btc = crypto.find(c => c.id === 'bitcoin')
         const eth = crypto.find(c => c.id === 'ethereum')
         if (btc?.price_change_percentage_24h != null) map['BTC'] = +btc.price_change_percentage_24h.toFixed(2)
         if (eth?.price_change_percentage_24h != null) map['ETH'] = +eth.price_change_percentage_24h.toFixed(2)
       }
-
-
 
       setTickers(TICKER_ORDER.map(sym => ({ sym, pct: map[sym] ?? null })))
     } catch {}
@@ -67,21 +66,26 @@ function TickerStrip() {
 }
 
 const FEATURES = [
-  { icon: '📈', title: 'Live US Equities', desc: 'Real-time quotes for AAPL, MSFT, NVDA, TSLA and more via Finnhub. Prices refresh every 60 seconds.' },
-  { icon: '🇮🇳', title: 'Indian NSE Stocks', desc: 'Top NSE stocks with live prices in ₹ via Twelve Data. Search any NSE ticker directly.' },
-  { icon: '₿', title: 'Crypto Markets', desc: 'Top 8 cryptocurrencies by market cap with 30-day price charts via CoinGecko.' },
-  { icon: '📊', title: 'Market Indices', desc: 'Live S&P 500, NASDAQ, DOW and VIX percentage changes updating in real time.' },
-  { icon: '🔒', title: 'Secure by Design', desc: 'All API keys live server-side in Cloudflare Workers. Zero secrets reach your browser.' },
-  { icon: '🧮', title: 'Finance Calculators', desc: 'SIP, EMI, compound interest, stock returns, portfolio allocation and options P&L.' },
+  { icon: '📈', title: 'Live US Equities',     desc: 'Real-time quotes for AAPL, MSFT, NVDA, TSLA and more via Finnhub. Prices refresh every 60 seconds.' },
+  { icon: '🇮🇳', title: 'Indian NSE Stocks',   desc: 'Live NSE prices in ₹ via Twelve Data. INFY live — more stocks coming soon.' },
+  { icon: '₿',   title: 'Crypto Markets',       desc: 'Top 8 cryptocurrencies by market cap with 30-day price charts via CoinGecko.' },
+  { icon: '📊',  title: 'Market Indices',       desc: 'Live S&P 500, NASDAQ, DOW and VIX percentage changes updating in real time.' },
+  { icon: '🔒',  title: 'Secure by Design',     desc: 'All API keys live server-side in Cloudflare Workers. Zero secrets reach your browser.' },
+  { icon: '📚',  title: 'Learn Finance',         desc: 'Glossary of 62 terms, equity/bond/derivatives explainers, and AMFI mutual fund NAV lookup.' },
 ]
 
 const CALCS = [
-  { to: '/calculators/sip',       icon: '📅', name: 'SIP Calculator',      desc: 'Plan your monthly investments' },
-  { to: '/calculators/emi',       icon: '🏦', name: 'EMI Calculator',      desc: 'Calculate loan repayments' },
-  { to: '/calculators/compound',  icon: '📈', name: 'Compound Interest',   desc: 'Watch your wealth grow' },
-  { to: '/calculators/returns',   icon: '💹', name: 'Stock Returns',       desc: 'Analyse trade performance' },
-  { to: '/calculators/portfolio', icon: '🥧', name: 'Portfolio Allocator', desc: 'Visualise your holdings' },
-  { to: '/calculators/options',   icon: '⚖️', name: 'Options P&L',        desc: 'Options payoff analysis' },
+  { to: '/calculators/sip',         icon: '📅', name: 'SIP Calculator',       desc: 'Plan your monthly investments' },
+  { to: '/calculators/emi',         icon: '🏦', name: 'EMI Calculator',       desc: 'Calculate loan repayments' },
+  { to: '/calculators/compound',    icon: '📈', name: 'Compound Interest',    desc: 'Watch your wealth grow' },
+  { to: '/calculators/returns',     icon: '💹', name: 'Stock Returns',        desc: 'Analyse trade performance' },
+  { to: '/calculators/portfolio',   icon: '🥧', name: 'Portfolio Allocator',  desc: 'Visualise your holdings' },
+  { to: '/calculators/options',     icon: '⚖️', name: 'Options P&L',         desc: 'Options payoff analysis' },
+  { to: '/calculators/networth',    icon: '💰', name: 'Net Worth Tracker',    desc: 'Know where you stand' },
+  { to: '/calculators/creditcard',  icon: '💳', name: 'Credit Card Trap',     desc: 'See the real cost of debt' },
+  { to: '/calculators/inflation',   icon: '📉', name: 'Inflation Impact',     desc: 'How much is ₹1L worth tomorrow?' },
+  { to: '/calculators/fdvsmf',      icon: '🏛️', name: 'FD vs Mutual Fund',   desc: 'Post-tax returns compared' },
+  { to: '/calculators/ulipvstermmf',icon: '🛡️', name: 'ULIP vs Term + MF',   desc: 'Break the ULIP myth' },
 ]
 
 const QUOTES = [
@@ -129,7 +133,7 @@ export default function Home() {
         </h1>
         <p style={{ fontSize: 14, color: C.textSec, lineHeight: 1.8, marginBottom: 40, maxWidth: 560, margin: '0 auto 40px' }}>
           Live US stocks, Indian NSE, crypto and market indices — all in one terminal.
-          Built with React and Cloudflare Workers. API keys never leave the server.
+          Free. No login. No ads.
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/dashboard" style={{
@@ -149,7 +153,6 @@ export default function Home() {
         </div>
       </div>
 
-
       {/* Features grid */}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '70px 24px' }}>
         <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, textAlign: 'center', marginBottom: 12 }}>FEATURES</div>
@@ -157,7 +160,8 @@ export default function Home() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
           {FEATURES.map(f => (
             <div key={f.title} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: '24px 20px' }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
+              {/* FIX: emoji font stack so flag renders on Windows Chrome */}
+              <div style={{ fontSize: 28, marginBottom: 12, fontFamily: EMOJI }}>{f.icon}</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 8 }}>{f.title}</div>
               <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7 }}>{f.desc}</div>
             </div>
@@ -170,7 +174,7 @@ export default function Home() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, textAlign: 'center', marginBottom: 12 }}>CALCULATORS</div>
           <h2 style={{ fontSize: 26, fontWeight: 600, textAlign: 'center', marginBottom: 12, color: C.text }}>Make smarter financial decisions</h2>
-          <p style={{ fontSize: 12, color: C.textSec, textAlign: 'center', marginBottom: 48 }}>Six calculators built for investors and traders</p>
+          <p style={{ fontSize: 12, color: C.textSec, textAlign: 'center', marginBottom: 48 }}>11 calculators built for Indian investors and traders</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
             {CALCS.map(c => (
               <Link key={c.to} to={c.to} style={{ textDecoration: 'none' }}>
@@ -181,7 +185,7 @@ export default function Home() {
                   onMouseEnter={e => e.currentTarget.style.borderColor = C.amber}
                   onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
                 >
-                  <div style={{ fontSize: 24, marginBottom: 10 }}>{c.icon}</div>
+                  <div style={{ fontSize: 24, marginBottom: 10, fontFamily: EMOJI }}>{c.icon}</div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: C.amber, marginBottom: 6 }}>{c.name}</div>
                   <div style={{ fontSize: 11, color: C.textSec }}>{c.desc}</div>
                 </div>
@@ -190,7 +194,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
 
       {/* Quote section */}
       <div style={{ padding: '60px 24px', textAlign: 'center' }}>
@@ -219,7 +222,7 @@ export default function Home() {
       {/* Footer */}
       <div style={{ padding: '32px 24px', textAlign: 'center' }}>
         <div style={{ fontSize: 11, color: C.textDim, marginBottom: 8 }}>
-          STOCKS: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO
+          STOCKS: FINNHUB · INDIA NSE: TWELVE DATA · CRYPTO: COINGECKO · MF NAV: AMFI
         </div>
         <div style={{ fontSize: 11, color: C.textDim }}>
           Built with React + Cloudflare Workers ·{' '}
