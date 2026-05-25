@@ -67,7 +67,7 @@ function TickerStrip() {
 
 const FEATURES = [
   { icon: '📈', title: 'Live US Equities',     desc: 'Real-time quotes for AAPL, MSFT, NVDA, TSLA and more via Finnhub. Prices refresh every 60 seconds.' },
-  { icon: '🇮🇳', title: 'Indian NSE Stocks',   desc: 'Live NSE prices in ₹ via Twelve Data. INFY live — more stocks coming soon.' },
+  { icon: '₹',   title: 'Indian NSE Stocks',   desc: 'Live NSE prices in ₹ via Twelve Data. INFY live — more stocks coming soon.' },
   { icon: '₿',   title: 'Crypto Markets',       desc: 'Top 8 cryptocurrencies by market cap with 30-day price charts via CoinGecko.' },
   { icon: '📊',  title: 'Market Indices',       desc: 'Live S&P 500, NASDAQ, DOW and VIX percentage changes updating in real time.' },
   { icon: '🔒',  title: 'Secure by Design',     desc: 'All API keys live server-side in Cloudflare Workers. Zero secrets reach your browser.' },
