@@ -17,8 +17,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 - Rotating finance quotes from Buffett, Munger, Graham and others
 
 ### Markets Terminal (`/dashboard`)
-- **Live US equities** — AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN via Finnhub
-- **WebSocket prices** — tick-by-tick updates during US market hours (7 PM–1:30 AM IST). Rows flash green/red on price change
+- **Live US equities** — AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN via Finnhub (polling every 60s)
 - **Real historical charts** — 5D (hourly), 1M, 3M, 6M, 1Y, Custom via Polygon.io. SIMULATED badge on non-real charts
 - **Live Indian NSE** — INFY via Twelve Data (free tier limitation)
 - **Live crypto** — top 8 by market cap with 30-day charts via CoinGecko
@@ -62,7 +61,6 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 ```
 Browser
    │
-   ├── /api/wstoken                     ──▶  Cloudflare Worker  ──▶  (serves Finnhub key at runtime)
    ├── /api/stocks?symbols=AAPL,MSFT    ──▶  Cloudflare Worker  ──▶  Finnhub REST
    ├── /api/indices                      ──▶  Cloudflare Worker  ──▶  Finnhub (ETF proxies)
    ├── /api/indian                       ──▶  Cloudflare Worker  ──▶  Twelve Data
@@ -70,11 +68,21 @@ Browser
    ├── /api/chart?symbol=AAPL&range=1Y   ──▶  Cloudflare Worker  ──▶  Polygon.io
    ├── /api/news?symbol=AAPL             ──▶  Cloudflare Worker  ──▶  Bing RSS / Finnhub
    ├── /api/mfnav?q=mirae                ──▶  Cloudflare Worker  ──▶  AMFI portal
-   ├── wss://ws.finnhub.io               ──▶  Direct WebSocket   ──▶  Finnhub
    └── CoinGecko                         ──▶  Direct (no key)
 ```
 
 All API keys live exclusively in Cloudflare encrypted Secrets — never in the client bundle.
+
+---
+
+## Security
+
+- **No API keys in the frontend bundle** — all keys server-side in Cloudflare Workers
+- **No WebSocket key exposure** — removed Finnhub WebSocket; US stocks now polled via `/api/stocks` every 60s
+- **Origin locking** — Workers reject non-`mkt-vision.com` requests
+- **Input sanitization** on all Worker symbol params
+- **Server-side caching** prevents rate limit abuse
+- **GPG-signed commits**
 
 ---
 
@@ -87,23 +95,11 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 | Hosting | Cloudflare Pages |
 | API proxy | Cloudflare Pages Functions (Workers) |
 | US stocks | [Finnhub](https://finnhub.io) (free tier) |
-| Real-time | Finnhub WebSocket |
-| Charts | [Polygon.io](https://polygon.io) (free tier) |
+| Historical charts | [Polygon.io](https://polygon.io) (free tier) |
 | Indian NSE | [Twelve Data](https://twelvedata.com) (free tier) |
 | Crypto | [CoinGecko](https://coingecko.com) (public) |
 | MF NAV | [AMFI](https://www.amfiindia.com) (public) |
 | News | Bing News RSS |
-
----
-
-## Security
-
-- No API keys in the frontend bundle
-- WebSocket key served via `/api/wstoken` at runtime
-- Origin locking — Workers reject non-`mkt-vision.com` requests
-- Input sanitization on all Worker symbol params
-- Server-side caching prevents rate limit abuse
-- GPG-signed commits
 
 ---
 
@@ -117,7 +113,6 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   ├── search.js       # Symbol search → Finnhub + Twelve Data
 │   ├── chart.js        # OHLC → Polygon.io
 │   ├── news.js         # News → Bing RSS / Finnhub
-│   ├── wstoken.js      # Finnhub WebSocket key endpoint
 │   └── mfnav.js        # MF NAV → AMFI portal
 ├── src/
 │   ├── components/
@@ -134,8 +129,8 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │       ├── SIP.jsx · EMI.jsx · Compound.jsx
 │   │       ├── StockReturn.jsx · Portfolio.jsx · Options.jsx
 │   │       ├── NetWorth.jsx · CreditCard.jsx · Inflation.jsx
-│   │       ├── FDvsMF.jsx · ULIPvsTermMF.jsx
-│   ├── App.jsx          # Lazy-loaded routes
+│   │       └── FDvsMF.jsx · ULIPvsTermMF.jsx
+│   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx
 ├── public/favicon.ico
@@ -156,7 +151,7 @@ npm run dev
 ### Deployment
 
 1. Push to GitHub → Cloudflare auto-deploys
-2. Environment variables under **Settings → Environment Variables**:
+2. Add environment variables under **Settings → Environment Variables**:
 
 | Variable | Type | Value |
 |---|---|---|
@@ -173,7 +168,6 @@ npm run dev
 - **NSE historical charts** — simulated (paid plan required)
 - **Index absolute values** — ETF proxies show % change only
 - **Polygon rate limit** — 5 calls/min free tier; requests debounced + cached
-- **WebSocket** — US market hours only (9:30 AM–4 PM ET / 7 PM–1:30 AM IST)
 - **SGB** — primary issuance stopped Feb 2024; secondary market (NSE/BSE) only
 
 ---
