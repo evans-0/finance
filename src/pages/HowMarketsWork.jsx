@@ -608,7 +608,7 @@ function DerivativesMarket() {
         </div>
       </Section>
 
-      <Section subtitle="05 — RISK REALITY" title="Why 90% of retail F&O traders lose money">
+      <Section subtitle="05 - RISK REALITY" title="Why 90% of retail F&O traders lose money">
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: 12, marginBottom: 20 }}>
             {[['89%', 'Retail F&O traders lose money', C.red, 'SEBI Study 2023'],
