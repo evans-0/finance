@@ -41,6 +41,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **Inflation Impact** | Purchasing power decay, goal inflator |
 | **FD vs Mutual Fund** | Post-tax, inflation-adjusted, breakeven CAGR |
 | **ULIP vs Term + MF** | Charges breakdown, mortality cost by age |
+| **Buy vs Rent** | Opportunity cost of down payment, tax benefits (US + India), net worth trajectory |
 
 ### Financial Education
 - **Glossary** (`/glossary`) — 62 terms across 8 categories, searchable
@@ -129,7 +130,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │       ├── SIP.jsx · EMI.jsx · Compound.jsx
 │   │       ├── StockReturn.jsx · Portfolio.jsx · Options.jsx
 │   │       ├── NetWorth.jsx · CreditCard.jsx · Inflation.jsx
-│   │       └── FDvsMF.jsx · ULIPvsTermMF.jsx
+│   │       └── FDvsMF.jsx · ULIPvsTermMF.jsx · BuyVsRent.jsx
 │   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx
