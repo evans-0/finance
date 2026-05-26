@@ -86,6 +86,13 @@ const CALCULATORS = [
     desc: 'See why mixing insurance with investment costs you lakhs. Compare ULIP charges vs buying them separately.',
     tags: ['ULIP', 'Term Insurance', 'Financial Literacy'],
   },
+  {
+  to: '/calculators/buyvsrent',
+  icon: String.fromCodePoint(0x1F3E0),
+  name: 'Buy vs Rent',
+  desc: 'Compare true cost of buying vs renting. Includes opportunity cost of down payment, tax benefits, and net worth trajectory. Supports US and India.',
+  tags: ['Real Estate', 'Personal Finance', 'Planning'],
+  },
 ]
 
 export default function CalculatorsHub() {
