@@ -93,6 +93,13 @@ const CALCULATORS = [
   desc: 'Compare true cost of buying vs renting. Includes opportunity cost of down payment, tax benefits, and net worth trajectory. Supports US and India.',
   tags: ['Real Estate', 'Personal Finance', 'Planning'],
   },
+  {
+  to: '/calculators/fire',
+  icon: String.fromCodePoint(0x1F525),
+  name: 'FIRE Calculator',
+  desc: 'Find your Financial Independence number. Includes Lean/Regular/Fat FIRE variants, Coast FIRE point, savings rate analysis, and corpus trajectory.',
+  tags: ['FIRE', 'Retirement', 'Personal Finance'],
+  },
 ]
 
 export default function CalculatorsHub() {

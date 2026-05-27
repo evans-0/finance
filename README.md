@@ -42,6 +42,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **FD vs Mutual Fund** | Post-tax, inflation-adjusted, breakeven CAGR |
 | **ULIP vs Term + MF** | Charges breakdown, mortality cost by age |
 | **Buy vs Rent** | Opportunity cost of down payment, tax benefits (US + India), net worth trajectory |
+| **FIRE** | Lean/Regular/Fat FIRE numbers, Coast FIRE age, savings rate, corpus trajectory |
 
 ### Financial Education
 - **Glossary** (`/glossary`) — 62 terms across 8 categories, searchable
