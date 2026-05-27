@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid,
@@ -13,6 +13,16 @@ const C = {
   text: '#c8d8f0', textSec: '#506888', textDim: '#1e3050',
 }
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
+
+function useWindowWidth() {
+  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+  return width
+}
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 const fmtIN = n => {
@@ -157,20 +167,49 @@ function StatBox({ label, value, sub, color }) {
   )
 }
 
-function AssetRow({ asset, onChange, onRemove, fmt }) {
+// FormattedInput: shows Indian/US format when blurred, raw number when focused
+function FormattedInput({ value, onChange, color, mode, style = {} }) {
+  const [focused, setFocused] = useState(false)
+  const fmt = v => {
+    if (mode === 'us') return v === 0 ? '' : String(Math.round(v))
+    if (!v || v === 0) return ''
+    const abs = Math.round(v)
+    const s = abs.toString()
+    if (s.length <= 3) return s
+    const last3 = s.slice(-3)
+    const rest = s.slice(0, -3)
+    const parts = []
+    for (let i = rest.length; i > 0; i -= 2) parts.unshift(rest.slice(Math.max(0, i - 2), i))
+    return parts.join(',') + ',' + last3
+  }
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 130px 90px 28px', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+    <input
+      type="text"
+      value={focused ? (value === 0 ? '' : value) : fmt(value)}
+      onFocus={() => setFocused(true)}
+      onBlur={e => { setFocused(false); onChange(parseFloat(e.target.value.replace(/,/g, '')) || 0) }}
+      onChange={e => { if (focused) onChange(parseFloat(e.target.value.replace(/,/g, '')) || 0) }}
+      style={{ ...style, color: color || C.text }}
+    />
+  )
+}
+
+function AssetRow({ asset, onChange, onRemove, mode, isMobile }) {
+  const inputStyle = { width: '100%', background: C.bg, border: '1px solid ' + C.border, padding: '7px 10px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }
+  const grid = isMobile
+    ? { display: 'grid', gridTemplateColumns: '1fr 110px 80px 28px', gap: 6, marginBottom: 8, alignItems: 'center' }
+    : { display: 'grid', gridTemplateColumns: '1fr 130px 90px 28px', gap: 8, marginBottom: 8, alignItems: 'center' }
+  return (
+    <div style={grid}>
       <input value={asset.name} onChange={e => onChange('name', e.target.value)}
         placeholder="Asset name"
-        style={{ background: C.bg, border: '1px solid ' + C.border, color: C.text, padding: '7px 10px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
-      <div style={{ position: 'relative' }}>
-        <input type="number" value={asset.value} onChange={e => onChange('value', parseFloat(e.target.value) || 0)}
-          style={{ width: '100%', background: C.bg, border: '1px solid ' + C.border, color: C.text, padding: '7px 10px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
-      </div>
+        style={{ ...inputStyle, color: C.text }} />
+      <FormattedInput value={asset.value} onChange={v => onChange('value', v)} mode={mode}
+        style={inputStyle} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <input type="number" value={asset.returnRate} onChange={e => onChange('returnRate', parseFloat(e.target.value) || 0)}
           step={0.1} min={0} max={50}
-          style={{ width: '100%', background: C.bg, border: '1px solid ' + C.border, color: C.amber, padding: '7px 8px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
+          style={{ ...inputStyle, color: C.amber, padding: '7px 8px' }} />
         <span style={{ fontSize: 11, color: C.textSec }}>%</span>
       </div>
       <button onClick={onRemove} style={{ background: 'transparent', border: '1px solid ' + C.border, color: C.red, borderRadius: 3, cursor: 'pointer', fontSize: 14, padding: '4px 6px', lineHeight: 1 }}>×</button>
@@ -178,23 +217,24 @@ function AssetRow({ asset, onChange, onRemove, fmt }) {
   )
 }
 
-function LiabilityRow({ liability, onChange, onRemove }) {
+function LiabilityRow({ liability, onChange, onRemove, mode, isMobile }) {
+  const inputStyle = { width: '100%', background: C.bg, border: '1px solid ' + C.border, padding: '7px 10px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 110px 90px 70px 28px', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 110px 90px 70px 28px', gap: isMobile ? '6px 8px' : 8, marginBottom: isMobile ? 16 : 8, alignItems: 'center' }}>
       <input value={liability.name} onChange={e => onChange('name', e.target.value)}
         placeholder="Liability name"
-        style={{ background: C.bg, border: '1px solid ' + C.border, color: C.text, padding: '7px 10px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
-      <input type="number" value={liability.balance} onChange={e => onChange('balance', parseFloat(e.target.value) || 0)}
-        style={{ background: C.bg, border: '1px solid ' + C.border, color: C.text, padding: '7px 10px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
-      <input type="number" value={liability.emi} onChange={e => onChange('emi', parseFloat(e.target.value) || 0)}
-        style={{ background: C.bg, border: '1px solid ' + C.border, color: C.red, padding: '7px 8px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        style={{ ...inputStyle, color: C.text }} />
+      <FormattedInput value={liability.balance} onChange={v => onChange('balance', v)} mode={mode}
+        style={inputStyle} />
+      <FormattedInput value={liability.emi} onChange={v => onChange('emi', v)} mode={mode}
+        style={inputStyle} color={C.red} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, gridColumn: isMobile ? '1' : 'auto' }}>
         <input type="number" value={liability.rate} onChange={e => onChange('rate', parseFloat(e.target.value) || 0)}
           step={0.1} min={0} max={30}
-          style={{ width: '100%', background: C.bg, border: '1px solid ' + C.border, color: C.textSec, padding: '7px 6px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none' }} />
+          style={{ ...inputStyle, color: C.textSec, padding: '7px 6px' }} />
         <span style={{ fontSize: 11, color: C.textSec }}>%</span>
       </div>
-      <button onClick={onRemove} style={{ background: 'transparent', border: '1px solid ' + C.border, color: C.red, borderRadius: 3, cursor: 'pointer', fontSize: 14, padding: '4px 6px', lineHeight: 1 }}>×</button>
+      <button onClick={onRemove} style={{ background: 'transparent', border: '1px solid ' + C.border, color: C.red, borderRadius: 3, cursor: 'pointer', fontSize: 14, padding: '4px 6px', lineHeight: 1, gridColumn: isMobile ? '2' : 'auto', justifySelf: isMobile ? 'end' : 'auto' }}>×</button>
     </div>
   )
 }
@@ -215,6 +255,7 @@ const CustomTooltip = ({ active, payload, label, fmt }) => {
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function FutureNetWorth() {
   const [mode, setMode] = useState('in')
+  const isMobile = useWindowWidth() < 700
   const [assets, setAssets] = useState({ in: DEFAULT_ASSETS.in, us: DEFAULT_ASSETS.us })
   const [liabilities, setLiabilities] = useState({ in: DEFAULT_LIABILITIES.in, us: DEFAULT_LIABILITIES.us })
   const [global, setGlobal] = useState(DEFAULT_GLOBAL)
@@ -246,7 +287,7 @@ export default function FutureNetWorth() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '52px 24px' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '24px 16px' : '52px 24px' }}>
 
         {/* Header */}
         <div style={{ marginBottom: 36 }}>
@@ -269,7 +310,7 @@ export default function FutureNetWorth() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', gap: 32, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '420px 1fr', gap: isMobile ? 20 : 32, alignItems: 'start' }}>
 
           {/* ── LEFT: Balance sheet inputs ── */}
           <div>
@@ -283,7 +324,7 @@ export default function FutureNetWorth() {
                 <span />
               </div>
               {a.map(asset => (
-                <AssetRow key={asset.id} asset={asset} fmt={fmt}
+                <AssetRow key={asset.id} asset={asset} mode={mode} isMobile={isMobile}
                   onChange={(f, v) => updateAsset(asset.id, f, v)}
                   onRemove={() => removeAsset(asset.id)} />
               ))}
@@ -302,7 +343,7 @@ export default function FutureNetWorth() {
                 <span />
               </div>
               {l.map(liab => (
-                <LiabilityRow key={liab.id} liability={liab}
+                <LiabilityRow key={liab.id} mode={mode} isMobile={isMobile} liability={liab}
                   onChange={(f, v) => updateLiability(liab.id, f, v)}
                   onRemove={() => removeLiability(liab.id)} />
               ))}
@@ -318,14 +359,14 @@ export default function FutureNetWorth() {
                 <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 6 }}>
                   AMOUNT ({curr}/MO)
                 </label>
-                <input type="number" value={g.monthlySavings} onChange={e => setG('monthlySavings', parseFloat(e.target.value) || 0)}
-                  style={{ width: '100%', background: C.bg, border: '1px solid ' + C.border, color: C.text, padding: '8px 12px', fontSize: 13, fontFamily: MONO, borderRadius: 3, outline: 'none', marginBottom: 4 }} />
+                <FormattedInput value={g.monthlySavings} onChange={v => setG('monthlySavings', v)} mode={mode}
+                  style={{ width: '100%', background: C.bg, border: '1px solid ' + C.border, padding: '8px 12px', fontSize: 13, fontFamily: MONO, borderRadius: 3, outline: 'none', marginBottom: 4 }} />
                 <div style={{ fontSize: 11, color: C.amber }}>{fmt(g.monthlySavings)}/mo</div>
                 <input type="range" value={g.monthlySavings} onChange={e => setG('monthlySavings', parseFloat(e.target.value))}
                   min={0} max={mode === 'in' ? 200000 : 20000} step={mode === 'in' ? 1000 : 100}
                   style={{ width: '100%', marginTop: 6, accentColor: C.amber }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 6 }}>INVESTED AT (%)</label>
                   <input type="number" value={g.savingsReturn} onChange={e => setG('savingsReturn', parseFloat(e.target.value) || 0)}
@@ -348,7 +389,7 @@ export default function FutureNetWorth() {
           {/* ── RIGHT: Results ── */}
           <div>
             {/* Stat cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
               <StatBox label="CURRENT NET WORTH" value={fmt(currentNW)} sub={`Assets: ${fmt(currentAssets)}`} color={currentNW >= 0 ? C.green : C.red} />
               <StatBox label={`NET WORTH · YR ${g.years}`} value={fmt(futureNW)} sub={`Liab: ${fmt(chartData[chartData.length-1]?.liabilities || 0)}`} color={C.amber} />
               <StatBox label="TOTAL GROWTH" value={fmt(growth)} sub="in absolute terms" color={growth >= 0 ? C.green : C.red} />
@@ -357,7 +398,7 @@ export default function FutureNetWorth() {
 
             {/* Chart */}
             <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: '20px 16px 12px', marginBottom: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? 8 : 0, marginBottom: 16 }}>
                 <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 2 }}>BALANCE SHEET PROJECTION</div>
                 <div style={{ display: 'flex', gap: 16 }}>
                   {[['ASSETS', C.green], ['LIABILITIES', C.red], ['NET WORTH', C.amber]].map(([label, color]) => (
