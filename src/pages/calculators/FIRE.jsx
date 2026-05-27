@@ -49,12 +49,15 @@ const DEFAULTS = {
 
 // ── Core calculation ──────────────────────────────────────────────────────────
 function computeFIRE(p, activeVariant) {
-  const annualExpenses = p.retireExpenses * 12
+  const annualExpensesToday = p.retireExpenses * 12
+  const yearsToRetire = p.retireAge - p.currentAge
+  // Inflate today's retirement expenses to what they'll cost at retirement date
+  const annualExpenses = annualExpensesToday * Math.pow(1 + p.inflation / 100, yearsToRetire)
   const monthlySavings = p.monthlyIncome - p.monthlyExpenses
   const r = p.returnRate / 100
   const rMonthly = r / 12
 
-  // FIRE numbers for each variant
+  // FIRE numbers for each variant — all inflation-adjusted to retirement date
   const fireNumbers = VARIANTS.map(v => ({
     ...v,
     fireNumber: annualExpenses * v.mult,
@@ -104,7 +107,6 @@ function computeFIRE(p, activeVariant) {
   const savingsRate = monthlySavings > 0 ? (monthlySavings / p.monthlyIncome) * 100 : 0
   const progress = Math.min((p.currentSavings / mainFireNumber) * 100, 100)
 
-  const yearsToRetire = p.retireAge - p.currentAge
   const monthsToRetire = yearsToRetire * 12
   const futureCorpusNeeded = mainFireNumber - p.currentSavings * Math.pow(1 + r, yearsToRetire)
   const monthlySavingsNeeded = rMonthly > 0
