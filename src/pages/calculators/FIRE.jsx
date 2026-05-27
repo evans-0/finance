@@ -48,7 +48,7 @@ const DEFAULTS = {
 }
 
 // ── Core calculation ──────────────────────────────────────────────────────────
-function computeFIRE(p, mode) {
+function computeFIRE(p, activeVariant) {
   const annualExpenses = p.retireExpenses * 12
   const monthlySavings = p.monthlyIncome - p.monthlyExpenses
   const r = p.returnRate / 100
@@ -60,8 +60,9 @@ function computeFIRE(p, mode) {
     fireNumber: annualExpenses * v.mult,
   }))
 
-  // Main FIRE number (regular, 4% rule)
-  const mainFireNumber = annualExpenses * 25
+  // Active variant drives all stats
+  const activeV = VARIANTS.find(v => v.key === activeVariant) || VARIANTS[1]
+  const mainFireNumber = annualExpenses * activeV.mult
 
   // Build year-by-year accumulation
   const maxAge = Math.max(p.retireAge + p.withdrawYears, p.currentAge + 60)
@@ -74,7 +75,7 @@ function computeFIRE(p, mode) {
     const isAccumulating = age < p.retireAge
 
     if (isAccumulating) {
-      // Check Coast FIRE: can we stop contributing now and still hit FIRE number?
+      // Coast FIRE: can we stop contributing now and growth alone hits the active target?
       const yearsLeft = p.retireAge - age
       const coastNumber = mainFireNumber / Math.pow(1 + r, yearsLeft)
       if (!coastFireAge && corpus >= coastNumber) coastFireAge = age
@@ -95,21 +96,14 @@ function computeFIRE(p, mode) {
     }
 
     const point = { age, corpus: Math.round(corpus) }
-    // Add reference lines for each FIRE variant
     fireNumbers.forEach(v => { point[v.key + 'Target'] = Math.round(v.fireNumber) })
     data.push(point)
   }
 
-  // Years to FIRE from today
   const yearsToFire = fireAge ? fireAge - p.currentAge : null
-
-  // Savings rate
   const savingsRate = monthlySavings > 0 ? (monthlySavings / p.monthlyIncome) * 100 : 0
-
-  // Progress toward main FIRE number
   const progress = Math.min((p.currentSavings / mainFireNumber) * 100, 100)
 
-  // Monthly savings needed to hit FIRE by retireAge
   const yearsToRetire = p.retireAge - p.currentAge
   const monthsToRetire = yearsToRetire * 12
   const futureCorpusNeeded = mainFireNumber - p.currentSavings * Math.pow(1 + r, yearsToRetire)
@@ -186,7 +180,7 @@ export default function FIRECalculator() {
   const set = mode === 'us' ? setUs : setIn
   const fmt = mode === 'us' ? fmtUS : n => '₹' + fmtIN(n)
 
-  const result = useMemo(() => computeFIRE(params, mode), [params, mode])
+  const result = useMemo(() => computeFIRE(params, activeVariant), [params, activeVariant])
   const {
     fireNumbers, mainFireNumber, data,
     yearsToFire, fireAge, coastFireAge,
