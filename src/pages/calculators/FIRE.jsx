@@ -109,15 +109,16 @@ function computeFIRE(p, activeVariant) {
 
   const monthsToRetire = yearsToRetire * 12
   const futureCorpusNeeded = mainFireNumber - p.currentSavings * Math.pow(1 + r, yearsToRetire)
-  const monthlySavingsNeeded = rMonthly > 0
+  const alreadyFunded = futureCorpusNeeded <= 0
+  const rawSavingsNeeded = alreadyFunded ? 0 : rMonthly > 0
     ? futureCorpusNeeded * rMonthly / (Math.pow(1 + rMonthly, monthsToRetire) - 1)
     : futureCorpusNeeded / monthsToRetire
 
   return {
     fireNumbers, mainFireNumber, data,
     yearsToFire, fireAge, coastFireAge,
-    savingsRate, progress,
-    monthlySavings, monthlySavingsNeeded: Math.max(monthlySavingsNeeded, 0),
+    savingsRate, progress, alreadyFunded,
+    monthlySavings, monthlySavingsNeeded: Math.max(rawSavingsNeeded, 0),
     retireAge: p.retireAge,
   }
 }
@@ -186,12 +187,12 @@ export default function FIRECalculator() {
   const {
     fireNumbers, mainFireNumber, data,
     yearsToFire, fireAge, coastFireAge,
-    savingsRate, progress,
+    savingsRate, progress, alreadyFunded,
     monthlySavings, monthlySavingsNeeded,
     retireAge,
   } = result
 
-  const onTrack = monthlySavings >= monthlySavingsNeeded
+  const onTrack = alreadyFunded || monthlySavings >= monthlySavingsNeeded
   const sectionStyle = { fontSize: 10, color: C.amber, letterSpacing: 2, marginBottom: 14, marginTop: 24 }
   const divider = <div style={{ borderTop: '1px solid ' + C.border, margin: '20px 0' }} />
 
@@ -308,7 +309,9 @@ export default function FIRECalculator() {
               </div>
               <div style={{ fontSize: 12, color: C.textSec, lineHeight: 1.8 }}>
                 Saving {fmt(monthlySavings)}/mo.{' '}
-                {onTrack
+                {alreadyFunded
+                  ? `Your existing corpus grows to hit your FIRE number — zero additional contributions needed.`
+                  : onTrack
                   ? `You need ${fmt(monthlySavingsNeeded)}/mo — you're saving ${fmt(monthlySavings - monthlySavingsNeeded)} more than required.`
                   : `You need ${fmt(monthlySavingsNeeded)}/mo to retire at ${retireAge} — shortfall of ${fmt(monthlySavingsNeeded - monthlySavings)}/mo.`
                 }
