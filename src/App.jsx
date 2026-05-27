@@ -24,6 +24,7 @@ const ULIPvsTermMF   = lazy(() => import('./pages/calculators/ULIPvsTermMF'))
 const MFNav          = lazy(() => import('./pages/MFNav'))
 const BuyVsRent		 = lazy(() => import('./pages/calculators/BuyVsRent'))
 const FIRE			 = lazy(() => import('./pages/calculators/FIRE'))
+const FutureNetWorth = lazy(() => import('./pages/calculators/FutureNetWorth'))
 
 const Loader = () => (
   <div style={{ background: '#020c18', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'monospace', color: '#506888', fontSize: 12, letterSpacing: 2 }}>
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/mf-nav"                     element={<MFNav />} />
 		  <Route path="/calculators/buyvsrent" element={<BuyVsRent />} />
 		  <Route path="/calculators/fire" element={<FIRE />} />
+		  <Route path="/calculators/futurenetworth" element={<FutureNetWorth />} />
         </Routes>
       </Suspense>
     </ErrorBoundary>

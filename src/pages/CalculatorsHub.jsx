@@ -100,6 +100,13 @@ const CALCULATORS = [
   desc: 'Find your Financial Independence number. Includes Lean/Regular/Fat FIRE variants, Coast FIRE point, savings rate analysis, and corpus trajectory.',
   tags: ['FIRE', 'Retirement', 'Personal Finance'],
   },
+  {
+  to: '/calculators/futurenetworth',
+  icon: String.fromCodePoint(0x1F4C8),
+  name: 'Future Net Worth',
+  desc: 'Full balance sheet projection. Each asset grows at its own rate, each liability amortises via EMI. See where you stand in 10, 20, 30 years.',
+  tags: ['Net Worth', 'Planning', 'Personal Finance'],
+  },
 ]
 
 export default function CalculatorsHub() {
