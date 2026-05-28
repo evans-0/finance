@@ -32,12 +32,14 @@ Respond ONLY with a valid JSON object — no markdown, no backticks, no preamble
   "explanation": "2-3 short paragraphs explaining what this concept means and why it matters. Use plain English. Include at least one specific numerical example in rupees.",
   "example": "One concrete worked example — walk through the numbers step by step. Keep it to 3-5 sentences.",
   "mistakes": [
-    "First common mistake people make with this concept",
-    "Second common mistake",
-    "Third common mistake"
+    "A specific mistake people commonly make regarding this concept — write the actual mistake, not a placeholder",
+    "Another distinct, non-obvious mistake specific to this concept",
+    "A third mistake — make it actionable and concrete, not generic investing advice"
   ],
-  "relatedTerms": ["RelatedTerm1", "RelatedTerm2", "RelatedTerm3"]
+  "relatedTerms": ["ActualTerm1", "ActualTerm2", "ActualTerm3"]
 }
+
+Each mistake must be a real, complete sentence describing an actual mistake. Do not copy the instruction text. Do not write "First common mistake" or similar meta-text.
 
 The relatedTerms must be picked from this list only — return the short form (e.g. "CAGR" not "Compound Annual Growth Rate"):
 CAGR, NAV, Expense Ratio, SIP, Lumpsum, Diversification, Asset Allocation, Rebalancing, Benchmark, Alpha, Beta, XIRR, Bull Market, Bear Market, Market Cap, P/E Ratio, EPS, Dividend, IPO, Circuit Breaker, Bid-Ask Spread, Volume, Equity Fund, Debt Fund, Index Fund, ELSS, Exit Load, AUM, EMI, Principal, Amortisation, Prepayment, Credit Score, Credit Utilisation, Moratorium, LTCG, STCG, TDS, 80C, HRA, Inflation, Interest Rate, Repo Rate, Fiscal Deficit, GDP, CPI, Options, Futures, Derivatives, Call Option, Put Option, Strike Price, Expiry, Margin, Hedging, Short Selling, Arbitrage, Liquidity, Volatility, Risk-Adjusted Return, Sharpe Ratio, Standard Deviation, Compounding, Time Value of Money, Opportunity Cost, Sunk Cost, Net Worth, FIRE`
