@@ -1,13 +1,38 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
   amber: '#f5a623', text: '#c8d8f0', textSec: '#506888', textDim: '#1e3050',
-  green: '#00e676', red: '#ff3c5c',
+  green: '#00e676', red: '#ff3c5c', blue: '#4fc3f7',
 }
 const MONO = "'Consolas','Menlo','Monaco','Courier New',monospace"
+
+// Map terms to relevant calculators on the site
+const CALCULATOR_MAP = {
+  'SIP': { label: 'SIP Calculator', to: '/calculators/sip' },
+  'CAGR': { label: 'Stock Returns Calculator', to: '/calculators/stockreturn' },
+  'EMI': { label: 'EMI Calculator', to: '/calculators/emi' },
+  'Amortisation': { label: 'EMI Calculator', to: '/calculators/emi' },
+  'Principal': { label: 'EMI Calculator', to: '/calculators/emi' },
+  'Prepayment': { label: 'EMI Calculator', to: '/calculators/emi' },
+  'Expense Ratio': { label: 'SIP Calculator', to: '/calculators/sip' },
+  'NAV': { label: 'MF NAV Lookup', to: '/mf-nav' },
+  'ELSS': { label: 'SIP Calculator', to: '/calculators/sip' },
+  'Compounding': { label: 'Compound Interest Calculator', to: '/calculators/compound' },
+  'Credit Score': { label: 'Credit Card Calculator', to: '/calculators/creditcard' },
+  'Credit Utilisation': { label: 'Credit Card Calculator', to: '/calculators/creditcard' },
+  'Options': { label: 'Options P&L Calculator', to: '/calculators/options' },
+  'Call Option': { label: 'Options P&L Calculator', to: '/calculators/options' },
+  'Put Option': { label: 'Options P&L Calculator', to: '/calculators/options' },
+  'Futures': { label: 'Options P&L Calculator', to: '/calculators/options' },
+  'Net Worth': { label: 'Net Worth Calculator', to: '/calculators/networth' },
+  'FIRE': { label: 'FIRE Calculator', to: '/calculators/fire' },
+  'Inflation': { label: 'Inflation Impact Calculator', to: '/calculators/inflation' },
+  'Alpha': { label: 'Stock Returns Calculator', to: '/calculators/stockreturn' },
+  'Beta': { label: 'Stock Returns Calculator', to: '/calculators/stockreturn' },
+}
 
 const TERMS = [
   // Investing
@@ -59,64 +84,189 @@ const TERMS = [
   { term: 'TDS', full: 'Tax Deducted at Source', category: 'Tax', definition: 'Tax automatically deducted by the payer before making a payment. Banks deduct 10% TDS on FD interest above ₹40,000 per year. You can claim it back if your total income is below the taxable limit.' },
   { term: '80C', full: 'Section 80C Deduction', category: 'Tax', definition: 'A tax deduction under the old regime allowing up to ₹1.5 lakh to be deducted from taxable income. Covers PPF, ELSS, EPF, home loan principal, life insurance premiums. Not available under the new tax regime.' },
   { term: 'HRA', full: 'House Rent Allowance', category: 'Tax', definition: 'A component of salary that can be partially or fully exempt from tax if you pay rent. Exemption is minimum of: actual HRA received, 50% of salary (metro) or 40% (non-metro), or actual rent minus 10% of salary.' },
-  { term: 'Indexation', full: 'Indexation Benefit', category: 'Tax', definition: 'Adjusting the purchase price of an asset for inflation to reduce taxable capital gains. If you bought property for ₹20 lakh in 2010 and sell for ₹50 lakh in 2024, indexation raises the cost to ₹38 lakh, reducing your taxable gain. Removed for real estate in Budget 2024.' },
+
+  // Economics
+  { term: 'Inflation', full: 'Inflation', category: 'Economics', definition: 'The rate at which the general price level of goods and services rises over time, eroding purchasing power. At 6% annual inflation, ₹1 lakh today will only buy what ₹74,726 buys today in 5 years.' },
+  { term: 'Interest Rate', full: 'Interest Rate', category: 'Economics', definition: 'The cost of borrowing money or the return for lending it, expressed as a percentage. RBI\'s repo rate influences all borrowing costs in India. When RBI raises rates, home loan EMIs go up.' },
+  { term: 'Repo Rate', full: 'Repo Rate', category: 'Economics', definition: 'The rate at which RBI lends money to commercial banks. A higher repo rate makes borrowing expensive for banks, which pass the cost to consumers. RBI uses it to control inflation.' },
+  { term: 'Fiscal Deficit', full: 'Fiscal Deficit', category: 'Economics', definition: 'When a government spends more than it earns in a financial year. Expressed as a percentage of GDP. India\'s fiscal deficit target is typically 4–5% of GDP. Higher deficit can lead to inflation.' },
+  { term: 'GDP', full: 'Gross Domestic Product', category: 'Economics', definition: 'The total monetary value of all goods and services produced in a country in a year. India\'s GDP growth of 7%+ makes it one of the fastest-growing major economies. Markets often rally on strong GDP data.' },
+  { term: 'CPI', full: 'Consumer Price Index', category: 'Economics', definition: 'A measure of inflation tracking the price change of a basket of consumer goods. RBI targets CPI inflation of 4% (±2%). CPI data influences RBI\'s decision to raise or cut interest rates.' },
 
   // Derivatives
-  { term: 'Options', full: 'Options Contract', category: 'Derivatives', definition: 'A contract giving the buyer the right (not obligation) to buy or sell an asset at a predetermined price before expiry. Call option = right to buy. Put option = right to sell. Premium paid upfront is the maximum loss for the buyer.' },
-  { term: 'Call Option', full: 'Call Option', category: 'Derivatives', definition: 'The right to buy an asset at the strike price before expiry. You buy a call when you expect the price to rise. If Nifty is at 22,000 and you buy a 22,500 call, you profit if Nifty rises above 22,500 + premium paid.' },
-  { term: 'Put Option', full: 'Put Option', category: 'Derivatives', definition: 'The right to sell an asset at the strike price before expiry. You buy a put when you expect the price to fall. Used as insurance for portfolios — a put option can protect against market crashes.' },
-  { term: 'Strike Price', full: 'Strike Price', category: 'Derivatives', definition: 'The predetermined price at which an option can be exercised. A Nifty 22,000 call has a strike price of 22,000. In-the-money if market is above strike (for calls) or below strike (for puts).' },
-  { term: 'Premium', full: 'Option Premium', category: 'Derivatives', definition: 'The price paid to buy an options contract. For the buyer it\'s the maximum possible loss. For the seller it\'s the maximum possible gain. Premium is driven by intrinsic value + time value + implied volatility.' },
-  { term: 'Futures', full: 'Futures Contract', category: 'Derivatives', definition: 'A legal obligation to buy or sell an asset at a predetermined price on a future date. Unlike options, both parties must fulfil the contract. Used for hedging and speculation. High leverage means high risk.' },
-  { term: 'F&O', full: 'Futures & Options', category: 'Derivatives', definition: 'Derivative instruments traded on exchanges like NSE. India has one of the largest F&O markets in the world by volume. 90%+ of retail F&O traders lose money — SEBI data confirms this repeatedly.' },
+  { term: 'Options', full: 'Options Contract', category: 'Derivatives', definition: 'A contract giving you the right (but not obligation) to buy or sell an asset at a set price before a set date. Used for hedging or speculation. Complex instruments — not for beginners.' },
+  { term: 'Futures', full: 'Futures Contract', category: 'Derivatives', definition: 'An agreement to buy or sell an asset at a predetermined price on a future date. Unlike options, both parties are obligated to fulfil the contract. Used by traders and companies to hedge price risk.' },
+  { term: 'Derivatives', full: 'Derivatives', category: 'Derivatives', definition: 'Financial instruments whose value is derived from an underlying asset (stocks, commodities, currencies). Includes futures and options. India\'s NSE is the world\'s largest derivatives exchange by volume.' },
+  { term: 'Call Option', full: 'Call Option', category: 'Derivatives', definition: 'The right to buy an asset at a fixed price (strike price) before expiry. You buy a call when you expect the price to rise. If it doesn\'t, you only lose the premium paid.' },
+  { term: 'Put Option', full: 'Put Option', category: 'Derivatives', definition: 'The right to sell an asset at a fixed price before expiry. You buy a put when you expect the price to fall — it acts like insurance on a stock you own.' },
+  { term: 'Strike Price', full: 'Strike Price', category: 'Derivatives', definition: 'The price at which an options contract can be exercised. A Nifty call option with strike 22,000 gives you the right to buy Nifty at 22,000 regardless of its actual price at expiry.' },
+  { term: 'Expiry', full: 'Expiry Date', category: 'Derivatives', definition: 'The date on which a futures or options contract expires. In India, NSE weekly options expire every Thursday. After expiry, the contract is settled and ceases to exist.' },
+  { term: 'Margin', full: 'Margin', category: 'Derivatives', definition: 'A deposit required to open and hold a leveraged position. Trading ₹10 lakh in futures may require only ₹1 lakh margin — 10x leverage. Losses beyond your margin trigger a margin call.' },
+  { term: 'Hedging', full: 'Hedging', category: 'Derivatives', definition: 'Reducing risk by taking an offsetting position. An investor holding ₹10 lakh of Nifty stocks might buy put options to protect against a market crash — like buying insurance.' },
+  { term: 'Short Selling', full: 'Short Selling', category: 'Derivatives', definition: 'Selling a stock you don\'t own, hoping to buy it back cheaper later. You profit if the price falls. High risk — losses are theoretically unlimited if the stock price rises instead.' },
+  { term: 'Arbitrage', full: 'Arbitrage', category: 'Derivatives', definition: 'Profiting from price differences of the same asset in different markets. If a stock trades at ₹100 on NSE and ₹100.50 on BSE, buying on NSE and selling on BSE locks in a risk-free ₹0.50 profit per share.' },
 
   // Personal Finance
-  { term: 'Net Worth', full: 'Net Worth', category: 'Personal Finance', definition: 'Total assets minus total liabilities. If you own assets worth ₹50 lakh and owe ₹20 lakh in loans, your net worth is ₹30 lakh. The most important measure of financial health.' },
-  { term: 'Emergency Fund', full: 'Emergency Fund', category: 'Personal Finance', definition: '3–6 months of expenses kept in liquid, safe instruments. First rule of personal finance. Prevents you from selling investments at a loss during job loss, medical emergency, or unexpected expenses.' },
-  { term: 'Inflation', full: 'Inflation', category: 'Personal Finance', definition: 'The rate at which prices rise over time, eroding purchasing power. India\'s average inflation is 5–7% per year. ₹1 lakh today will have the buying power of ~₹55,000 in 10 years at 6% inflation.' },
-  { term: 'FIRE', full: 'Financial Independence, Retire Early', category: 'Personal Finance', definition: 'A movement focused on saving aggressively (50–70% of income) to build a corpus large enough to live off investment returns indefinitely. The 4% rule states you can withdraw 4% annually from your corpus without running out.' },
-  { term: 'Compound Interest', full: 'Compound Interest', category: 'Personal Finance', definition: 'Earning interest on your interest. ₹1 lakh at 12% simple interest = ₹1.12 lakh after 1 year. At compound interest after 10 years = ₹3.1 lakh. Einstein allegedly called it the eighth wonder of the world.' },
-  { term: '50/30/20 Rule', full: '50/30/20 Budgeting Rule', category: 'Personal Finance', definition: 'A popular budgeting framework: 50% of income on needs (rent, food, bills), 30% on wants (entertainment, dining out), 20% on savings and debt repayment. A starting point — adjust ratios to your situation.' },
-
-  // Insurance
-  { term: 'Term Insurance', full: 'Term Life Insurance', category: 'Insurance', definition: 'Pure life insurance with no investment component. Pays a lump sum to your family if you die during the policy term. A ₹1 crore cover for a 30-year-old costs ~₹8,000–10,000 per year. Cheapest way to protect your family.' },
-  { term: 'ULIP', full: 'Unit Linked Insurance Plan', category: 'Insurance', definition: 'A product combining insurance and investment. Part of your premium pays for life cover, the rest is invested in funds. High charges (allocation, fund management, mortality) make it inferior to buying term + MF separately for most people.' },
-  { term: 'Sum Assured', full: 'Sum Assured', category: 'Insurance', definition: 'The fixed amount your insurer will pay on a claim. If your term insurance has a sum assured of ₹1 crore, your family receives ₹1 crore on your death. Rule of thumb: 10–15x your annual income.' },
-  { term: 'Premium', full: 'Insurance Premium', category: 'Insurance', definition: 'The amount you pay to keep your insurance policy active — monthly, quarterly, or annually. Missing a premium payment can lapse your policy. Term insurance premiums are low; ULIPs charge far more.' },
-  { term: 'Claim Settlement Ratio', full: 'Claim Settlement Ratio', category: 'Insurance', definition: 'The percentage of claims an insurer paid out of total claims received. A ratio of 98% means the insurer settled 98 out of 100 claims. Choose insurers with CSR above 95% for life insurance.' },
+  { term: 'Liquidity', full: 'Liquidity', category: 'Personal Finance', definition: 'How quickly and easily an asset can be converted to cash without losing value. Cash is the most liquid. Real estate is illiquid — selling takes months. Always keep 3–6 months of expenses in liquid assets.' },
+  { term: 'Volatility', full: 'Volatility', category: 'Personal Finance', definition: 'The degree of price fluctuation in an investment. High volatility = large price swings. Small-cap stocks are more volatile than large-caps. Higher volatility = higher risk and potentially higher returns.' },
+  { term: 'Risk-Adjusted Return', full: 'Risk-Adjusted Return', category: 'Personal Finance', definition: 'Return measured relative to the risk taken. Two funds both returning 12% can have very different risk levels. The one with lower volatility has a better risk-adjusted return — measured by Sharpe Ratio.' },
+  { term: 'Sharpe Ratio', full: 'Sharpe Ratio', category: 'Personal Finance', definition: 'A measure of return per unit of risk. Sharpe = (Return - Risk-Free Rate) / Standard Deviation. A Sharpe above 1 is good; above 2 is excellent. Use it to compare funds with similar returns.' },
+  { term: 'Standard Deviation', full: 'Standard Deviation', category: 'Personal Finance', definition: 'A statistical measure of how spread out returns are around the average. A fund with 15% average return and high standard deviation swings wildly; one with low SD is more consistent.' },
+  { term: 'Compounding', full: 'Compounding', category: 'Personal Finance', definition: 'Earning returns on your returns. ₹1 lakh at 12% for 30 years = ₹29.9 lakh. The same ₹1 lakh for 10 years = only ₹3.1 lakh. Time is the most powerful variable in compounding.' },
+  { term: 'Time Value of Money', full: 'Time Value of Money', category: 'Personal Finance', definition: '₹1 today is worth more than ₹1 in the future because of its earning potential. ₹1 lakh today invested at 10% is worth ₹1.1 lakh next year. This principle underpins all financial calculations.' },
+  { term: 'Opportunity Cost', full: 'Opportunity Cost', category: 'Personal Finance', definition: 'The value of the next best alternative you give up when making a choice. Keeping ₹5 lakh in a savings account at 3% when the market earns 12% means an annual opportunity cost of ₹45,000.' },
+  { term: 'Sunk Cost', full: 'Sunk Cost', category: 'Personal Finance', definition: 'Money already spent that cannot be recovered. A stock down 50% is a sunk cost — the decision to hold or sell should be based on future prospects, not what you paid. The sunk cost fallacy leads to poor decisions.' },
+  { term: 'Net Worth', full: 'Net Worth', category: 'Personal Finance', definition: 'Total assets minus total liabilities. If you own a ₹80 lakh flat, ₹10 lakh in investments, but owe ₹40 lakh on a home loan, your net worth is ₹50 lakh. Growing net worth is the foundation of wealth building.' },
+  { term: 'FIRE', full: 'Financial Independence, Retire Early', category: 'Personal Finance', definition: 'A movement focused on aggressive saving and investing to retire decades before the traditional age. The core idea: build a corpus 25× your annual expenses, then withdraw 4% per year. Requires a high savings rate.' },
 ]
 
 const CATEGORIES = ['All', ...Array.from(new Set(TERMS.map(t => t.category)))]
 
+// ── Deep Dive Panel ───────────────────────────────────────────────────────────
+function DeepDive({ term, onClose }) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useState(() => {
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+    fetch(`/api/explain?term=${encodeURIComponent(term.term)}&full=${encodeURIComponent(term.full)}&category=${encodeURIComponent(term.category)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (cancelled) return
+        if (d.error) throw new Error(d.error)
+        setData(d)
+      })
+      .catch(e => { if (!cancelled) setError(e.message) })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [term.term])
+
+  const calc = CALCULATOR_MAP[term.term]
+  const allTermKeys = new Set(TERMS.map(t => t.term))
+
+  const panelStyle = {
+    background: C.bg, border: `1px solid ${C.amber}`, borderRadius: 4,
+    padding: '20px 22px', marginTop: 10,
+  }
+
+  if (loading) return (
+    <div style={panelStyle}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: C.textSec, fontSize: 12 }}>
+        <span style={{ display: 'inline-block', width: 14, height: 14, border: `2px solid ${C.amber}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        Generating deep dive...
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  )
+
+  if (error) return (
+    <div style={{ ...panelStyle, borderColor: C.red }}>
+      <div style={{ fontSize: 12, color: C.red }}>{error}</div>
+    </div>
+  )
+
+  if (!data) return null
+
+  return (
+    <div style={panelStyle}>
+      {/* Explanation */}
+      <div style={{ fontSize: 10, color: C.amber, letterSpacing: 2, marginBottom: 10 }}>DEEP DIVE</div>
+      <div style={{ fontSize: 13, color: C.text, lineHeight: 1.9, marginBottom: 18, whiteSpace: 'pre-line' }}>
+        {data.explanation}
+      </div>
+
+      {/* Example */}
+      {data.example && (
+        <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.green}`, borderRadius: 3, padding: '12px 16px', marginBottom: 18 }}>
+          <div style={{ fontSize: 10, color: C.green, letterSpacing: 2, marginBottom: 6 }}>WORKED EXAMPLE</div>
+          <div style={{ fontSize: 12, color: C.text, lineHeight: 1.8 }}>{data.example}</div>
+        </div>
+      )}
+
+      {/* Common mistakes */}
+      {data.mistakes?.length > 0 && (
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 10, color: C.red, letterSpacing: 2, marginBottom: 10 }}>COMMON MISTAKES</div>
+          {data.mistakes.map((m, i) => (
+            <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
+              <span style={{ color: C.red, fontSize: 12, flexShrink: 0, marginTop: 1 }}>✕</span>
+              <span style={{ fontSize: 12, color: C.textSec, lineHeight: 1.7 }}>{m}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Footer: related terms + calculator link */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
+        {data.relatedTerms?.filter(t => allTermKeys.has(t) && t !== term.term).map(t => (
+          <button key={t} onClick={onClose.bind(null, t)}
+            style={{ background: C.panel, border: `1px solid ${C.border}`, color: C.blue, padding: '4px 10px', fontSize: 11, fontFamily: MONO, borderRadius: 2, cursor: 'pointer', letterSpacing: 0.5 }}>
+            {t} →
+          </button>
+        ))}
+        {calc && (
+          <Link to={calc.to} style={{ marginLeft: 'auto', background: C.amber, color: C.bg, padding: '5px 12px', fontSize: 11, fontFamily: MONO, fontWeight: 700, borderRadius: 2, textDecoration: 'none', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
+            {calc.label} ↗
+          </Link>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function Glossary() {
-  const [query,    setQuery]    = useState('')
+  const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
+  const [expandedTerm, setExpandedTerm] = useState(null)
+  const cache = useRef(new Map())
 
   const filtered = TERMS.filter(t => {
     const matchCat = category === 'All' || t.category === category
-    const matchQ   = query === '' ||
-      t.term.toLowerCase().includes(query.toLowerCase()) ||
+    const matchQ = !query || t.term.toLowerCase().includes(query.toLowerCase()) ||
       t.full.toLowerCase().includes(query.toLowerCase()) ||
       t.definition.toLowerCase().includes(query.toLowerCase())
     return matchCat && matchQ
-  }).sort((a, b) => a.term.localeCompare(b.term))
+  })
+
+  const toggleTerm = (term) => {
+    setExpandedTerm(prev => prev === term ? null : term)
+  }
+
+  // Jump to a related term: clear filters, expand it
+  const jumpToTerm = (termKey) => {
+    setQuery('')
+    setCategory('All')
+    setExpandedTerm(termKey)
+    setTimeout(() => {
+      document.getElementById(`term-${termKey}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 50)
+  }
 
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
       <Navbar />
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(24px, 4vw, 52px) clamp(12px, 3vw, 24px)' }}>
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '52px 24px' }}>
+
+        {/* Header */}
         <div style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 8 }}>REFERENCE</div>
           <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>Financial Glossary</h1>
-          <p style={{ fontSize: 12, color: C.textSec }}>{TERMS.length} terms explained in plain English — no jargon, no fluff.</p>
+          <p style={{ fontSize: 12, color: C.textSec, lineHeight: 1.8 }}>
+            {TERMS.length} terms explained in plain English. Click any term for an AI-generated deep dive — worked examples, common mistakes, and related concepts.
+          </p>
         </div>
 
         {/* Search */}
         <div style={{ position: 'relative', marginBottom: 16 }}>
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search terms..." aria-label="Search financial glossary"
+          <input type="text" value={query} onChange={e => setQuery(e.target.value)}
+            placeholder="Search terms..." aria-label="Search financial glossary"
             style={{ width: '100%', background: C.panel, border: `1px solid ${query ? C.amber : C.border}`, color: C.text, padding: '10px 40px 10px 16px', fontSize: 12, fontFamily: MONO, borderRadius: 3, outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }} />
           {query
-            ? <button onClick={() => setQuery('')} aria-label='Clear search' style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: C.textSec, fontSize: 18, background: 'none', border: 'none', padding: 0 }}>×</button>
+            ? <button onClick={() => setQuery('')} aria-label="Clear search" style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: C.textSec, fontSize: 18, background: 'none', border: 'none', padding: 0 }}>×</button>
             : <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: C.textSec, fontSize: 12 }}>🔍</span>
           }
         </div>
@@ -143,19 +293,36 @@ export default function Glossary() {
 
         {/* Terms */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {filtered.map(t => (
-            <div key={t.term} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: '16px 20px', transition: 'border-color 0.15s' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = C.amber}
-              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
-            >
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: C.amber }}>{t.term}</span>
-                {t.full !== t.term && <span style={{ fontSize: 11, color: C.textSec }}>{t.full}</span>}
-                <span style={{ marginLeft: 'auto', fontSize: 11, color: C.textDim, border: `1px solid ${C.border}`, padding: '2px 6px', borderRadius: 2, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{t.category}</span>
+          {filtered.map(t => {
+            const isOpen = expandedTerm === t.term
+            return (
+              <div key={t.term} id={`term-${t.term}`}>
+                <div
+                  onClick={() => toggleTerm(t.term)}
+                  style={{
+                    background: C.panel, border: `1px solid ${isOpen ? C.amber : C.border}`,
+                    borderRadius: isOpen ? '3px 3px 0 0' : 3, padding: '16px 20px',
+                    transition: 'border-color 0.15s', cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => { if (!isOpen) e.currentTarget.style.borderColor = C.textSec }}
+                  onMouseLeave={e => { if (!isOpen) e.currentTarget.style.borderColor = C.border }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: C.amber }}>{t.term}</span>
+                    {t.full !== t.term && <span style={{ fontSize: 11, color: C.textSec }}>{t.full}</span>}
+                    <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: 11, color: C.textDim, border: `1px solid ${C.border}`, padding: '2px 6px', borderRadius: 2, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{t.category}</span>
+                      <span style={{ fontSize: 10, color: isOpen ? C.amber : C.textSec, letterSpacing: 1 }}>{isOpen ? '▲ CLOSE' : '▼ DEEP DIVE'}</span>
+                    </span>
+                  </div>               <p style={{ fontSize: 12, color: C.text, lineHeight: 1.8, margin: 0 }}>{t.definition}</p>
+                </div>
+
+                {isOpen && (
+                  <DeepDive term={t} onClose={jumpToTerm} />
+                )}
               </div>
-              <p style={{ fontSize: 12, color: C.text, lineHeight: 1.8, margin: 0 }}>{t.definition}</p>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {filtered.length === 0 && (
