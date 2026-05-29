@@ -789,6 +789,87 @@ const FACTSHEET_METRICS = [
   { metric: 'Exit Load',     what: 'Fee for early redemption', look: 'Most equity funds: 1% if redeemed within 1 year. Zero after that.' },
 ]
 
+function RegularVsDirect() {
+  const [monthly, setMonthly] = useState(10000)
+  const [years, setYears]     = useState(20)
+  const r       = 0.12
+  const directER  = 0.001  // 0.1%
+  const regularER = 0.010  // 1.0% — typical regular plan
+ 
+  const calc = (er) => {
+    let corpus = 0
+    const rMo = (r - er) / 12
+    for (let m = 0; m < years * 12; m++) corpus = corpus * (1 + rMo) + monthly
+    return Math.round(corpus)
+  }
+ 
+  const directVal  = calc(directER)
+  const regularVal = calc(regularER)
+  const diff       = directVal - regularVal
+  const fmtIN      = n => n >= 1e7 ? (n/1e7).toFixed(2) + ' Cr' : n >= 1e5 ? (n/1e5).toFixed(1) + ' L' : n.toLocaleString('en-IN')
+ 
+  return (
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
+      <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>THE DISTRIBUTOR COMMISSION YOU NEVER SEE</div>
+ 
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+        <div>
+          <label style={{ fontSize: 10, color: C.textSec, display: 'block', marginBottom: 6 }}>MONTHLY SIP (₹)</label>
+          <input type="range" min={1000} max={100000} step={1000} value={monthly}
+            onChange={e => setMonthly(+e.target.value)} style={{ width: '100%', accentColor: C.amber }} />
+          <div style={{ fontSize: 12, color: C.amber, marginTop: 4 }}>₹{fmtIN(monthly)}</div>
+        </div>
+        <div>
+          <label style={{ fontSize: 10, color: C.textSec, display: 'block', marginBottom: 6 }}>TIME HORIZON (YRS)</label>
+          <input type="range" min={5} max={35} step={1} value={years}
+            onChange={e => setYears(+e.target.value)} style={{ width: '100%', accentColor: C.amber }} />
+          <div style={{ fontSize: 12, color: C.amber, marginTop: 4 }}>{years} years</div>
+        </div>
+      </div>
+ 
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+        <div style={{ background: C.bg, border: `1px solid ${C.green}`, borderRadius: 3, padding: 16 }}>
+          <div style={{ fontSize: 10, color: C.green, letterSpacing: 1, marginBottom: 6 }}>DIRECT PLAN</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>₹{fmtIN(directVal)}</div>
+          <div style={{ fontSize: 10, color: C.textSec, marginTop: 6 }}>Expense ratio: ~0.1%</div>
+          <div style={{ fontSize: 10, color: C.textSec }}>No distributor. Money goes straight to AMC.</div>
+          <div style={{ marginTop: 10, fontSize: 10, color: C.textSec }}>Available on: Zerodha Coin, Groww (direct), AMC website, MF Central</div>
+        </div>
+        <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, marginBottom: 6 }}>REGULAR PLAN</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: C.textSec }}>₹{fmtIN(regularVal)}</div>
+          <div style={{ fontSize: 10, color: C.textSec, marginTop: 6 }}>Expense ratio: ~1.0%</div>
+          <div style={{ fontSize: 10, color: C.textSec }}>Includes ~0.5–1% trail commission to distributor.</div>
+          <div style={{ marginTop: 10, fontSize: 10, color: C.textSec }}>Sold by: banks, agents, some apps (Paytm Money regular, PhonePe)</div>
+        </div>
+      </div>
+ 
+      <div style={{ background: C.bg, border: `1px solid ${C.amber}`, borderRadius: 3, padding: '14px 16px', marginBottom: 16 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.amber, marginBottom: 4 }}>
+          Direct plan gives ₹{fmtIN(diff)} more over {years} years
+        </div>
+        <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.8 }}>
+          The 0.9% gap looks small. But it comes out of your returns every single year, and the compounding effect over {years} years is enormous. This money goes to the distributor or bank that sold you the fund — not to you.
+        </div>
+      </div>
+ 
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {[
+          { q: 'Are the funds different?',    a: 'No. Same fund house, same fund manager, same portfolio. Only the expense ratio differs. Direct is strictly better on paper.' },
+          { q: 'Why do regular plans exist?', a: 'Distributors and banks earn a trail commission for selling you the fund. They have no incentive to recommend direct plans.' },
+          { q: 'Should I always go direct?',  a: 'Almost always yes, if you\'re self-directed. If you genuinely need advice from a fee-only financial planner (who charges a flat fee, not commission), a regular plan through them may be acceptable.' },
+          { q: 'How do I switch?',            a: 'You can switch from regular to direct within the same fund house. It triggers a redemption and fresh purchase — check for exit load and capital gains tax before switching.' },
+        ].map(item => (
+          <div key={item.q} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: '12px 14px' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.text, marginBottom: 4 }}>Q: {item.q}</div>
+            <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7 }}>A: {item.a}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function MutualFundsMarket() {
   return (
     <>
@@ -837,6 +918,13 @@ function MutualFundsMarket() {
         <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
           SEBI mandates all fund factsheets to be published monthly. Find them on the AMC website or aggregators like ValueResearch and Morningstar India. Don't invest without checking at least the expense ratio, AUM, and 3-year Sharpe ratio.
         </div>
+      </Section>
+
+      <Section id="mf-regular-direct" subtitle="05 — REGULAR VS DIRECT" title="The 1% you're silently paying every year">
+      <RegularVsDirect />
+      <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+        Most people investing through a bank, insurance agent, or certain apps are in regular plans without knowing it. Check your fund name — if it says "Regular" or "Growth - Regular", you're paying a commission. The same fund with "Direct" in the name has a lower expense ratio and is available on Zerodha Coin, MF Central, or directly on the AMC website.
+      </div>
       </Section>
     </>
   )
