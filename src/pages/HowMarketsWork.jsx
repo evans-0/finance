@@ -79,7 +79,6 @@ function OrderFlow() {
   return (
     <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
       <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>WHAT HAPPENS WHEN YOU CLICK "BUY"</div>
-      {/* Desktop: horizontal row */}
       {!mobile && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 24 }}>
           {FLOW_STEPS.map((step, i) => (
@@ -99,7 +98,6 @@ function OrderFlow() {
           ))}
         </div>
       )}
-      {/* Mobile: vertical column */}
       {mobile && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0, marginBottom: 24 }}>
           {FLOW_STEPS.map((step, i) => (
@@ -224,27 +222,21 @@ function SupplyDemand() {
 // ── Order types ───────────────────────────────────────────────────────────────
 const ORDER_TYPES = [
   {
-    type: 'Market Order',
-    icon: '⚡',
-    color: C.amber,
+    type: 'Market Order', icon: '⚡', color: C.amber,
     desc: 'Buy or sell immediately at the best available price.',
     pros: ['Guaranteed execution', 'Instant fill'],
     cons: ['Price not guaranteed', 'Bad in volatile markets'],
     example: '"Buy 10 shares of AAPL right now at whatever price it\'s at."',
   },
   {
-    type: 'Limit Order',
-    icon: '🎯',
-    color: C.blue,
+    type: 'Limit Order', icon: '🎯', color: C.blue,
     desc: 'Buy or sell only at a specific price or better.',
     pros: ['Price guaranteed', 'No surprises'],
     cons: ['May not execute', 'Can miss the trade'],
     example: '"Buy 10 shares of AAPL only if the price drops to $290."',
   },
   {
-    type: 'Stop Loss',
-    icon: '🛡️',
-    color: C.red,
+    type: 'Stop Loss', icon: '🛡️', color: C.red,
     desc: 'Automatically sell if the price falls to a set level.',
     pros: ['Limits downside', 'Hands-off protection'],
     cons: ['Can trigger on temporary dips', 'Guaranteed exit, not price'],
@@ -262,31 +254,30 @@ const PARTICIPANTS = [
 
 // ── Trading hours ─────────────────────────────────────────────────────────────
 const HOURS = [
-  { time: '9:00', label: 'Pre-Open', sub: 'Orders collected, opening price discovered', color: C.textSec, active: false },
-  { time: '9:15', label: 'Market Opens', sub: 'Regular trading begins', color: C.green, active: true },
-  { time: '3:30', label: 'Market Closes', sub: 'No new orders accepted', color: C.red, active: false },
-  { time: '3:40', label: 'Post-Close', sub: 'Closing price calculated', color: C.textSec, active: false },
-  { time: 'T+1', label: 'Settlement', sub: 'Shares delivered, money transferred', color: C.amber, active: false },
+  { time: '9:00',  label: 'Pre-Open',      sub: 'Orders collected, opening price discovered', color: C.textSec, active: false },
+  { time: '9:15',  label: 'Market Opens',  sub: 'Regular trading begins',                     color: C.green,   active: true  },
+  { time: '3:30',  label: 'Market Closes', sub: 'No new orders accepted',                     color: C.red,     active: false },
+  { time: '3:40',  label: 'Post-Close',    sub: 'Closing price calculated',                   color: C.textSec, active: false },
+  { time: 'T+1',   label: 'Settlement',    sub: 'Shares delivered, money transferred',        color: C.amber,   active: false },
 ]
-
 
 // ── Bond Market ───────────────────────────────────────────────────────────────
 const BOND_TYPES = [
-  { name: 'G-Secs', full: 'Government Securities', icon: '🏛️', color: '#2196f3', issuer: 'Central Govt', risk: 'Zero', return: '6.5–7.5%', tenure: '1–40 years', how: 'RBI Retail Direct, Zerodha, DHAN' },
-  { name: 'T-Bills', full: 'Treasury Bills', icon: '⏱️', color: '#06b6d4', issuer: 'Central Govt', risk: 'Zero', return: '6.5–7%', tenure: '91/182/364 days', how: 'RBI Retail Direct' },
-  { name: 'SDL', full: 'State Development Loans', icon: '🗺️', color: '#a855f7', issuer: 'State Govts', risk: 'Near Zero', return: '7–7.5%', tenure: '5–25 years', how: 'RBI Retail Direct, NSE' },
-  { name: 'Corporate Bonds', full: 'Corporate Bonds', icon: '🏢', color: C.amber, issuer: 'Companies', risk: 'Moderate', return: '8–12%', tenure: '1–10 years', how: 'NSE, BSE, Bond platforms' },
-  { name: 'SGB', full: 'Sovereign Gold Bonds', icon: '🥇', color: '#f59e0b', issuer: 'RBI (Govt)', risk: 'Low', return: '2.5% + gold price', tenure: '8 years', how: 'Secondary market only (NSE/BSE) — RBI stopped new issuances after Feb 2024' },
+  { name: 'G-Secs',         full: 'Government Securities', icon: '🏛️', color: '#2196f3', issuer: 'Central Govt', risk: 'Zero',     return: '6.5–7.5%',        tenure: '1–40 years',     how: 'RBI Retail Direct, Zerodha, DHAN' },
+  { name: 'T-Bills',        full: 'Treasury Bills',        icon: '⏱️', color: '#06b6d4', issuer: 'Central Govt', risk: 'Zero',     return: '6.5–7%',          tenure: '91/182/364 days', how: 'RBI Retail Direct' },
+  { name: 'SDL',            full: 'State Development Loans',icon: '🗺️', color: '#a855f7', issuer: 'State Govts',  risk: 'Near Zero',return: '7–7.5%',          tenure: '5–25 years',     how: 'RBI Retail Direct, NSE' },
+  { name: 'Corporate Bonds',full: 'Corporate Bonds',       icon: '🏢', color: C.amber,   issuer: 'Companies',    risk: 'Moderate', return: '8–12%',           tenure: '1–10 years',     how: 'NSE, BSE, Bond platforms' },
+  { name: 'SGB',            full: 'Sovereign Gold Bonds',  icon: '🥇', color: '#f59e0b', issuer: 'RBI (Govt)',   risk: 'Low',      return: '2.5% + gold price',tenure: '8 years',        how: 'Secondary market only (NSE/BSE) — RBI stopped new issuances after Feb 2024' },
 ]
 
 function YieldPriceDemo() {
   const [rate, setRate] = useState(7)
-  const baseRate   = 7
-  const faceValue  = 1000
-  const coupon     = faceValue * baseRate / 100  // fixed ₹70/year
-  const bondPrice  = Math.round(coupon / (rate / 100))
-  const priceUp    = bondPrice > faceValue
-  const priceDown  = bondPrice < faceValue
+  const baseRate  = 7
+  const faceValue = 1000
+  const coupon    = faceValue * baseRate / 100
+  const bondPrice = Math.round(coupon / (rate / 100))
+  const priceUp   = bondPrice > faceValue
+  const priceDown = bondPrice < faceValue
 
   return (
     <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
@@ -349,7 +340,7 @@ function BondMarket() {
               <div style={{ fontSize: 13, fontWeight: 700, color: C.amber, marginBottom: 12 }}>Equity vs Bond</div>
               {[
                 ['Equity', 'You own a piece of a company. Returns depend on profit. High risk, high reward.', C.green],
-                ['Bond', 'You lend money. Borrower pays fixed interest. Lower risk, predictable return.', C.blue],
+                ['Bond',   'You lend money. Borrower pays fixed interest. Lower risk, predictable return.',  C.blue],
               ].map(([t, d, col]) => (
                 <div key={t} style={{ background: C.bg, border: `1px solid ${col}33`, borderRadius: 3, padding: 12, marginBottom: 10 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: col, marginBottom: 4 }}>{t}</div>
@@ -360,10 +351,10 @@ function BondMarket() {
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, color: C.amber, marginBottom: 12 }}>Bond basics</div>
               {[
-                ['Face Value', 'The principal amount — typically ₹1,000 per bond. Returned at maturity.'],
-                ['Coupon', 'The fixed interest paid periodically. A 7% bond on ₹1,000 = ₹70/year.'],
-                ['Maturity', 'When the issuer repays the face value. Can range from 91 days to 40 years.'],
-                ['Yield', 'Actual return based on current price. Yield = Coupon / Current Price.'],
+                ['Face Value',    'The principal amount — typically ₹1,000 per bond. Returned at maturity.'],
+                ['Coupon',        'The fixed interest paid periodically. A 7% bond on ₹1,000 = ₹70/year.'],
+                ['Maturity',      'When the issuer repays the face value. Can range from 91 days to 40 years.'],
+                ['Yield',         'Actual return based on current price. Yield = Coupon / Current Price.'],
                 ['Credit Rating', 'AAA = safest. D = default. Higher risk = higher yield demanded by investors.'],
               ].map(([t, d]) => (
                 <div key={t} style={{ display: 'flex', gap: 8, marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${C.border}` }}>
@@ -395,7 +386,7 @@ function BondMarket() {
                 <div style={{ fontSize: 10, color: C.textSec }}>Issuer: <span style={{ color: C.text }}>{b.issuer}</span></div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                {[['RISK', b.risk, b.risk === 'Zero' ? C.green : b.risk === 'Low' ? C.green : b.risk === 'Near Zero' ? C.green : C.amber],
+                {[['RISK', b.risk, b.risk === 'Zero' || b.risk === 'Near Zero' || b.risk === 'Low' ? C.green : C.amber],
                   ['RETURN', b.return, C.amber],
                   ['TENURE', b.tenure, C.text],
                 ].map(([l, v, col]) => (
@@ -417,10 +408,10 @@ function BondMarket() {
       <Section subtitle="04 — RBI'S ROLE" title="How RBI controls the bond market">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 16 }}>
           {[
-            { icon: '📉', title: 'Rate Cut → Bonds Up', desc: 'When RBI cuts the repo rate, existing bonds with higher coupons become more valuable. Bond prices rise. Good for existing bond holders.' },
-            { icon: '📈', title: 'Rate Hike → Bonds Down', desc: 'When RBI hikes rates, new bonds offer better returns. Old bonds become less attractive. Bond prices fall.' },
-            { icon: '🖨️', title: 'Open Market Operations', desc: 'RBI buys or sells G-Secs to control liquidity. Buying injects money into the economy; selling removes it.' },
-            { icon: '📊', title: '10-Year G-Sec Yield', desc: 'India\'s benchmark interest rate indicator. When this yield rises, home loan and corporate borrowing rates follow. Watch it like a market barometer.' },
+            { icon: '📉', title: 'Rate Cut → Bonds Up',       desc: 'When RBI cuts the repo rate, existing bonds with higher coupons become more valuable. Bond prices rise. Good for existing bond holders.' },
+            { icon: '📈', title: 'Rate Hike → Bonds Down',    desc: 'When RBI hikes rates, new bonds offer better returns. Old bonds become less attractive. Bond prices fall.' },
+            { icon: '🖨️', title: 'Open Market Operations',    desc: 'RBI buys or sells G-Secs to control liquidity. Buying injects money into the economy; selling removes it.' },
+            { icon: '📊', title: '10-Year G-Sec Yield',       desc: 'India\'s benchmark interest rate indicator. When this yield rises, home loan and corporate borrowing rates follow. Watch it like a market barometer.' },
           ].map(item => (
             <div key={item.title} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
               <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
@@ -434,9 +425,7 @@ function BondMarket() {
   )
 }
 
-
 // ── Derivatives Market ────────────────────────────────────────────────────────
-
 function PayoffBuilder() {
   const [type,    setType]    = useState('call')
   const [strike,  setStrike]  = useState(22000)
@@ -462,8 +451,8 @@ function PayoffBuilder() {
   const maxP  = Math.max(...chartPoints.map(d => d.pnl))
   const range = maxP - minP || 1
   const W = 500, H = 180, PAD = 40
-  const toY   = v  => PAD + ((maxP - v) / range) * (H - PAD * 2)
-  const toX   = i  => PAD + (i / (chartPoints.length - 1)) * (W - PAD * 2)
+  const toY   = v => PAD + ((maxP - v) / range) * (H - PAD * 2)
+  const toX   = i => PAD + (i / (chartPoints.length - 1)) * (W - PAD * 2)
   const zeroY = toY(0)
   const pathD = chartPoints.map((d, i) => (i === 0 ? 'M' : 'L') + toX(i).toFixed(1) + ',' + toY(d.pnl).toFixed(1)).join(' ')
   const beIdx = chartPoints.findIndex(p => p.price >= breakeven)
@@ -504,8 +493,8 @@ function PayoffBuilder() {
               {isProfit ? '+' : ''}{String.fromCharCode(0x20B9)}{Math.abs(pnl).toLocaleString('en-IN')}
             </div>
           </div>
-          {[['BREAKEVEN', String.fromCharCode(0x20B9) + breakeven.toLocaleString('en-IN'), null],
-            ['MAX LOSS', String.fromCharCode(0x20B9) + premium.toLocaleString('en-IN') + ' (premium)', C.red],
+          {[['BREAKEVEN',  String.fromCharCode(0x20B9) + breakeven.toLocaleString('en-IN'), null],
+            ['MAX LOSS',   String.fromCharCode(0x20B9) + premium.toLocaleString('en-IN') + ' (premium)', C.red],
             ['MAX PROFIT', type === 'call' ? 'Unlimited' : String.fromCharCode(0x20B9) + (strike - premium).toLocaleString('en-IN'), C.green],
             ['IN THE MONEY', type === 'call' ? (spot > strike ? 'YES' : 'NO') : (spot < strike ? 'YES' : 'NO'),
               type === 'call' ? (spot > strike ? C.green : C.red) : (spot < strike ? C.green : C.red)],
@@ -521,10 +510,10 @@ function PayoffBuilder() {
         <div style={{ fontSize: 9, color: C.textSec, letterSpacing: 1, marginBottom: 8 }}>PAYOFF AT EXPIRY</div>
         <svg viewBox={'0 0 ' + W + ' ' + H} style={{ width: '100%', height: 'auto' }}>
           <line x1={PAD} y1={zeroY} x2={W - PAD} y2={zeroY} stroke={C.border} strokeDasharray="4 4" />
-          <line x1={PAD} y1={PAD} x2={PAD} y2={H - PAD} stroke={C.border} />
+          <line x1={PAD} y1={PAD}   x2={PAD}     y2={H - PAD} stroke={C.border} />
           <path d={pathD} fill="none" stroke={type === 'call' ? C.green : C.red} strokeWidth="2" />
           {beIdx >= 0 && <line x1={toX(beIdx)} y1={PAD} x2={toX(beIdx)} y2={H - PAD} stroke={C.amber} strokeDasharray="3 3" strokeWidth="1" />}
-          <text x={PAD + 4} y={zeroY - 4} fill={C.textSec} fontSize="9">0</text>
+          <text x={PAD + 4}     y={zeroY - 4}  fill={C.textSec} fontSize="9">0</text>
           <text x={W - PAD - 30} y={H - PAD + 12} fill={C.textSec} fontSize="9">Price</text>
         </svg>
       </div>
@@ -541,7 +530,7 @@ function DerivativesMarket() {
             A derivative is a financial contract whose value is <span style={{ color: C.amber }}>derived from an underlying asset</span> — a stock, index, commodity, or currency. You are not buying the asset itself. You are buying a contract about its future price.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 12 }}>
-            {[{ name: 'Futures', icon: String.fromCodePoint(0x1F4CB), color: C.blue, desc: 'A legal obligation to buy or sell at a set price on a future date. Both buyer and seller MUST fulfil the contract.', example: 'You agree to buy 1 lot of Nifty at 22,000 on expiry regardless of where Nifty actually trades.' },
+            {[{ name: 'Futures', icon: String.fromCodePoint(0x1F4CB), color: C.blue,   desc: 'A legal obligation to buy or sell at a set price on a future date. Both buyer and seller MUST fulfil the contract.', example: 'You agree to buy 1 lot of Nifty at 22,000 on expiry regardless of where Nifty actually trades.' },
               { name: 'Options', icon: String.fromCodePoint(0x2696) + String.fromCodePoint(0xFE0F), color: C.purple, desc: 'The right (not obligation) to buy or sell at a set price before expiry. Buyer pays a premium. Seller collects it.', example: 'You buy the right to purchase Nifty at 22,000. If Nifty hits 23,000, you profit 1,000 minus premium.' },
             ].map(d => (
               <div key={d.name} style={{ background: C.bg, border: '1px solid ' + d.color + '33', borderRadius: 3, padding: 16 }}>
@@ -572,12 +561,12 @@ function DerivativesMarket() {
                 </tr>
               </thead>
               <tbody>
-                {[['Obligation', 'Must buy/sell', 'Right, not obligation'],
-                  ['Premium', 'No — pay margin', 'Yes — pay upfront'],
-                  ['Max loss (buyer)', 'Unlimited', 'Limited to premium'],
-                  ['Max profit (buyer)', 'Unlimited', 'Unlimited (calls)'],
-                  ['Leverage', 'Very high', 'High via premium'],
-                  ['Best used for', 'Hedging large positions', 'Defined risk bets'],
+                {[['Obligation',       'Must buy/sell',         'Right, not obligation'],
+                  ['Premium',          'No — pay margin',       'Yes — pay upfront'],
+                  ['Max loss (buyer)', 'Unlimited',             'Limited to premium'],
+                  ['Max profit (buyer)','Unlimited',            'Unlimited (calls)'],
+                  ['Leverage',         'Very high',             'High via premium'],
+                  ['Best used for',    'Hedging large positions','Defined risk bets'],
                 ].map(([label, fut, opt], ri) => (
                   <tr key={label} style={{ background: ri % 2 === 0 ? C.bg : 'transparent' }}>
                     <td style={{ padding: '10px 12px', borderBottom: '1px solid ' + C.border, color: C.textSec, fontWeight: 600 }}>{label}</td>
@@ -598,7 +587,7 @@ function DerivativesMarket() {
       <Section subtitle="04 — HOW MARGINS WORK" title="Leverage — the double-edged sword">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 16 }}>
           {[{ title: 'What is margin?', color: C.amber, content: 'In F&O you do not pay the full contract value. You pay a fraction called margin — typically 10-20%. This creates leverage. Nifty lot = 25 units x 22,000 = 5.5 lakh contract. Margin needed: ~1.1 lakh (20%). A 1% Nifty move = 5,500 gain/loss. That is a 5% move on your margin in one day.', warn: false },
-            { title: 'Margin call', color: C.red, content: 'If your position moves against you and balance falls below maintenance margin, your broker demands you top up immediately — or they square off your position at a loss. Margin calls can wipe out your entire capital in a single volatile session.', warn: true },
+            { title: 'Margin call',    color: C.red,   content: 'If your position moves against you and balance falls below maintenance margin, your broker demands you top up immediately — or they square off your position at a loss. Margin calls can wipe out your entire capital in a single volatile session.', warn: true },
           ].map(item => (
             <div key={item.title} style={{ background: C.panel, border: '1px solid ' + item.color + '44', borderRadius: 4, padding: 20 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: item.color, marginBottom: 12 }}>{item.title}</div>
@@ -612,9 +601,9 @@ function DerivativesMarket() {
       <Section subtitle="05 — THE RISK REALITY" title="Why 90% of retail F&O traders lose money">
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: 12, marginBottom: 20 }}>
-            {[['89%', 'Retail F&O traders lose money', C.red, 'SEBI Study 2023'],
-              ['93%', 'Loss-making in options', C.red, 'SEBI Study 2024'],
-              ['7.1M', 'Unique retail F&O traders', C.amber, 'NSE Data'],
+            {[['89%',  'Retail F&O traders lose money',   C.red,   'SEBI Study 2023'],
+              ['93%',  'Loss-making in options',           C.red,   'SEBI Study 2024'],
+              ['7.1M', 'Unique retail F&O traders',        C.amber, 'NSE Data'],
               [String.fromCharCode(0x20B9) + '1.81L Cr', 'Retail losses FY2022-24', C.red, 'SEBI Study 2024'],
             ].map(([stat, label, color, source]) => (
               <div key={stat} style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: 16, textAlign: 'center' }}>
@@ -634,9 +623,9 @@ function DerivativesMarket() {
       <Section subtitle="06 — LEGITIMATE USE CASES" title="When derivatives actually make sense">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[{ icon: String.fromCodePoint(0x1F6E1), title: 'Hedging a portfolio', color: C.green, desc: 'You hold 10 lakh of Nifty stocks. Before budget day you buy Nifty put options. If the market crashes, your puts profit and offset losses. This is what derivatives were designed for.' },
-            { icon: String.fromCodePoint(0x1F4B1), title: 'Currency hedging', color: C.blue, desc: 'An IT company earns in USD but pays salaries in INR. They use USD/INR futures to lock in the exchange rate and eliminate currency risk. Every large exporter does this.' },
-            { icon: String.fromCodePoint(0x1F33E), title: 'Commodity hedging', color: C.amber, desc: 'A flour mill buys wheat futures to lock in input costs 3 months ahead. An airline buys crude oil futures to stabilise fuel costs. These are the real business needs derivatives were built for.' },
-            { icon: String.fromCodePoint(0x26A0), title: 'Speculation — high risk', color: C.red, desc: 'Betting on short-term market direction with leverage. SEBI data shows 89% of retail traders lose. If you do this, use only money you can afford to lose entirely.' },
+            { icon: String.fromCodePoint(0x1F4B1), title: 'Currency hedging',    color: C.blue,  desc: 'An IT company earns in USD but pays salaries in INR. They use USD/INR futures to lock in the exchange rate and eliminate currency risk. Every large exporter does this.' },
+            { icon: String.fromCodePoint(0x1F33E), title: 'Commodity hedging',   color: C.amber, desc: 'A flour mill buys wheat futures to lock in input costs 3 months ahead. An airline buys crude oil futures to stabilise fuel costs. These are the real business needs derivatives were built for.' },
+            { icon: String.fromCodePoint(0x26A0),  title: 'Speculation — high risk', color: C.red, desc: 'Betting on short-term market direction with leverage. SEBI data shows 89% of retail traders lose. If you do this, use only money you can afford to lose entirely.' },
           ].map(item => (
             <div key={item.title} style={{ background: C.panel, border: '1px solid ' + item.color + '33', borderRadius: 3, padding: 16, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
               <span style={{ fontSize: 24, flexShrink: 0 }}>{item.icon}</span>
@@ -646,6 +635,440 @@ function DerivativesMarket() {
               </div>
             </div>
           ))}
+        </div>
+      </Section>
+    </>
+  )
+}
+
+// ── Mutual Funds Tab ──────────────────────────────────────────────────────────
+const FUND_FLOW = [
+  { icon: '👤', label: 'YOU',          sub: 'Invest ₹5,000/mo',       color: C.amber  },
+  { icon: '🏢', label: 'AMC',          sub: 'Mirae / SBI / HDFC',     color: C.blue   },
+  { icon: '👔', label: 'FUND MANAGER', sub: 'Decides what to buy',    color: C.purple },
+  { icon: '📊', label: 'PORTFOLIO',    sub: 'Basket of stocks/bonds', color: C.green  },
+  { icon: '📈', label: 'RETURNS',      sub: 'NAV grows over time',    color: C.amber  },
+]
+
+function FundFlow() {
+  const [active, setActive] = useState(-1)
+  const [running, setRunning] = useState(false)
+  const [mobile, setMobile] = useState(window.innerWidth < 600)
+
+  useEffect(() => {
+    const h = () => setMobile(window.innerWidth < 600)
+    window.addEventListener('resize', h)
+    return () => window.removeEventListener('resize', h)
+  }, [])
+
+  const run = () => {
+    if (running) return
+    setRunning(true); setActive(-1)
+    FUND_FLOW.forEach((_, i) => {
+      setTimeout(() => {
+        setActive(i)
+        if (i === FUND_FLOW.length - 1) setRunning(false)
+      }, i * 700)
+    })
+  }
+
+  return (
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
+      <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>WHERE YOUR MONEY GOES</div>
+      {!mobile ? (
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+          {FUND_FLOW.map((step, i) => (
+            <div key={step.label} style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ textAlign: 'center', padding: '12px 16px', borderRadius: 4, minWidth: 100, background: active >= i ? step.color + '22' : C.bg, border: `1px solid ${active >= i ? step.color : C.border}`, transition: 'all 0.3s' }}>
+                <div style={{ fontSize: 20, marginBottom: 4 }}>{step.icon}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: active >= i ? step.color : C.textSec }}>{step.label}</div>
+                <div style={{ fontSize: 9, color: C.textSec, marginTop: 2 }}>{step.sub}</div>
+              </div>
+              {i < FUND_FLOW.length - 1 && (
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, width: 32 }}>
+                  <div style={{ flex: 1, height: 2, background: active > i ? C.green : C.border, transition: 'background 0.3s' }} />
+                  <div style={{ fontSize: 10, color: active > i ? C.green : C.border, marginLeft: -1 }}>▶</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 24 }}>
+          {FUND_FLOW.map((step, i) => (
+            <div key={step.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '10px 12px', borderRadius: 4, background: active >= i ? step.color + '22' : C.bg, border: `1px solid ${active >= i ? step.color : C.border}`, transition: 'all 0.3s' }}>
+                <span style={{ fontSize: 20 }}>{step.icon}</span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: active >= i ? step.color : C.textSec }}>{step.label}</div>
+                  <div style={{ fontSize: 10, color: C.textSec }}>{step.sub}</div>
+                </div>
+              </div>
+              {i < FUND_FLOW.length - 1 && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: 28 }}>
+                  <div style={{ width: 2, flex: 1, background: active > i ? C.green : C.border, transition: 'background 0.3s' }} />
+                  <div style={{ fontSize: 10, color: active > i ? C.green : C.border }}>▼</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      <button onClick={run} disabled={running} style={{ background: running ? C.bg : C.amber, color: running ? C.textSec : '#020c18', border: `1px solid ${running ? C.border : C.amber}`, padding: '8px 20px', fontSize: 11, fontFamily: MONO, cursor: running ? 'not-allowed' : 'pointer', borderRadius: 2, fontWeight: 700, letterSpacing: 1, transition: 'all 0.2s' }}>
+        {running ? 'INVESTING...' : '▶ TRACE MY MONEY'}
+      </button>
+    </div>
+  )
+}
+
+function ActiveVsPassive() {
+  const [monthly, setMonthly] = useState(5000)
+  const years = 20
+  const r = 0.12
+  const activeER = 0.015
+  const passiveER = 0.001
+  const fmtIN = n => n >= 1e7 ? (n/1e7).toFixed(2) + ' Cr' : n >= 1e5 ? (n/1e5).toFixed(1) + ' L' : n.toLocaleString('en-IN')
+
+  const calc = (er) => {
+    let corpus = 0
+    const rMo = (r - er) / 12
+    for (let m = 0; m < years * 12; m++) corpus = corpus * (1 + rMo) + monthly
+    return Math.round(corpus)
+  }
+
+  const activeVal = calc(activeER)
+  const passiveVal = calc(passiveER)
+  const diff = passiveVal - activeVal
+
+  return (
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
+      <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>EXPENSE RATIO — THE SILENT KILLER</div>
+      <div style={{ marginBottom: 20 }}>
+        <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 6 }}>MONTHLY SIP AMOUNT</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <input type="range" min={1000} max={50000} step={1000} value={monthly} onChange={e => setMonthly(+e.target.value)} style={{ flex: 1, accentColor: C.amber }} />
+          <span style={{ fontSize: 14, fontWeight: 700, color: C.amber, minWidth: 80 }}>₹{fmtIN(monthly)}</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+        {[
+          { label: 'ACTIVE FUND',  er: '1.5% expense ratio', val: activeVal,  color: C.red,   note: 'Typical actively managed fund' },
+          { label: 'INDEX FUND',   er: '0.1% expense ratio', val: passiveVal, color: C.green, note: 'Nifty 50 index fund' },
+        ].map(f => (
+          <div key={f.label} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+            <div style={{ fontSize: 10, color: f.color, letterSpacing: 1, marginBottom: 6 }}>{f.label}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: f.color }}>₹{fmtIN(f.val)}</div>
+            <div style={{ fontSize: 10, color: C.textSec, marginTop: 4 }}>{f.er}</div>
+            <div style={{ fontSize: 10, color: C.textSec, marginTop: 2 }}>{f.note}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ background: C.bg, border: `1px solid ${C.amber}`, borderRadius: 3, padding: '12px 16px', fontSize: 12, color: C.amber }}>
+        The index fund gives you <strong>₹{fmtIN(diff)}</strong> more over {years} years — purely from lower fees. Same market exposure, {(activeER - passiveER) * 100}% less drag every year.
+      </div>
+    </div>
+  )
+}
+
+const SEBI_CATEGORIES = [
+  { name: 'Large Cap',  icon: '🏛️', color: C.blue,   risk: 'LOW–MED',  desc: 'Top 100 companies by market cap. HDFC, TCS, Reliance. Stable, lower upside.',          example: 'Nifty 50 Index Fund' },
+  { name: 'Mid Cap',    icon: '🏗️', color: C.amber,  risk: 'MEDIUM',   desc: 'Rank 101–250. Growth companies building scale. Higher risk and reward.',                  example: 'Nifty Midcap 150' },
+  { name: 'Small Cap',  icon: '🚀', color: C.red,    risk: 'HIGH',     desc: 'Rank 251 and below. High growth potential, high volatility. Long horizon only.',           example: 'Nifty Smallcap 250' },
+  { name: 'Flexi Cap',  icon: '🔀', color: C.purple, risk: 'VAR',      desc: 'Fund manager freely allocates across large, mid, and small cap.',                         example: 'Parag Parikh Flexi Cap' },
+  { name: 'ELSS',       icon: '🔒', color: C.green,  risk: 'MED–HIGH', desc: '3-year lock-in. Tax deduction up to ₹1.5L under Section 80C (old regime).',              example: 'Mirae Asset ELSS' },
+  { name: 'Debt Fund',  icon: '🏦', color: '#4fc3f7',risk: 'LOW',      desc: 'Bonds, T-bills, govt securities. Predictable returns, capital preservation.',             example: 'HDFC Short Term Debt' },
+]
+
+const FACTSHEET_METRICS = [
+  { metric: 'AUM',           what: 'Assets Under Management',  look: 'Larger = more investor trust. Very large AUM can limit mid/small cap alpha.' },
+  { metric: 'Expense Ratio', what: 'Annual management fee',    look: 'Lower is better. Index funds: <0.2%. Active: 1–2%. This compounds against you.' },
+  { metric: 'Sharpe Ratio',  what: 'Return per unit of risk',  look: '>1 is good, >2 is excellent. Compare funds in the same category.' },
+  { metric: 'Alpha',         what: 'Excess return vs benchmark',look: 'Positive = fund manager adding value. Negative = paying fees for underperformance.' },
+  { metric: 'Beta',          what: 'Volatility vs market',     look: '<1 = less volatile. Not always good — low beta funds may lag in bull markets.' },
+  { metric: 'Std Deviation', what: 'How much returns swing',   look: 'Lower = more consistent. Compare across same category, not across equity vs debt.' },
+  { metric: 'Exit Load',     what: 'Fee for early redemption', look: 'Most equity funds: 1% if redeemed within 1 year. Zero after that.' },
+]
+
+function MutualFundsMarket() {
+  return (
+    <>
+      <Section id="mf-how" subtitle="01 — FUND STRUCTURE" title="How does a mutual fund actually work?">
+        <FundFlow />
+        <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          An AMC (Asset Management Company) pools money from thousands of investors. A fund manager uses this pool to buy a diversified basket of securities. Your ownership is represented in <span style={{ color: C.amber }}>units</span> — when the portfolio grows, the NAV per unit rises. You don't own the stocks directly; you own units of the fund.
+        </div>
+      </Section>
+
+      <Section id="mf-active-passive" subtitle="02 — ACTIVE VS PASSIVE" title="Why expense ratio destroys more wealth than you think">
+        <ActiveVsPassive />
+        <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          Most active fund managers in India fail to beat the Nifty 50 index over 10+ year periods. Yet they charge 10–15× more in fees. A 1.4% annual difference sounds small — compounded over 20 years on a large corpus, it's life-changing money left on the table.
+        </div>
+      </Section>
+
+      <Section id="mf-categories" subtitle="03 — SEBI CATEGORIES" title="Which type of fund is right for you?">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+          {SEBI_CATEGORIES.map(f => (
+            <div key={f.name} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                <span style={{ fontSize: 22 }}>{f.icon}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: f.color }}>{f.name}</div>
+                  <div style={{ fontSize: 9, color: f.color, letterSpacing: 1 }}>RISK: {f.risk}</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7, marginBottom: 10 }}>{f.desc}</div>
+              <div style={{ fontSize: 10, color: C.textDim, borderTop: `1px solid ${C.border}`, paddingTop: 8 }}>e.g. {f.example}</div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section id="mf-factsheet" subtitle="04 — READING A FACTSHEET" title="What to actually look at before investing">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {FACTSHEET_METRICS.map(m => (
+            <div key={m.metric} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%,120px),1fr))', gap: 16, alignItems: 'start', background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: '14px 18px' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.amber }}>{m.metric}</div>
+              <div style={{ fontSize: 11, color: C.textSec }}>{m.what}</div>
+              <div style={{ fontSize: 11, color: C.text, lineHeight: 1.7 }}>✓ {m.look}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          SEBI mandates all fund factsheets to be published monthly. Find them on the AMC website or aggregators like ValueResearch and Morningstar India. Don't invest without checking at least the expense ratio, AUM, and 3-year Sharpe ratio.
+        </div>
+      </Section>
+    </>
+  )
+}
+
+// ── Personal Finance Tab ──────────────────────────────────────────────────────
+function BudgetRule() {
+  const [income, setIncome] = useState(60000)
+  const fmtIN = n => n >= 1e5 ? (n/1e5).toFixed(1) + 'L' : n.toLocaleString('en-IN')
+  const bars = [
+    { label: 'NEEDS',   pct: 50, val: Math.round(income * 0.5), color: C.blue,  examples: 'Rent, groceries, EMIs, utilities, transport' },
+    { label: 'WANTS',   pct: 30, val: Math.round(income * 0.3), color: C.amber, examples: 'Dining out, OTT, shopping, travel, hobbies' },
+    { label: 'SAVINGS', pct: 20, val: Math.round(income * 0.2), color: C.green, examples: 'Investments, emergency fund, debt prepayment' },
+  ]
+
+  return (
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
+      <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>THE 50/30/20 RULE</div>
+      <div style={{ marginBottom: 24 }}>
+        <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 6 }}>MONTHLY TAKE-HOME SALARY</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <input type="range" min={20000} max={500000} step={5000} value={income} onChange={e => setIncome(+e.target.value)} style={{ flex: 1, accentColor: C.amber }} />
+          <span style={{ fontSize: 14, fontWeight: 700, color: C.amber, minWidth: 80 }}>₹{fmtIN(income)}</span>
+        </div>
+      </div>
+      <div style={{ display: 'flex', height: 32, borderRadius: 3, overflow: 'hidden', marginBottom: 20 }}>
+        {bars.map(b => (
+          <div key={b.label} style={{ flex: b.pct, background: b.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#020c18', letterSpacing: 1 }}>{b.pct}%</span>
+          </div>
+        ))}
+      </div>
+      {bars.map(b => (
+        <div key={b.label} style={{ display: 'grid', gridTemplateColumns: '80px 90px 1fr', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: 2, background: b.color, flexShrink: 0 }} />
+            <span style={{ fontSize: 10, color: b.color, fontWeight: 700, letterSpacing: 0.5 }}>{b.label}</span>
+          </div>
+          <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>₹{fmtIN(b.val)}</span>
+          <span style={{ fontSize: 11, color: C.textSec }}>{b.examples}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmergencyFund() {
+  const [expenses, setExpenses] = useState(40000)
+  const fmtIN = n => n >= 1e5 ? (n/1e5).toFixed(1) + ' L' : n.toLocaleString('en-IN')
+  const WHERE = [
+    { label: 'Savings Account', return: '3–4%', liquid: '✓ Instant', note: 'Keep 1 month here for immediate access' },
+    { label: 'Liquid Fund',     return: '6–7%', liquid: '✓ 1 day',   note: 'Best for bulk of emergency fund. SEBI regulated.' },
+    { label: 'FD (sweep-in)',   return: '7–8%', liquid: '✓ Same day',note: 'Good return, full liquidity with sweep-in facility' },
+  ]
+
+  return (
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
+      <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>EMERGENCY FUND CALCULATOR</div>
+      <div style={{ marginBottom: 20 }}>
+        <label style={{ fontSize: 10, color: C.textSec, letterSpacing: 1, display: 'block', marginBottom: 6 }}>MONTHLY EXPENSES (₹)</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <input type="range" min={10000} max={300000} step={5000} value={expenses} onChange={e => setExpenses(+e.target.value)} style={{ flex: 1, accentColor: C.amber }} />
+          <span style={{ fontSize: 14, fontWeight: 700, color: C.amber, minWidth: 80 }}>₹{fmtIN(expenses)}</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+        {[3, 6].map(months => (
+          <div key={months} style={{ background: C.bg, border: `1px solid ${months === 6 ? C.amber : C.border}`, borderRadius: 3, padding: 16 }}>
+            <div style={{ fontSize: 10, color: months === 6 ? C.amber : C.textSec, letterSpacing: 1, marginBottom: 6 }}>{months} MONTHS {months === 6 ? '← RECOMMENDED' : ''}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: months === 6 ? C.amber : C.text }}>₹{fmtIN(expenses * months)}</div>
+            <div style={{ fontSize: 10, color: C.textSec, marginTop: 4 }}>{months === 3 ? 'Minimum — single income' : 'Ideal — covers job loss, medical, major repairs'}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 12 }}>WHERE TO KEEP IT</div>
+      {WHERE.map(w => (
+        <div key={w.label} style={{ display: 'grid', gridTemplateColumns: '140px 60px 70px 1fr', gap: 12, alignItems: 'center', marginBottom: 8, padding: '10px 12px', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3 }}>
+          <span style={{ fontSize: 12, color: C.text, fontWeight: 600 }}>{w.label}</span>
+          <span style={{ fontSize: 11, color: C.green }}>{w.return}</span>
+          <span style={{ fontSize: 11, color: C.blue }}>{w.liquid}</span>
+          <span style={{ fontSize: 11, color: C.textSec }}>{w.note}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const DEBT_EXAMPLE = [
+  { name: 'Credit Card',   balance: 80000,  rate: 42, minPmt: 2400 },
+  { name: 'Personal Loan', balance: 200000, rate: 16, minPmt: 5000 },
+  { name: 'Car Loan',      balance: 350000, rate: 10, minPmt: 8000 },
+]
+
+function DebtPayoff() {
+  const [method, setMethod] = useState('avalanche')
+  const extra = 5000
+  const fmtIN = n => n >= 1e5 ? (n/1e5).toFixed(1) + ' L' : n.toLocaleString('en-IN')
+
+  const simulate = (debts, strategy) => {
+    let d = debts.map(x => ({ ...x, bal: x.balance }))
+    let totalInterest = 0, months = 0
+    while (d.some(x => x.bal > 0) && months < 360) {
+      months++
+      d.forEach(x => {
+        if (x.bal > 0) {
+          const int = x.bal * x.rate / 100 / 12
+          totalInterest += int
+          x.bal = Math.max(x.bal + int - x.minPmt, 0)
+        }
+      })
+      const target = strategy === 'avalanche'
+        ? d.filter(x => x.bal > 0).sort((a, b) => b.rate - a.rate)[0]
+        : d.filter(x => x.bal > 0).sort((a, b) => a.bal - b.bal)[0]
+      if (target) target.bal = Math.max(target.bal - extra, 0)
+    }
+    return { totalInterest: Math.round(totalInterest), months }
+  }
+
+  const avalanche = simulate(DEBT_EXAMPLE, 'avalanche')
+  const snowball  = simulate(DEBT_EXAMPLE, 'snowball')
+
+  return (
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24 }}>
+      <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>DEBT PAYOFF STRATEGY — ₹5,000 EXTRA/MONTH</div>
+      <div style={{ display: 'flex', gap: 0, marginBottom: 20, border: `1px solid ${C.border}`, borderRadius: 3, overflow: 'hidden', width: 'fit-content' }}>
+        {[['avalanche', '❄️ AVALANCHE'], ['snowball', '⛄ SNOWBALL']].map(([key, label]) => (
+          <button key={key} onClick={() => setMethod(key)} style={{ padding: '8px 20px', background: method === key ? C.amber : 'transparent', color: method === key ? '#020c18' : C.textSec, border: 'none', cursor: 'pointer', fontSize: 11, fontFamily: MONO, fontWeight: method === key ? 700 : 400, letterSpacing: 0.5 }}>{label}</button>
+        ))}
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        {DEBT_EXAMPLE.map((d, i) => (
+          <div key={d.name} style={{ display: 'grid', gridTemplateColumns: '130px 90px 60px 1fr', gap: 12, alignItems: 'center', padding: '10px 12px', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, marginBottom: 6 }}>
+            <span style={{ fontSize: 12, color: C.text, fontWeight: 600 }}>{d.name}</span>
+            <span style={{ fontSize: 11, color: C.text }}>₹{fmtIN(d.balance)}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: d.rate > 20 ? C.red : d.rate > 12 ? C.amber : C.green }}>{d.rate}%</span>
+            <span style={{ fontSize: 10, color: C.textSec }}>
+              {method === 'avalanche' && i === 0 ? '← Pay this first (highest rate)' : ''}
+              {method === 'snowball'  && i === 0 ? '← Pay this first (smallest balance)' : ''}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        {[
+          { label: 'AVALANCHE', sub: 'Highest rate first',    months: avalanche.months, interest: avalanche.totalInterest, color: C.blue,   note: 'Saves most money mathematically' },
+          { label: 'SNOWBALL',  sub: 'Smallest balance first', months: snowball.months,  interest: snowball.totalInterest,  color: C.purple, note: 'Better for motivation — quick wins' },
+        ].map(s => (
+          <div key={s.label} style={{ background: C.bg, border: `1px solid ${method === s.label.toLowerCase() ? s.color : C.border}`, borderRadius: 3, padding: 16 }}>
+            <div style={{ fontSize: 10, color: s.color, letterSpacing: 1, marginBottom: 8 }}>{s.label}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 2 }}>{s.months} months</div>
+            <div style={{ fontSize: 12, color: C.red, marginBottom: 6 }}>₹{fmtIN(s.interest)} interest paid</div>
+            <div style={{ fontSize: 10, color: C.textSec }}>{s.note}</div>
+          </div>
+        ))}
+      </div>
+      {avalanche.totalInterest < snowball.totalInterest && (
+        <div style={{ marginTop: 12, background: C.bg, border: `1px solid ${C.green}`, borderRadius: 3, padding: '10px 14px', fontSize: 11, color: C.green }}>
+          Avalanche saves ₹{fmtIN(snowball.totalInterest - avalanche.totalInterest)} more in interest. But if you struggle with motivation, snowball's quick wins keep you on track — the best strategy is the one you stick to.
+        </div>
+      )}
+    </div>
+  )
+}
+
+const INSURANCE_TYPES = [
+  {
+    type: 'Term Life Insurance', icon: '🛡️', color: C.green, verdict: 'BUY THIS',
+    desc: 'Pure protection. You pay a premium, your family gets the sum assured if you die. No returns if you survive — that\'s the point.',
+    good: ['Very cheap — ₹1 crore cover for ~₹10,000/year at age 28', 'Simple, transparent', 'SEBI/IRDAI regulated'],
+    bad:  ['No maturity benefit', 'Premiums lost if you outlive the term'],
+  },
+  {
+    type: 'ULIP', icon: '⚠️', color: C.red, verdict: 'AVOID',
+    desc: 'Combines insurance with investment. High charges eat your returns. Almost always worse than buying term + investing the difference separately.',
+    good: ['Tax benefit under 80C', 'Technically one product for both needs'],
+    bad:  ['Mortality charges hidden in fine print', 'Fund management charges 1.35%+', 'Lock-in 5 years minimum', 'Returns rarely beat index funds'],
+  },
+  {
+    type: 'Health Insurance', icon: '🏥', color: C.blue, verdict: 'MUST HAVE',
+    desc: 'Covers hospitalisation and medical expenses. One serious illness without cover can wipe out years of savings.',
+    good: ['Cashless treatment at network hospitals', 'Premium deductible under 80D', 'Family floater covers all members'],
+    bad:  ['Pre-existing conditions excluded for 2–4 years', 'Sub-limits on room rent in cheaper plans'],
+  },
+]
+
+function PersonalFinanceMarket() {
+  return (
+    <>
+      <Section id="pf-budget" subtitle="01 — BUDGETING" title="The 50/30/20 rule — a starting point">
+        <BudgetRule />
+        <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          The 50/30/20 rule is a guide, not a law. In expensive cities like Mumbai or Bengaluru, needs alone may consume 60–70%. The key insight: <span style={{ color: C.amber }}>pay yourself first</span>. Set up an auto-debit for your SIP on salary day so savings happen before spending.
+        </div>
+      </Section>
+
+      <Section id="pf-emergency" subtitle="02 — EMERGENCY FUND" title="Build this before investing a single rupee">
+        <EmergencyFund />
+        <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          Without an emergency fund, any unexpected expense — job loss, medical, car breakdown — forces you to break your investments or take on debt. Build 3–6 months of expenses in liquid assets first. This is not an investment; it's insurance against life.
+        </div>
+      </Section>
+
+      <Section id="pf-debt" subtitle="03 — DEBT PAYOFF" title="Avalanche vs Snowball — which should you use?">
+        <DebtPayoff />
+        <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          Any debt above 10% interest rate should be paid off before investing in equity. A 42% credit card is a guaranteed -42% return. Paying it off is the best risk-free return available anywhere.
+        </div>
+      </Section>
+
+      <Section id="pf-insurance" subtitle="04 — INSURANCE" title="What to buy, what to avoid">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {INSURANCE_TYPES.map(ins => (
+            <div key={ins.type} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <span style={{ fontSize: 24 }}>{ins.icon}</span>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{ins.type}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: ins.color, border: `1px solid ${ins.color}`, padding: '2px 8px', borderRadius: 2, letterSpacing: 1 }}>{ins.verdict}</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: C.textSec, marginTop: 4, lineHeight: 1.7 }}>{ins.desc}</div>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>{ins.good.map(g => <div key={g} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✓ {g}</div>)}</div>
+                <div>{ins.bad.map(b  => <div key={b}  style={{ fontSize: 11, color: C.textSec, marginBottom: 4 }}>✗ {b}</div>)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+          Rule of thumb: buy term cover of 10–15× your annual income. If you earn ₹10L/year, get a ₹1–1.5 crore term policy. This ensures your family can sustain their lifestyle from investment returns on the sum assured alone.
         </div>
       </Section>
     </>
@@ -668,13 +1091,12 @@ export default function HowMarketsWork() {
           <p style={{ fontSize: 13, color: C.textSec, lineHeight: 1.9, maxWidth: 640 }}>
             Every second, millions of trades happen across NSE and BSE. Here's what actually happens when you click "Buy" — from your phone to the exchange and back.
           </p>
-          {/* Scale stats */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginTop: 32 }}>
             {[
-              { label: 'Daily NSE turnover', value: 1200000, prefix: '₹', suffix: ' Cr' },
-              { label: 'Orders per second', value: 15000, suffix: '+' },
-              { label: 'Listed companies', value: 2200, suffix: '+' },
-              { label: 'Settlement', value: 1, prefix: 'T+', suffix: ' day' },
+              { label: 'Daily NSE turnover',  value: 1200000, prefix: '₹', suffix: ' Cr' },
+              { label: 'Orders per second',   value: 15000,   suffix: '+' },
+              { label: 'Listed companies',    value: 2200,    suffix: '+' },
+              { label: 'Settlement',          value: 1,       prefix: 'T+', suffix: ' day' },
             ].map(s => (
               <div key={s.label} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
                 <div style={{ fontSize: 20, fontWeight: 700, color: C.amber }}>
@@ -687,117 +1109,110 @@ export default function HowMarketsWork() {
         </div>
 
         {/* Market tabs */}
-        <div style={{ display: 'flex', gap: 0, marginBottom: 48, borderBottom: `1px solid ${C.border}` }}>
-          {[['equity', 'Equity Market'], ['bond', 'Bond Market'], ['derivatives', 'Derivatives']].map(([key, label]) => (
+        <div style={{ display: 'flex', gap: 0, marginBottom: 48, borderBottom: `1px solid ${C.border}`, overflowX: 'auto' }}>
+          {[['equity', 'Equity Market'], ['bond', 'Bond Market'], ['derivatives', 'Derivatives'], ['mutualfunds', 'Mutual Funds'], ['personalfinance', 'Personal Finance']].map(([key, label]) => (
             <button key={key} onClick={() => setMarket(key)} style={{
               background: 'none', border: 'none', borderBottom: `2px solid ${market === key ? C.amber : 'transparent'}`,
               color: market === key ? C.amber : C.textSec, padding: '10px 24px', fontSize: 12,
               fontFamily: MONO, cursor: 'pointer', letterSpacing: 1.5, fontWeight: market === key ? 700 : 400,
-              marginBottom: -1, transition: 'all 0.2s',
+              marginBottom: -1, transition: 'all 0.2s', whiteSpace: 'nowrap',
             }}>{label.toUpperCase()}</button>
           ))}
         </div>
 
         {market === 'equity' && <>
-        {/* 1. Order flow */}
-        <Section id="order-flow" subtitle="01 — TRADE LIFECYCLE" title="What happens when you click Buy?">
-          <OrderFlow />
-          <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
-            Your order travels from your app → broker's system → NSE's matching engine in milliseconds. The engine finds a seller willing to sell at your price. Both sides are confirmed, and on T+1 (next trading day) the shares land in your demat account and money leaves your account.
-          </div>
-        </Section>
+          <Section id="order-flow" subtitle="01 — TRADE LIFECYCLE" title="What happens when you click Buy?">
+            <OrderFlow />
+            <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+              Your order travels from your app → broker's system → NSE's matching engine in milliseconds. The engine finds a seller willing to sell at your price. Both sides are confirmed, and on T+1 (next trading day) the shares land in your demat account and money leaves your account.
+            </div>
+          </Section>
 
-        {/* 2. Order book */}
-        <Section id="order-book" subtitle="02 — BID & ASK" title="The Order Book — where buyers meet sellers">
-          <OrderBook />
-          <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
-            The order book shows all pending buy (bid) and sell (ask) orders. The difference between the lowest ask and highest bid is the <span style={{ color: C.amber }}>spread</span>. Liquid stocks like RELIANCE have spreads of ₹0.05. Illiquid small-caps can have spreads of ₹5–10, meaning you lose money the moment you buy.
-          </div>
-        </Section>
+          <Section id="order-book" subtitle="02 — BID & ASK" title="The Order Book — where buyers meet sellers">
+            <OrderBook />
+            <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+              The order book shows all pending buy (bid) and sell (ask) orders. The difference between the lowest ask and highest bid is the <span style={{ color: C.amber }}>spread</span>. Liquid stocks like RELIANCE have spreads of ₹0.05. Illiquid small-caps can have spreads of ₹5–10, meaning you lose money the moment you buy.
+            </div>
+          </Section>
 
-        {/* 3. Supply demand */}
-        <Section id="price-movement" subtitle="03 — PRICE DISCOVERY" title="How prices actually move">
-          <SupplyDemand />
-          <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
-            Prices move purely from supply and demand imbalance. More people wanting to buy than sell = price goes up. A large sell order can temporarily push the price down. News, earnings, and macro events all shift the buyer/seller balance instantly.
-          </div>
-        </Section>
+          <Section id="price-movement" subtitle="03 — PRICE DISCOVERY" title="How prices actually move">
+            <SupplyDemand />
+            <div style={{ marginTop: 16, fontSize: 11, color: C.textSec, lineHeight: 1.8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16 }}>
+              Prices move purely from supply and demand imbalance. More people wanting to buy than sell = price goes up. A large sell order can temporarily push the price down. News, earnings, and macro events all shift the buyer/seller balance instantly.
+            </div>
+          </Section>
 
-        {/* 4. Order types */}
-        <Section id="order-types" subtitle="04 — ORDER TYPES" title="Market order vs Limit order vs Stop Loss">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {ORDER_TYPES.map(o => (
-              <div key={o.type} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                    <span style={{ fontSize: 20 }}>{o.icon}</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: o.color }}>{o.type}</span>
+          <Section id="order-types" subtitle="04 — ORDER TYPES" title="Market order vs Limit order vs Stop Loss">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {ORDER_TYPES.map(o => (
+                <div key={o.type} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20 }}>{o.icon}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: o.color }}>{o.type}</span>
+                    </div>
+                    <p style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7, margin: 0 }}>{o.desc}</p>
                   </div>
-                  <p style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7, margin: 0 }}>{o.desc}</p>
-                </div>
-                <div>
-                  <div style={{ fontSize: 9, color: C.green, letterSpacing: 1, marginBottom: 6 }}>PROS</div>
-                  {o.pros.map(p => <div key={p} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✓ {p}</div>)}
-                  <div style={{ fontSize: 9, color: C.red, letterSpacing: 1, marginBottom: 6, marginTop: 10 }}>CONS</div>
-                  {o.cons.map(c => <div key={c} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✗ {c}</div>)}
-                </div>
-                <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: 12 }}>
-                  <div style={{ fontSize: 9, color: C.amber, letterSpacing: 1, marginBottom: 6 }}>EXAMPLE</div>
-                  <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7, fontStyle: 'italic' }}>{o.example}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* 5. Participants */}
-        <Section id="participants" subtitle="05 — WHO'S TRADING" title="Market participants and their role">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {PARTICIPANTS.map(p => (
-              <div key={p.name} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16, display: 'grid', gridTemplateColumns: 'auto 1fr minmax(60px, auto)', gap: 16, alignItems: 'center' }}>
-                <span style={{ fontSize: 24 }}>{p.icon}</span>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: p.color, marginBottom: 4 }}>{p.name}</div>
-                  <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7 }}>{p.desc}</div>
-                </div>
-                <div style={{ textAlign: 'right', minWidth: 60 }}>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: p.color }}>{p.pct}%</div>
-                  <div style={{ fontSize: 9, color: C.textSec }}>OF VOLUME</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* 6. Trading hours */}
-        <Section id="trading-hours" subtitle="06 — MARKET HOURS" title="NSE trading hours (IST)">
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 'clamp(12px, 3vw, 24px)', maxWidth: '100%' }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {HOURS.map((h, i) => (
-                <div key={h.time} style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
-                  {/* Left column: dot + line */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 40, flexShrink: 0 }}>
-                    <div style={{ width: 16, height: 16, borderRadius: 8, background: h.active ? C.green : C.bg, border: `2px solid ${h.color}`, flexShrink: 0, marginTop: 4 }} />
-                    {i < HOURS.length - 1 && (
-                      <div style={{ width: 1, flex: 1, background: C.border, minHeight: 20, margin: '4px 0' }} />
-                    )}
+                  <div>
+                    <div style={{ fontSize: 9, color: C.green, letterSpacing: 1, marginBottom: 6 }}>PROS</div>
+                    {o.pros.map(p => <div key={p} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✓ {p}</div>)}
+                    <div style={{ fontSize: 9, color: C.red, letterSpacing: 1, marginBottom: 6, marginTop: 10 }}>CONS</div>
+                    {o.cons.map(c => <div key={c} style={{ fontSize: 11, color: C.text, marginBottom: 4 }}>✗ {c}</div>)}
                   </div>
-                  {/* Right column: time + content */}
-                  <div style={{ paddingBottom: i < HOURS.length - 1 ? 20 : 0, paddingTop: 2 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: h.color, marginBottom: 3 }}>{h.time}</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: C.text, marginBottom: 2 }}>{h.label}</div>
-                    <div style={{ fontSize: 11, color: C.textSec }}>{h.sub}</div>
+                  <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: 12 }}>
+                    <div style={{ fontSize: 9, color: C.amber, letterSpacing: 1, marginBottom: 6 }}>EXAMPLE</div>
+                    <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7, fontStyle: 'italic' }}>{o.example}</div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        </Section>
+          </Section>
 
+          <Section id="participants" subtitle="05 — WHO'S TRADING" title="Market participants and their role">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {PARTICIPANTS.map(p => (
+                <div key={p.name} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 3, padding: 16, display: 'grid', gridTemplateColumns: 'auto 1fr minmax(60px, auto)', gap: 16, alignItems: 'center' }}>
+                  <span style={{ fontSize: 24 }}>{p.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: p.color, marginBottom: 4 }}>{p.name}</div>
+                    <div style={{ fontSize: 11, color: C.textSec, lineHeight: 1.7 }}>{p.desc}</div>
+                  </div>
+                  <div style={{ textAlign: 'right', minWidth: 60 }}>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: p.color }}>{p.pct}%</div>
+                    <div style={{ fontSize: 9, color: C.textSec }}>OF VOLUME</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <Section id="trading-hours" subtitle="06 — MARKET HOURS" title="NSE trading hours (IST)">
+            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 'clamp(12px, 3vw, 24px)', maxWidth: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {HOURS.map((h, i) => (
+                  <div key={h.time} style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 40, flexShrink: 0 }}>
+                      <div style={{ width: 16, height: 16, borderRadius: 8, background: h.active ? C.green : C.bg, border: `2px solid ${h.color}`, flexShrink: 0, marginTop: 4 }} />
+                      {i < HOURS.length - 1 && (
+                        <div style={{ width: 1, flex: 1, background: C.border, minHeight: 20, margin: '4px 0' }} />
+                      )}
+                    </div>
+                    <div style={{ paddingBottom: i < HOURS.length - 1 ? 20 : 0, paddingTop: 2 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: h.color, marginBottom: 3 }}>{h.time}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: C.text, marginBottom: 2 }}>{h.label}</div>
+                      <div style={{ fontSize: 11, color: C.textSec }}>{h.sub}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Section>
         </>}
 
-        {market === 'bond' && <BondMarket />}
-        {market === 'derivatives' && <DerivativesMarket />}
+        {market === 'bond'          && <BondMarket />}
+        {market === 'derivatives'   && <DerivativesMarket />}
+        {market === 'mutualfunds'   && <MutualFundsMarket />}
+        {market === 'personalfinance' && <PersonalFinanceMarket />}
 
         {/* CTA */}
         <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: 28, textAlign: 'center' }}>
@@ -805,7 +1220,7 @@ export default function HowMarketsWork() {
           <div style={{ fontSize: 12, color: C.textSec, marginBottom: 20 }}>Use our financial calculators to plan your investments, or check the glossary for more terms.</div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/calculators" style={{ background: C.amber, color: '#020c18', padding: '10px 24px', textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: 1.5, borderRadius: 3 }}>CALCULATORS →</Link>
-            <Link to="/glossary" style={{ background: 'transparent', color: C.amber, padding: '10px 24px', textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: 1.5, borderRadius: 3, border: `1px solid ${C.amber}` }}>GLOSSARY →</Link>
+            <Link to="/glossary"    style={{ background: 'transparent', color: C.amber, padding: '10px 24px', textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: 1.5, borderRadius: 3, border: `1px solid ${C.amber}` }}>GLOSSARY →</Link>
           </div>
         </div>
 
