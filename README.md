@@ -140,11 +140,20 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │   ├── HowMarketsWork.jsx  # 5-tab interactive explainer
 │   │   ├── MFNav.jsx
 │   │   └── calculators/
-│   │       ├── SIP.jsx · EMI.jsx · Compound.jsx
-│   │       ├── StockReturn.jsx · Portfolio.jsx · Options.jsx
-│   │       ├── NetWorth.jsx · CreditCard.jsx · Inflation.jsx
-│   │       └── FDvsMF.jsx · ULIPvsTermMF.jsx · BuyVsRent.jsx
-│   │       └── FIRE.jsx · FutureNetWorth.jsx
+│   │       ├── SIP.jsx
+│   │       ├── EMI.jsx
+│   │       ├── Compound.jsx
+│   │       ├── StockReturn.jsx
+│   │       ├── Portfolio.jsx
+│   │       ├── Options.jsx
+│   │       ├── NetWorth.jsx
+│   │       ├── CreditCard.jsx
+│   │       ├── Inflation.jsx
+│   │       ├── FDvsMF.jsx
+│   │       ├── ULIPvsTermMF.jsx
+│   │       ├── BuyVsRent.jsx
+│   │       ├── FIRE.jsx
+│   │       └── FutureNetWorth.jsx
 │   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx
