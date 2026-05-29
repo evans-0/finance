@@ -1055,17 +1055,19 @@ function DebtPayoff() {
         ))}
       </div>
       <div style={{ marginBottom: 16 }}>
-        {DEBT_EXAMPLE.map((d, i) => (
-          <div key={d.name} style={{ display: 'grid', gridTemplateColumns: '130px 90px 60px 1fr', gap: 12, alignItems: 'center', padding: '10px 12px', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, marginBottom: 6 }}>
-            <span style={{ fontSize: 12, color: C.text, fontWeight: 600 }}>{d.name}</span>
-            <span style={{ fontSize: 11, color: C.text }}>₹{fmtIN(d.balance)}</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: d.rate > 20 ? C.red : d.rate > 12 ? C.amber : C.green }}>{d.rate}%</span>
-            <span style={{ fontSize: 10, color: C.textSec }}>
-              {method === 'avalanche' && i === 0 ? '← Pay this first (highest rate)' : ''}
-              {method === 'snowball'  && i === 0 ? '← Pay this first (smallest balance)' : ''}
-            </span>
-          </div>
-        ))}
+        {DEBT_EXAMPLE.map((d, i) => {
+          const isTarget = method === 'avalanche' ? i === 0 : i === 1
+          return (
+            <div key={d.name} style={{ display: 'grid', gridTemplateColumns: '130px 90px 60px 1fr', gap: 12, alignItems: 'center', padding: '10px 12px', background: isTarget ? C.amber + '0a' : C.bg, border: `1px solid ${isTarget ? C.amber : C.border}`, borderRadius: 3, marginBottom: 6 }}>
+              <span style={{ fontSize: 12, color: C.text, fontWeight: 600 }}>{d.name}</span>
+              <span style={{ fontSize: 11, color: C.text }}>₹{fmtIN(d.balance)}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: d.rate > 20 ? C.red : d.rate > 12 ? C.amber : C.green }}>{d.rate}%</span>
+              <span style={{ fontSize: 10, color: C.amber }}>
+                {isTarget ? (method === 'avalanche' ? '← Pay this first (highest rate)' : '← Pay this first (smallest balance)') : ''}
+              </span>
+            </div>
+          )
+        })}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {[
