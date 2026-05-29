@@ -42,14 +42,23 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **FD vs Mutual Fund** | Post-tax, inflation-adjusted, breakeven CAGR |
 | **ULIP vs Term + MF** | Charges breakdown, mortality cost by age |
 | **Buy vs Rent** | Opportunity cost of down payment, tax benefits (US + India), net worth trajectory |
-| **FIRE** | Lean/Regular/Fat FIRE numbers, Coast FIRE age, savings rate, corpus trajectory |
+| **FIRE** | Lean/Regular/Fat FIRE numbers, inflation-adjusted corpus, Coast FIRE age, corpus trajectory |
+| **Future Net Worth** | Full balance sheet projection — each asset at its own return rate, liabilities amortise via EMI |
 
 ### Financial Education
-- **Glossary** (`/glossary`) — 62 terms across 8 categories, searchable
-- **How Markets Work** (`/how-markets-work`) — 3-tab interactive explainer:
-  - *Equity Market* — order flow animation, order book, supply/demand slider, order types, market hours
-  - *Bond Market* — yield vs price demo, bond types in India, RBI's role
-  - *Derivatives* — futures vs options, interactive payoff builder, margins, SEBI risk data
+
+#### Glossary (`/glossary`)
+- 62 terms across 8 categories, searchable and filterable
+- **AI-powered deep dives** — clicking any term generates a full explainer via Cloudflare AI (Llama 3.1 8B): plain English explanation, worked rupee example, common mistakes, related term chips, calculator link
+- Responses edge-cached 24 hours — no repeat AI calls for the same term
+
+#### How Markets Work (`/how-markets-work`)
+Five-tab interactive explainer:
+- **Equity Market** — order flow animation, live order book, supply/demand slider, order types, market participants, trading hours
+- **Bond Market** — yield vs price interactive demo, bond types in India, RBI's role
+- **Derivatives** — futures vs options, interactive payoff builder, margins, SEBI retail loss data
+- **Mutual Funds** — fund structure animation, active vs passive expense ratio drag, SEBI categories, factsheet metrics guide, regular vs direct plan comparison
+- **Personal Finance** — 50/30/20 budget rule, emergency fund calculator, avalanche vs snowball debt payoff simulator, insurance guide
 
 ### Mutual Fund NAV (`/mf-nav`)
 - Search any Indian mutual fund by name
@@ -70,10 +79,11 @@ Browser
    ├── /api/chart?symbol=AAPL&range=1Y   ──▶  Cloudflare Worker  ──▶  Polygon.io
    ├── /api/news?symbol=AAPL             ──▶  Cloudflare Worker  ──▶  Bing RSS / Finnhub
    ├── /api/mfnav?q=mirae                ──▶  Cloudflare Worker  ──▶  AMFI portal
+   ├── /api/explain?term=CAGR            ──▶  Cloudflare Worker  ──▶  Cloudflare AI (Llama 3.1 8B)
    └── CoinGecko                         ──▶  Direct (no key)
 ```
 
-All API keys live exclusively in Cloudflare encrypted Secrets — never in the client bundle.
+All API keys live exclusively in Cloudflare encrypted Secrets — never in the client bundle. The AI binding uses Cloudflare's `env.AI` — no external API key required.
 
 ---
 
@@ -96,6 +106,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 | Build | Vite (code-split, main bundle ~197KB) |
 | Hosting | Cloudflare Pages |
 | API proxy | Cloudflare Pages Functions (Workers) |
+| AI (glossary) | Cloudflare AI — `@cf/meta/llama-3.1-8b-instruct` (env.AI binding) |
 | US stocks | [Finnhub](https://finnhub.io) (free tier) |
 | Historical charts | [Polygon.io](https://polygon.io) (free tier) |
 | Indian NSE | [Twelve Data](https://twelvedata.com) (free tier) |
@@ -115,7 +126,8 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   ├── search.js       # Symbol search → Finnhub + Twelve Data
 │   ├── chart.js        # OHLC → Polygon.io
 │   ├── news.js         # News → Bing RSS / Finnhub
-│   └── mfnav.js        # MF NAV → AMFI portal
+│   ├── mfnav.js        # MF NAV → AMFI portal
+│   └── explain.js      # Glossary deep dives → Cloudflare AI
 ├── src/
 │   ├── components/
 │   │   ├── Navbar.jsx          # Mobile sidebar + desktop links
@@ -124,14 +136,15 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │   ├── Home.jsx
 │   │   ├── Dashboard.jsx
 │   │   ├── CalculatorsHub.jsx
-│   │   ├── Glossary.jsx
-│   │   ├── HowMarketsWork.jsx
+│   │   ├── Glossary.jsx        # 62 terms + AI deep dives
+│   │   ├── HowMarketsWork.jsx  # 5-tab interactive explainer
 │   │   ├── MFNav.jsx
 │   │   └── calculators/
 │   │       ├── SIP.jsx · EMI.jsx · Compound.jsx
 │   │       ├── StockReturn.jsx · Portfolio.jsx · Options.jsx
 │   │       ├── NetWorth.jsx · CreditCard.jsx · Inflation.jsx
 │   │       └── FDvsMF.jsx · ULIPvsTermMF.jsx · BuyVsRent.jsx
+│   │       └── FIRE.jsx · FutureNetWorth.jsx
 │   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx
@@ -162,6 +175,9 @@ npm run dev
 | `POLYGON_KEY` | Secret | Polygon.io API key |
 | `ALLOWED_ORIGIN` | Plaintext | `https://mkt-vision.com` |
 
+3. Add AI binding under **Settings → Functions → Bindings**:
+   - Type: `Workers AI`, Variable name: `AI`
+
 ---
 
 ## Known Limitations
@@ -171,6 +187,7 @@ npm run dev
 - **Index absolute values** — ETF proxies show % change only
 - **Polygon rate limit** — 5 calls/min free tier; requests debounced + cached
 - **SGB** — primary issuance stopped Feb 2024; secondary market (NSE/BSE) only
+- **Cloudflare AI** — free tier allows ~10,000 neurons/day; glossary deep dives are edge-cached 24h to minimise usage
 
 ---
 
