@@ -1013,8 +1013,8 @@ function EmergencyFund() {
 }
 
 const DEBT_EXAMPLE = [
-  { name: 'Credit Card',   balance: 80000,  rate: 42, minPmt: 2400 },
-  { name: 'Personal Loan', balance: 200000, rate: 16, minPmt: 5000 },
+  { name: 'Credit Card',   balance: 180000,  rate: 42, minPmt: 5500 },
+  { name: 'Personal Loan', balance: 80000, rate: 16, minPmt: 2000 },
   { name: 'Car Loan',      balance: 350000, rate: 10, minPmt: 8000 },
 ]
 
