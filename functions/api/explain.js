@@ -1,6 +1,6 @@
 // functions/api/explain.js
 // Cloudflare Pages Function — uses env.AI binding (no API key needed)
-// Model: @cf/meta/llama-3.1-8b-instruct
+// Model: @cf/meta/llama-3.1-8b-instruct-fast
 
 export async function onRequestGet(context) {
   const { request, env } = context
@@ -45,7 +45,7 @@ The relatedTerms must be picked from this list only — return the short form (e
 CAGR, NAV, Expense Ratio, SIP, Lumpsum, Diversification, Asset Allocation, Rebalancing, Benchmark, Alpha, Beta, XIRR, Bull Market, Bear Market, Market Cap, P/E Ratio, EPS, Dividend, IPO, Circuit Breaker, Bid-Ask Spread, Volume, Equity Fund, Debt Fund, Index Fund, ELSS, Exit Load, AUM, EMI, Principal, Amortisation, Prepayment, Credit Score, Credit Utilisation, Moratorium, LTCG, STCG, TDS, 80C, HRA, Inflation, Interest Rate, Repo Rate, Fiscal Deficit, GDP, CPI, Options, Futures, Derivatives, Call Option, Put Option, Strike Price, Expiry, Margin, Hedging, Short Selling, Arbitrage, Liquidity, Volatility, Risk-Adjusted Return, Sharpe Ratio, Standard Deviation, Compounding, Time Value of Money, Opportunity Cost, Sunk Cost, Net Worth, FIRE`
 
   try {
-    const response = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+    const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [
         {
           role: 'system',
