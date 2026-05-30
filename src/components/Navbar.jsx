@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { to: '/glossary',         label: 'GLOSSARY' },
   { to: '/how-markets-work', label: 'HOW MARKETS WORK' },
   { to: '/mf-nav',           label: 'MF NAV' },
+  { to: '/start-here' ,		 label: 'START HERE' },
 ]
 
 export default function Navbar() {
