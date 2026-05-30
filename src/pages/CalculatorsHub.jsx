@@ -126,8 +126,17 @@ export default function CalculatorsHub() {
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 10 }}>CALCULATORS</div>
           <h1 style={{ fontSize: 28, fontWeight: 700, color: C.text, marginBottom: 10 }}>Financial Calculators</h1>
           <p style={{ fontSize: 12, color: C.textSec, lineHeight: 1.8 }}>
-            Twelve calculators for investors and traders. Plan investments, analyse trades, and make better financial decisions.
+            Fourteen calculators for investors and traders. Plan investments, analyse trades, and make better financial decisions.
           </p>
+        </div>
+        <div style={{ background: C.panel, border: `1px solid ${C.amber}33`, borderRadius: 4, padding: '14px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.amber, marginBottom: 4 }}>New to investing?</div>
+            <div style={{ fontSize: 11, color: C.textSec }}>Learn the basics before using these calculators.</div>
+          </div>
+          <Link to="/start-here" style={{ background: C.amber, color: '#020c18', padding: '8px 18px', fontSize: 11, fontWeight: 700, fontFamily: MONO, textDecoration: 'none', borderRadius: 2, letterSpacing: 1, whiteSpace: 'nowrap' }}>
+            START HERE →
+          </Link>
         </div>
         {/* Search */}
         <div style={{ position: 'relative', marginBottom: 24 }}>

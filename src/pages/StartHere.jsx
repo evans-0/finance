@@ -313,9 +313,9 @@ export default function StartHere() {
             <SIPStarter />
             <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { label: 'Mirae Asset Large Cap', type: 'Large Cap Index', expense: '0.19%' },
-                { label: 'UTI Nifty 50 Index', type: 'Nifty 50 Index', expense: '0.18%' },
-                { label: 'Parag Parikh Flexi Cap', type: 'Flexi Cap', expense: '0.63%' },
+                { label: 'Nifty 50 Index Fund', type: 'Large Cap Passive', expense: '~0.1–0.2%' },
+                { label: 'Nifty Midcap 150 Index Fund', type: 'Mid Cap Passive', expense: '~0.2–0.4%' },
+                { label: 'Flexi Cap Fund (Direct)', type: 'Active — Any Cap', expense: '~0.5–1%' },
               ].map(f => (
                 <div key={f.label} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 70px', gap: 12, alignItems: 'center', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 3, padding: '10px 14px' }}>
                   <span style={{ fontSize: 11, color: C.text, fontWeight: 600 }}>{f.label}</span>
