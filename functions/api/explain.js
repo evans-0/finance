@@ -89,6 +89,7 @@ CAGR, NAV, Expense Ratio, SIP, Lumpsum, Diversification, Asset Allocation, Rebal
       },
     })
   } catch (err) {
+    console.error('AI error:', err)
     return new Response(
       JSON.stringify({ error: 'Failed to generate explanation. Try again.' }),
       {
