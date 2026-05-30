@@ -47,9 +47,15 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 
 ### Financial Education
 
+#### Start Here (`/start-here`)
+- Guided onboarding for new investors — 7 expandable steps in the right order
+- Profile picker (first job / saves but doesn't invest / has debt / already investing) personalises which steps to prioritise
+- Interactive demos: compounding visualiser, emergency fund checker, SIP starter
+- Links to relevant calculators and glossary terms at each step
+
 #### Glossary (`/glossary`)
 - 62 terms across 8 categories, searchable and filterable
-- **AI-powered deep dives** — clicking any term generates a full explainer via Cloudflare AI (Llama 3.1 8B): plain English explanation, worked rupee example, common mistakes, related term chips, calculator link
+- **AI-powered deep dives** — clicking any term generates a full explainer via Cloudflare AI (Llama 3.3 70B): plain English explanation, worked rupee example, common mistakes, related term chips, calculator link
 - Responses edge-cached 24 hours — no repeat AI calls for the same term
 
 #### How Markets Work (`/how-markets-work`)
@@ -79,7 +85,7 @@ Browser
    ├── /api/chart?symbol=AAPL&range=1Y   ──▶  Cloudflare Worker  ──▶  Polygon.io
    ├── /api/news?symbol=AAPL             ──▶  Cloudflare Worker  ──▶  Bing RSS / Finnhub
    ├── /api/mfnav?q=mirae                ──▶  Cloudflare Worker  ──▶  AMFI portal
-   ├── /api/explain?term=CAGR            ──▶  Cloudflare Worker  ──▶  Cloudflare AI (Llama 3.1 8B)
+   ├── /api/explain?term=CAGR            ──▶  Cloudflare Worker  ──▶  Cloudflare AI (Llama 3.3 70B)
    └── CoinGecko                         ──▶  Direct (no key)
 ```
 
@@ -106,7 +112,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 | Build | Vite (code-split, main bundle ~197KB) |
 | Hosting | Cloudflare Pages |
 | API proxy | Cloudflare Pages Functions (Workers) |
-| AI (glossary) | Cloudflare AI — `@cf/meta/llama-3.1-8b-instruct` (env.AI binding) |
+| AI (glossary) | Cloudflare AI — `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (env.AI binding) |
 | US stocks | [Finnhub](https://finnhub.io) (free tier) |
 | Historical charts | [Polygon.io](https://polygon.io) (free tier) |
 | Indian NSE | [Twelve Data](https://twelvedata.com) (free tier) |
@@ -139,6 +145,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │   ├── Glossary.jsx        # 62 terms + AI deep dives
 │   │   ├── HowMarketsWork.jsx  # 5-tab interactive explainer
 │   │   ├── MFNav.jsx
+│   │   ├── StartHere.jsx       # Guided onboarding for beginners
 │   │   └── calculators/
 │   │       ├── SIP.jsx
 │   │       ├── EMI.jsx
