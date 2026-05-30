@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 
@@ -128,7 +128,7 @@ function DeepDive({ term, onClose }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useState(() => {
+  useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
