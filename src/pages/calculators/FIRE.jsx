@@ -370,10 +370,14 @@ export default function FIRECalculator() {
             <div style={{ fontSize: 11, color: C.textDim, marginTop: 12, lineHeight: 1.7 }}>
               * Corpus shown post-retirement is inflation-adjusted withdrawal phase. A depleted corpus means your FIRE number is insufficient for the selected withdrawal period — increase corpus target or reduce withdrawal years.
             </div>
+            <div style={{ marginTop: 16 }}>
+              <Link to="/calculators/swp" style={{ fontSize: 11, color: C.amber, textDecoration: 'none', border: `1px solid ${C.amber}33`, padding: '8px 16px', borderRadius: 2 }}>
+                Model your withdrawals → SWP Calculator
+              </Link>
+            </div>
           </div>
         </div>
       </div>
     </div>
   )
 }
-<Link to="/calculators/swp">Model your withdrawals → SWP Calculator</Link>
