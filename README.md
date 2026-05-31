@@ -44,6 +44,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **Buy vs Rent** | Opportunity cost of down payment, tax benefits (US + India), net worth trajectory |
 | **FIRE** | Lean/Regular/Fat FIRE numbers, inflation-adjusted corpus, Coast FIRE age, corpus trajectory |
 | **Future Net Worth** | Full balance sheet projection — each asset at its own return rate, liabilities amortise via EMI |
+| **SWP** | Monthly withdrawal simulation, corpus depletion chart, inflation-adjusted withdrawals, 4% rule context |
 
 ### Financial Education
 
@@ -160,6 +161,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │       ├── ULIPvsTermMF.jsx
 │   │       ├── BuyVsRent.jsx
 │   │       ├── FIRE.jsx
+│   |       ├── SWP.jsx
 │   │       └── FutureNetWorth.jsx
 │   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
