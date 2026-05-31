@@ -107,6 +107,13 @@ const CALCULATORS = [
   desc: 'Full balance sheet projection. Each asset grows at its own rate, each liability amortises via EMI. See where you stand in 10, 20, 30 years.',
   tags: ['Net Worth', 'Planning', 'Personal Finance'],
   },
+  {
+  to: '/calculators/swp',
+  icon: String.fromCodePoint(0x1F4C9),
+  name: 'SWP Calculator',
+  desc: 'Model how long your retirement corpus lasts with monthly withdrawals. Includes inflation-adjusted withdrawals, 4% rule context, and corpus depletion chart.',
+  tags: ['Retirement', 'FIRE', 'Withdrawal', 'Personal Finance'],
+  },
 ]
 
 export default function CalculatorsHub() {

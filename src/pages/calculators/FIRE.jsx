@@ -376,3 +376,4 @@ export default function FIRECalculator() {
     </div>
   )
 }
+<Link to="/calculators/swp">Model your withdrawals → SWP Calculator</Link>
