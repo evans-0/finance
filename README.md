@@ -60,7 +60,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 - Responses edge-cached 24 hours — no repeat AI calls for the same term
 
 #### How Markets Work (`/how-markets-work`)
-Five-tab interactive explainer:
+Five standalone pages under `\how-markets-work`:
 - **Equity Market** — order flow animation, live order book, supply/demand slider, order types, market participants, trading hours
 - **Bond Market** — yield vs price interactive demo, bond types in India, RBI's role
 - **Derivatives** — futures vs options, interactive payoff builder, margins, SEBI retail loss data
@@ -144,7 +144,14 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │   ├── Dashboard.jsx
 │   │   ├── CalculatorsHub.jsx
 │   │   ├── Glossary.jsx        # 62 terms + AI deep dives
-│   │   ├── HowMarketsWork.jsx  # 5-tab interactive explainer
+│   │   ├── HowMarketsWork.jsx  # Hub page — links to all explainers
+│   │   ├── markets/
+│   │   │   ├── shared.jsx          # C, MONO, Counter, Section
+│   │   │   ├── EquityMarket.jsx
+│   │   │   ├── BondMarket.jsx
+│   │   │   ├── DerivativesMarket.jsx
+│   │   │   ├── MutualFundsMarket.jsx
+│   │   │   └── PersonalFinance.jsx
 │   │   ├── MFNav.jsx
 │   │   ├── StartHere.jsx       # Guided onboarding for beginners
 │   │   └── calculators/
