@@ -43,6 +43,14 @@ const TOPICS = [
     sections: ['50/30/20 rule', 'Emergency fund', 'Avalanche vs snowball', 'Insurance guide'],
     color: C.red,
   },
+  {
+  to: '/how-markets-work/ipos',
+  icon: '🚀',
+  title: 'How IPOs Work',
+  desc: 'From DRHP filing to listing day. Retail vs HNI vs QIB categories, ASBA flow, allotment lottery, Grey Market Premium, and common misconceptions.',
+  sections: ['IPO timeline', 'Investor categories', 'ASBA flow', 'GMP explained', 'Common misconceptions'],
+  color: C.green,
+  },
 ]
 
 export default function HowMarketsWork() {

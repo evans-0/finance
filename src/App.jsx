@@ -20,6 +20,7 @@ const BondMarket        = lazy(() => import('./pages/markets/BondMarket'))
 const DerivativesMarket = lazy(() => import('./pages/markets/DerivativesMarket'))
 const MutualFundsMarket = lazy(() => import('./pages/markets/MutualFundsMarket'))
 const PersonalFinance   = lazy(() => import('./pages/markets/PersonalFinance'))
+const IPOMarket         = lazy(() => import('./pages/markets/IPOMarket'))
 
 // Calculators
 const SIP            = lazy(() => import('./pages/calculators/SIP'))
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/how-markets-work/derivatives"        element={<DerivativesMarket />} />
           <Route path="/how-markets-work/mutual-funds"       element={<MutualFundsMarket />} />
           <Route path="/how-markets-work/personal-finance"   element={<PersonalFinance />} />
+		  <Route path="/how-markets-work/ipos" 				 element={<IPOMarket />} />
           <Route path="/mf-nav"                              element={<MFNav />} />
           <Route path="/start-here"                          element={<StartHere />} />
         </Routes>
