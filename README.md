@@ -60,12 +60,13 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 - Responses edge-cached 24 hours — no repeat AI calls for the same term
 
 #### How Markets Work (`/how-markets-work`)
-Five standalone pages under `\how-markets-work`:
+Six standalone pages under `\how-markets-work` with a hub landing page:
 - **Equity Market** — order flow animation, live order book, supply/demand slider, order types, market participants, trading hours
 - **Bond Market** — yield vs price interactive demo, bond types in India, RBI's role
 - **Derivatives** — futures vs options, interactive payoff builder, margins, SEBI retail loss data
 - **Mutual Funds** — fund structure animation, active vs passive expense ratio drag, SEBI categories, factsheet metrics guide, regular vs direct plan comparison
 - **Personal Finance** — 50/30/20 budget rule, emergency fund calculator, avalanche vs snowball debt payoff simulator, insurance guide
+- **How IPOs Work** — IPO timeline, retail/HNI/QIB categories, oversubscription lottery demo, ASBA flow, GMP explainer, listing day strategy, common misconceptions
 
 ### Mutual Fund NAV (`/mf-nav`)
 - Search any Indian mutual fund by name
@@ -138,6 +139,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 ├── src/
 │   ├── components/
 │   │   ├── Navbar.jsx          # Mobile sidebar + desktop links
+│   │   ├── ScrollToTop.jsx
 │   │   └── ErrorBoundary.jsx
 │   ├── pages/
 │   │   ├── Home.jsx
@@ -151,7 +153,8 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │   │   ├── BondMarket.jsx
 │   │   │   ├── DerivativesMarket.jsx
 │   │   │   ├── MutualFundsMarket.jsx
-│   │   │   └── PersonalFinance.jsx
+│   │   │   ├── PersonalFinance.jsx
+│   │   │   └── IPOMarket.jsx
 │   │   ├── MFNav.jsx
 │   │   ├── StartHere.jsx       # Guided onboarding for beginners
 │   │   └── calculators/
