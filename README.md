@@ -45,6 +45,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **FIRE** | Lean/Regular/Fat FIRE numbers, inflation-adjusted corpus, Coast FIRE age, corpus trajectory |
 | **Future Net Worth** | Full balance sheet projection — each asset at its own return rate, liabilities amortise via EMI |
 | **SWP** | Monthly withdrawal simulation, corpus depletion chart, inflation-adjusted withdrawals, 4% rule context |
+| **Loan Prepayment vs Invest** | Lump sum and monthly modes, interest saved vs corpus built, break-even return rate, crossover chart |
 
 ### Financial Education
 
@@ -172,6 +173,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   │       ├── BuyVsRent.jsx
 │   │       ├── FIRE.jsx
 │   |       ├── SWP.jsx
+|	|		├── LoanVsInvest.jsx
 │   │       └── FutureNetWorth.jsx
 │   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
