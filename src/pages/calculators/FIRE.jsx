@@ -225,7 +225,7 @@ export default function FIRECalculator() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 32, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 32, alignItems: 'start' }}>
 
           {/* ── LEFT: Inputs ── */}
           <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
@@ -275,7 +275,7 @@ export default function FIRECalculator() {
             </div>
 
             {/* Stat cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: 10, marginBottom: 20 }}>
               <StatBox
                 label="YEARS TO FIRE"
                 value={yearsToFire ? yearsToFire + ' yrs' : '—'}

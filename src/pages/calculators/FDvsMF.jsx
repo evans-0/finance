@@ -181,7 +181,7 @@ export default function FDvsMF() {
 
         {/* Winner banner */}
         <div style={{ background: C.panel, border: '2px solid ' + (mfWins ? C.green : C.blue), borderRadius: 4, padding: 24, marginBottom: 24 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 16, alignItems: 'center' }}>
+          <div style={{ overflowX: 'auto' }}><div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 16, alignItems: 'center', minWidth: 480 }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 10, color: C.blue, letterSpacing: 1.5, marginBottom: 6 }}>FIXED DEPOSIT (POST-TAX)</div>
               <div style={{ fontSize: 28, fontWeight: 700, color: C.blue }}>{fmt(fd.postTax)}</div>
@@ -199,7 +199,7 @@ export default function FDvsMF() {
               <div style={{ fontSize: 28, fontWeight: 700, color: C.green }}>{fmt(mf.postTax)}</div>
               <div style={{ fontSize: 11, color: C.textSec, marginTop: 4 }}>Gain: {fmt(mf.gain)} · Tax: {fmt(mf.tax)} · Real: {fmt(mf.realValue)}</div>
             </div>
-          </div>
+          </div></div>
           {breakeven !== null && (
             <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: C.textSec }}>
               MF needs a CAGR of at least <span style={{ color: C.amber, fontWeight: 700 }}>{fmtP(breakeven)}</span> to beat this FD post-tax

@@ -61,7 +61,8 @@ export default function Portfolio() {
             </div>
 
             {/* Header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.5fr 1fr auto', gap: 8, marginBottom: 8 }}>
+            <div style={{ overflowX: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.5fr 1fr auto', gap: 8, marginBottom: 8, minWidth: 380 }}>
               {['SYMBOL', 'QTY', 'PRICE', 'VALUE', ''].map(h => (
                 <span key={h} style={{ fontSize: 11, color: C.textDim, letterSpacing: 0.5 }}>{h}</span>
               ))}
@@ -83,6 +84,7 @@ export default function Portfolio() {
               )
             })}
 
+            </div>
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 12, marginTop: 8, display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 11, color: C.textSec }}>TOTAL PORTFOLIO VALUE</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: C.amber }}>{fmt(total)}</span>

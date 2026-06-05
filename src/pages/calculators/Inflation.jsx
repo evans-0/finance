@@ -191,7 +191,7 @@ export default function Inflation() {
             <div>
               <InputField label={'CURRENT COST (' + INR + ')'} value={goalCost} onChange={setGoalCost} min={1000} max={50000000} step={10000} />
               <InputField label="YEARS FROM NOW" value={goalYears} onChange={setGoalYears} min={1} max={30} step={1} suffix="YRS" />
-              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              <div style={{ display: 'flex', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
                 {COMMON_ITEMS.map(item => (
                   <button key={item.name} onClick={() => setGoalCost(item.price)}
                     style={{ background: C.bg, border: '1px solid ' + C.border, color: C.textSec, padding: '4px 8px', fontSize: 11, fontFamily: MONO, cursor: 'pointer', borderRadius: 2, letterSpacing: 0.3, whiteSpace: 'nowrap' }}>
@@ -215,7 +215,7 @@ export default function Inflation() {
         {/* Common items table */}
         <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24, marginTop: 24 }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 1.5, marginBottom: 16 }}>EVERYDAY ITEMS — TODAY vs {goalYears} YEARS AT {inflation}% INFLATION</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', overflowX: 'auto', gap: 0 }}>
+          <div style={{ overflowX: 'auto' }}><div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 0, minWidth: 440 }}>
             {['ITEM', 'TODAY', 'IN ' + goalYears + ' YEARS', 'INCREASE'].map(h => (
               <div key={h} style={{ fontSize: 11, color: C.textDim, padding: '6px 8px', borderBottom: '1px solid ' + C.border, letterSpacing: 0.5 }}>{h}</div>
             ))}
@@ -228,7 +228,7 @@ export default function Inflation() {
                 <div key={item.name + '3'} style={{ fontSize: 11, color: C.red, padding: '8px 8px', borderBottom: '1px solid ' + C.border }}>+{((future / item.price - 1) * 100).toFixed(0)}%</div>,
               ]
             })}
-          </div>
+          </div></div>
         </div>
       </div>
     </div>

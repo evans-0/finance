@@ -101,7 +101,7 @@ export default function NetWorth() {
           <div style={{ fontSize: 40, fontWeight: 700, color: isPositive ? C.green : C.red }}>
             {isPositive ? '' : '-'}{fmt(Math.abs(netWorth))}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 40, marginTop: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 16, flexWrap: 'wrap' }}>
             <div>
               <div style={{ fontSize: 11, color: C.textSec, marginBottom: 4 }}>TOTAL ASSETS</div>
               <div style={{ fontSize: 16, fontWeight: 600, color: C.green }}>{fmt(totalAssets)}</div>

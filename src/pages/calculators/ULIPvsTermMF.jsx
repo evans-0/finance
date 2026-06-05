@@ -209,7 +209,7 @@ export default function ULIPvsTermMF() {
 
         {/* Winner */}
         <div style={{ background: C.panel, border: '2px solid ' + (termWins ? C.green : C.purple), borderRadius: 4, padding: 24, marginBottom: 24 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 16, alignItems: 'center' }}>
+          <div style={{ overflowX: 'auto' }}><div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 16, alignItems: 'center', minWidth: 480 }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 10, color: C.purple, letterSpacing: 1.5, marginBottom: 6 }}>ULIP MATURITY VALUE</div>
               <div style={{ fontSize: 28, fontWeight: 700, color: C.purple }}>{fmt(ulip.maturity)}</div>

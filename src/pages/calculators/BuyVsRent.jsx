@@ -183,7 +183,7 @@ export default function BuyVsRent() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 32, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: 32, alignItems: 'start' }}>
 
           {/* LEFT: Inputs */}
           <div style={{ background: C.panel, border: '1px solid ' + C.border, borderRadius: 4, padding: 24 }}>
@@ -252,7 +252,7 @@ export default function BuyVsRent() {
           {/* RIGHT: Results */}
           <div>
             {/* Stat cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: 12, marginBottom: 20 }}>
               <StatBox label="MONTHLY COST: BUY" value={fmt(totalBuyMo)} color={C.blue} />
               <StatBox label="MONTHLY COST: RENT" value={fmt(rent0)} color={C.green} />
               <StatBox label={`NET WORTH GAP · YR ${years}`} value={fmt(gap)} color={buyWins ? C.green : '#ef5350'} />
