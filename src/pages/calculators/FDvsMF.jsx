@@ -181,25 +181,27 @@ export default function FDvsMF() {
 
         {/* Winner banner */}
         <div style={{ background: C.panel, border: '2px solid ' + (mfWins ? C.green : C.blue), borderRadius: 4, padding: 24, marginBottom: 24 }}>
-          <div style={{ overflowX: 'auto' }}><div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 16, alignItems: 'center', minWidth: 480 }}>
-            <div style={{ textAlign: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ flex: '1 1 160px', textAlign: 'center', minWidth: 0 }}>
               <div style={{ fontSize: 10, color: C.blue, letterSpacing: 1.5, marginBottom: 6 }}>FIXED DEPOSIT (POST-TAX)</div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: C.blue }}>{fmt(fd.postTax)}</div>
-              <div style={{ fontSize: 11, color: C.textSec, marginTop: 4 }}>Gain: {fmt(fd.gain)} · Real: {fmt(fd.realValue)}</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: C.blue }}>{fmt(fd.postTax)}</div>
+              <div style={{ fontSize: 11, color: C.textSec, marginTop: 4 }}>Gain: {fmt(fd.gain)}</div>
+              <div style={{ fontSize: 11, color: C.textSec }}>Real: {fmt(fd.realValue)}</div>
             </div>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', flexShrink: 0 }}>
               <div style={{ fontSize: 20 }}>{mfWins ? String.fromCodePoint(0x1F3C6) : String.fromCodePoint(0x1F3C6)}</div>
               <div style={{ fontSize: 11, color: mfWins ? C.green : C.blue, fontWeight: 700, marginTop: 4 }}>
                 {mfWins ? 'MF WINS' : 'FD WINS'}
               </div>
               <div style={{ fontSize: 10, color: C.textSec, marginTop: 2 }}>by {fmt(Math.abs(mfAdvantage))}</div>
             </div>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ flex: '1 1 160px', textAlign: 'center', minWidth: 0 }}>
               <div style={{ fontSize: 10, color: C.green, letterSpacing: 1.5, marginBottom: 6 }}>MUTUAL FUND (POST-TAX)</div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: C.green }}>{fmt(mf.postTax)}</div>
-              <div style={{ fontSize: 11, color: C.textSec, marginTop: 4 }}>Gain: {fmt(mf.gain)} · Tax: {fmt(mf.tax)} · Real: {fmt(mf.realValue)}</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: C.green }}>{fmt(mf.postTax)}</div>
+              <div style={{ fontSize: 11, color: C.textSec, marginTop: 4 }}>Gain: {fmt(mf.gain)} · Tax: {fmt(mf.tax)}</div>
+              <div style={{ fontSize: 11, color: C.textSec }}>Real: {fmt(mf.realValue)}</div>
             </div>
-          </div></div>
+          </div>
           {breakeven !== null && (
             <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: C.textSec }}>
               MF needs a CAGR of at least <span style={{ color: C.amber, fontWeight: 700 }}>{fmtP(breakeven)}</span> to beat this FD post-tax

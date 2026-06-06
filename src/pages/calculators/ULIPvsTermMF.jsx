@@ -209,23 +209,23 @@ export default function ULIPvsTermMF() {
 
         {/* Winner */}
         <div style={{ background: C.panel, border: '2px solid ' + (termWins ? C.green : C.purple), borderRadius: 4, padding: 24, marginBottom: 24 }}>
-          <div style={{ overflowX: 'auto' }}><div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 16, alignItems: 'center', minWidth: 480 }}>
-            <div style={{ textAlign: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ flex: '1 1 160px', textAlign: 'center', minWidth: 0 }}>
               <div style={{ fontSize: 10, color: C.purple, letterSpacing: 1.5, marginBottom: 6 }}>ULIP MATURITY VALUE</div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: C.purple }}>{fmt(ulip.maturity)}</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: C.purple }}>{fmt(ulip.maturity)}</div>
               <div style={{ fontSize: 11, color: C.textSec, marginTop: 4 }}>Charges paid: {fmt(ulip.totalCharges)}</div>
               <div style={{ fontSize: 10, color: C.textDim, marginTop: 2 }}>Tax-free (Sec 10(10D))</div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0 16px' }}>
+            <div style={{ textAlign: 'center', flexShrink: 0 }}>
               <div style={{ fontSize: 22, marginBottom: 4 }}>{String.fromCodePoint(termWins ? 0x2705 : 0x1F3C6)}</div>
               <div style={{ fontSize: 11, color: termWins ? C.green : C.purple, fontWeight: 700 }}>
                 {termWins ? 'TERM + MF WINS' : 'ULIP WINS'}
               </div>
               <div style={{ fontSize: 10, color: C.textSec, marginTop: 2 }}>by {fmt(Math.abs(advantage))}</div>
             </div>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ flex: '1 1 160px', textAlign: 'center', minWidth: 0 }}>
               <div style={{ fontSize: 10, color: C.green, letterSpacing: 1.5, marginBottom: 6 }}>TERM + MF MATURITY</div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: C.green }}>{fmt(termMF.maturity)}</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: C.green }}>{fmt(termMF.maturity)}</div>
               <div style={{ fontSize: 11, color: C.textSec, marginTop: 4 }}>After LTCG tax: {fmt(termMF.tax)}</div>
               <div style={{ fontSize: 10, color: C.textDim, marginTop: 2 }}>Same {fmt(coverage)} coverage</div>
             </div>
