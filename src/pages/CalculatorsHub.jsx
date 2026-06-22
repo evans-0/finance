@@ -121,6 +121,13 @@ const CALCULATORS = [
   desc: 'Should you prepay your loan or invest the extra money? Compare interest saved vs corpus built, with break-even return rate and crossover chart.',
   tags: ['Loans', 'Investing', 'Personal Finance', 'Decision'],
   },
+  {
+  to: '/calculators/goalsip',
+  icon: String.fromCodePoint(0x1F3AF),
+  name: 'Goal-based SIP',
+  desc: 'Enter your goal in today\'s money. Inflation-adjusts to the real future cost, then calculates the exact monthly SIP needed. House, car, education, travel — any goal.',
+  tags: ['SIP', 'Goal Planning', 'Investing', 'Inflation'],
+  },
 ]
 
 export default function CalculatorsHub() {

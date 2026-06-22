@@ -46,6 +46,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **Future Net Worth** | Full balance sheet projection — each asset at its own return rate, liabilities amortise via EMI |
 | **SWP** | Monthly withdrawal simulation, corpus depletion chart, inflation-adjusted withdrawals, 4% rule context |
 | **Loan Prepayment vs Invest** | Lump sum and monthly modes, interest saved vs corpus built, break-even return rate, crossover chart |
+| **Goal-based SIP** | Inflation-adjusted goal, reverse SIP calculation, lumpsum offset, corpus vs goal chart |
 
 ### Financial Education
 
