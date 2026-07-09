@@ -44,6 +44,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **Buy vs Rent** | Opportunity cost of down payment, tax benefits (US + India), net worth trajectory |
 | **FIRE** | Lean/Regular/Fat FIRE numbers, inflation-adjusted corpus, Coast FIRE age, corpus trajectory |
 | **Future Net Worth** | Full balance sheet projection — each asset at its own return rate, liabilities amortise via EMI |
+| **Retirement Monte Carlo** | 1,000 randomised simulations, survival probability, P10–P90 fan chart, withdrawal rate stress test |
 | **SWP** | Monthly withdrawal simulation, corpus depletion chart, inflation-adjusted withdrawals, 4% rule context |
 | **Loan Prepayment vs Invest** | Lump sum and monthly modes, interest saved vs corpus built, break-even return rate, crossover chart |
 | **Goal-based SIP** | Inflation-adjusted goal, reverse SIP calculation, lumpsum offset, corpus vs goal chart |
@@ -176,6 +177,7 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   |       ├── SWP.jsx
 |	|		├── LoanVsInvest.jsx
 │   │       └── FutureNetWorth.jsx
+│   │       └── MonteCarlo.jsx
 │   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx

@@ -40,6 +40,7 @@ const FutureNetWorth = lazy(() => import('./pages/calculators/FutureNetWorth'))
 const SWP            = lazy(() => import('./pages/calculators/SWP'))
 const LoanVsInvest 	 = lazy(() => import('./pages/calculators/LoanVsInvest'))
 const GoalSIP		 = lazy(() => import('./pages/calculators/GoalSIP'))
+const MonteCarlo     = lazy(() => import('./pages/calculators/MonteCarlo'))
 
 const Loader = () => (
   <div style={{ background: '#020c18', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'monospace', color: '#506888', fontSize: 12, letterSpacing: 2 }}>
@@ -73,6 +74,7 @@ export default function App() {
           <Route path="/calculators/swp"                     element={<SWP />} />
 		  <Route path="/calculators/loanvsinvest"			 element={<LoanVsInvest />} />
 		  <Route path="/calculators/goalsip" 				 element={<GoalSIP />} />
+		  <Route path="/calculators/montecarlo"			 element={<MonteCarlo />} />
           <Route path="/glossary"                            element={<Glossary />} />
           <Route path="/how-markets-work"                    element={<HowMarketsWork />} />
           <Route path="/how-markets-work/equity"             element={<EquityMarket />} />
