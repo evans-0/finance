@@ -79,13 +79,10 @@ const CALCS = [
   { to: '/calculators/emi',         icon: '🏦', name: 'EMI Calculator',       desc: 'Calculate loan repayments' },
   { to: '/calculators/compound',    icon: '📈', name: 'Compound Interest',    desc: 'Watch your wealth grow' },
   { to: '/calculators/returns',     icon: '💹', name: 'Stock Returns',        desc: 'Analyse trade performance' },
-  { to: '/calculators/portfolio',   icon: '🥧', name: 'Portfolio Allocator',  desc: 'Visualise your holdings' },
-  { to: '/calculators/options',     icon: '⚖️', name: 'Options P&L',         desc: 'Options payoff analysis' },
-  { to: '/calculators/networth',    icon: '💰', name: 'Net Worth Tracker',    desc: 'Know where you stand' },
   { to: '/calculators/creditcard',  icon: '💳', name: 'Credit Card Trap',     desc: 'See the real cost of debt' },
-  { to: '/calculators/inflation',   icon: '📉', name: 'Inflation Impact',     desc: 'How much is ₹1L worth tomorrow?' },
-  { to: '/calculators/fdvsmf',      icon: '🏛️', name: 'FD vs Mutual Fund',   desc: 'Post-tax returns compared' },
-  { to: '/calculators/ulipvstermmf',icon: '🛡️', name: 'ULIP vs Term + MF',   desc: 'Break the ULIP myth' },
+  { to: '/calculators/fire',        icon: '🔥', name: 'FIRE Calculator',      desc: 'Know your number to retire early' },
+  { to: '/calculators/montecarlo',  icon: '🎲', name: 'Retirement Monte Carlo', desc: '1,000 simulations, one probability' },
+  { to: '/calculators/buyvsrent',   icon: '🏠', name: 'Buy vs Rent',          desc: 'The real cost of owning a home' },
 ]
 
 const QUOTES = [
@@ -174,7 +171,7 @@ export default function Home() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, textAlign: 'center', marginBottom: 12 }}>CALCULATORS</div>
           <h2 style={{ fontSize: 26, fontWeight: 600, textAlign: 'center', marginBottom: 12, color: C.text }}>Make smarter financial decisions</h2>
-          <p style={{ fontSize: 12, color: C.textSec, textAlign: 'center', marginBottom: 48 }}>11 calculators built for Indian investors and traders</p>
+          <p style={{ fontSize: 12, color: C.textSec, textAlign: 'center', marginBottom: 48 }}>18 calculators built for Indian investors and traders</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
             {CALCS.map(c => (
               <Link key={c.to} to={c.to} style={{ textDecoration: 'none' }}>
@@ -191,6 +188,11 @@ export default function Home() {
                 </div>
               </Link>
             ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <Link to="/calculators" style={{ color: C.amber, fontSize: 12, fontWeight: 700, letterSpacing: 1.5, textDecoration: 'none' }}>
+              VIEW ALL 18 CALCULATORS →
+            </Link>
           </div>
         </div>
       </div>
