@@ -44,3 +44,13 @@ describe('payoffCurve', () => {
     }
   })
 })
+
+describe('payoffCurve with small strikes', () => {
+  it('terminates and returns points for strikes below 50, including an empty field (0)', () => {
+    for (const strike of [0, 1, 10, 40, 49]) {
+      const pts = payoffCurve('call', strike, 0.5, 1)
+      expect(pts.length).toBeGreaterThan(0)
+      expect(pts.length).toBeLessThanOrEqual(31)
+    }
+  })
+})

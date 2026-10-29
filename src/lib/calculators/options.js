@@ -16,7 +16,7 @@ export function optionSummary(type, strike, premium, qty) {
 export function payoffCurve(type, strike, premium, qty) {
   const low  = Math.round(strike * 0.85)
   const high = Math.round(strike * 1.15)
-  const step = Math.round((high - low) / 30)
+  const step = Math.max(1, Math.round((high - low) / 30))   // a 0 step would loop forever for strikes below ~50
   const points = []
   for (let p = low; p <= high; p += step) {
     points.push({ price: p, pnl: Math.round(optionPnL(type, strike, premium, p, qty)) })
