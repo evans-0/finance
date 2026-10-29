@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { optionPnL, optionSummary, payoffCurve } from '../../lib/calculators/options.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -32,25 +33,13 @@ export default function Options() {
   const [qty,       setQty]      = useState(50) // lot size
 
   // P&L at current price
-  const pnlNow = optType === 'call'
-    ? (Math.max(0, current - strike) - premium) * qty
-    : (Math.max(0, strike - current) - premium) * qty
+  const pnlNow = optionPnL(optType, strike, premium, current, qty)
 
-  const breakeven = optType === 'call' ? strike + premium : strike - premium
-  const maxLoss   = premium * qty
-  const maxProfit = optType === 'call' ? '∞' : (strike - premium) * qty
+  const { breakeven, maxLoss, maxProfit: maxProfitRaw } = optionSummary(optType, strike, premium, qty)
+  const maxProfit = maxProfitRaw === Infinity ? '∞' : maxProfitRaw
 
   // Chart data: P&L across price range
-  const low   = Math.round(strike * 0.85)
-  const high  = Math.round(strike * 1.15)
-  const step  = Math.round((high - low) / 30)
-  const chartData = []
-  for (let p = low; p <= high; p += step) {
-    const pnl = optType === 'call'
-      ? (Math.max(0, p - strike) - premium) * qty
-      : (Math.max(0, strike - p) - premium) * qty
-    chartData.push({ price: p, pnl: Math.round(pnl) })
-  }
+  const chartData = payoffCurve(optType, strike, premium, qty)
 
   const fmtCurr = n => (n < 0 ? '-₹' : '₹') + Math.abs(Math.round(n)).toLocaleString('en-IN')
 

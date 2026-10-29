@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { calcInflation } from '../../lib/calculators/inflation.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -71,12 +72,8 @@ export default function Inflation() {
   const [goalYears, setGoalYears] = useState(10)
 
   // Core calculations
-  const futureValue      = amount * Math.pow(1 + inflation / 100, years)
-  const purchasingPower  = amount / Math.pow(1 + inflation / 100, years)
-  const realReturn       = ((1 + returns / 100) / (1 + inflation / 100) - 1) * 100
-  const futureGoalCost   = goalCost * Math.pow(1 + inflation / 100, goalYears)
-  const monthlySavingsNeeded = futureGoalCost * (inflation / 12 / 100) /
-    (Math.pow(1 + inflation / 100 / 12, goalYears * 12) - 1) // SIP needed at inflation rate
+  const { futureValue, purchasingPower, realReturn, futureGoalCost, monthlySavingsNeeded } =
+    calcInflation({ amount, inflation, returns, years, goalCost, goalYears })
 
   // Chart data: purchasing power decay + nominal value
   const chartData = Array.from({ length: years + 1 }, (_, i) => ({

@@ -5,6 +5,7 @@ import {
   Tooltip, ReferenceLine, ResponsiveContainer, Legend
 } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { computeFIRE } from '../../lib/calculators/fire.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -47,81 +48,6 @@ const DEFAULTS = {
   in: { currentAge: 28, retireAge: 45, currentSavings: 1000000, monthlyIncome: 100000, monthlyExpenses: 50000, retireExpenses: 40000, returnRate: 12, retireReturn: 8, inflation: 6, withdrawYears: 35 },
 }
 
-// ── Core calculation ──────────────────────────────────────────────────────────
-function computeFIRE(p, activeVariant) {
-  const annualExpensesToday = p.retireExpenses * 12
-  const yearsToRetire = p.retireAge - p.currentAge
-  // Inflate today's retirement expenses to what they'll cost at retirement date
-  const annualExpenses = annualExpensesToday * Math.pow(1 + p.inflation / 100, yearsToRetire)
-  const monthlySavings = p.monthlyIncome - p.monthlyExpenses
-  const r = p.returnRate / 100
-  const rMonthly = r / 12
-
-  // FIRE numbers for each variant — all inflation-adjusted to retirement date
-  const fireNumbers = VARIANTS.map(v => ({
-    ...v,
-    fireNumber: annualExpenses * v.mult,
-  }))
-
-  // Active variant drives all stats
-  const activeV = VARIANTS.find(v => v.key === activeVariant) || VARIANTS[1]
-  const mainFireNumber = annualExpenses * activeV.mult
-
-  // Build year-by-year accumulation
-  const maxAge = Math.max(p.retireAge + p.withdrawYears, p.currentAge + 60)
-  let corpus = p.currentSavings
-  const data = []
-  let coastFireAge = null
-  let fireAge = null
-
-  for (let age = p.currentAge; age <= maxAge; age++) {
-    const isAccumulating = age < p.retireAge
-
-    if (isAccumulating) {
-      // Coast FIRE: can we stop contributing now and growth alone hits the active target?
-      const yearsLeft = p.retireAge - age
-      const coastNumber = mainFireNumber / Math.pow(1 + r, yearsLeft)
-      if (!coastFireAge && corpus >= coastNumber) coastFireAge = age
-
-      // Grow corpus with contributions
-      for (let m = 0; m < 12; m++) {
-        corpus = corpus * (1 + rMonthly) + monthlySavings
-      }
-
-      if (!fireAge && corpus >= mainFireNumber) fireAge = age
-    } else {
-      // Withdrawal phase
-      const withdrawR = p.retireReturn / 100
-      const inflAdj = Math.pow(1 + p.inflation / 100, age - p.retireAge)
-      const annualWithdraw = annualExpenses * inflAdj
-      corpus = corpus * (1 + withdrawR) - annualWithdraw
-      corpus = Math.max(corpus, 0)
-    }
-
-    const point = { age, corpus: Math.round(corpus) }
-    fireNumbers.forEach(v => { point[v.key + 'Target'] = Math.round(v.fireNumber) })
-    data.push(point)
-  }
-
-  const yearsToFire = fireAge ? fireAge - p.currentAge : null
-  const savingsRate = monthlySavings > 0 ? (monthlySavings / p.monthlyIncome) * 100 : 0
-  const progress = Math.min((p.currentSavings / mainFireNumber) * 100, 100)
-
-  const monthsToRetire = yearsToRetire * 12
-  const futureCorpusNeeded = mainFireNumber - p.currentSavings * Math.pow(1 + r, yearsToRetire)
-  const alreadyFunded = futureCorpusNeeded <= 0
-  const rawSavingsNeeded = alreadyFunded ? 0 : rMonthly > 0
-    ? futureCorpusNeeded * rMonthly / (Math.pow(1 + rMonthly, monthsToRetire) - 1)
-    : futureCorpusNeeded / monthsToRetire
-
-  return {
-    fireNumbers, mainFireNumber, data,
-    yearsToFire, fireAge, coastFireAge,
-    savingsRate, progress, alreadyFunded,
-    monthlySavings, monthlySavingsNeeded: Math.max(rawSavingsNeeded, 0),
-    retireAge: p.retireAge,
-  }
-}
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 function InputField({ label, value, onChange, min, max, step = 1, suffix, isCurrency, mode, hint }) {
@@ -183,7 +109,7 @@ export default function FIRECalculator() {
   const set = mode === 'us' ? setUs : setIn
   const fmt = mode === 'us' ? fmtUS : n => '₹' + fmtIN(n)
 
-  const result = useMemo(() => computeFIRE(params, activeVariant), [params, activeVariant])
+  const result = useMemo(() => computeFIRE(params, activeVariant, VARIANTS), [params, activeVariant])
   const {
     fireNumbers, mainFireNumber, data,
     yearsToFire, fireAge, coastFireAge,

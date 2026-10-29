@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/Navbar'
+import { calcStockReturn } from '../../lib/calculators/stockReturn.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -40,18 +41,9 @@ export default function StockReturn() {
   const [buyDate,     setBuyDate]     = useState('2023-01-01')
   const [sellDate,    setSellDate]    = useState('2024-01-01')
 
-  const investment   = buyPrice  * qty * (1 + brokerage / 100)
-  const proceeds     = sellPrice * qty * (1 - brokerage / 100)
-  const pnl          = proceeds - investment
-  const returnPct    = (pnl / investment) * 100
+  const { investment, proceeds, pnl, returnPct, days, cagr } =
+    calcStockReturn({ buyPrice, sellPrice, qty, brokerage, buyDate, sellDate })
   const isProfit     = pnl >= 0
-
-  // CAGR
-  const buyD  = new Date(buyDate)
-  const sellD = new Date(sellDate)
-  const days  = Math.max((sellD - buyD) / (1000 * 86400), 1)
-  const years = days / 365
-  const cagr  = years > 0 ? (Math.pow(proceeds / investment, 1 / years) - 1) * 100 : 0
 
   const fmtCurr = n => (n < 0 ? '-₹' : '₹') + Math.abs(Math.round(n)).toLocaleString('en-IN')
   const fmtPct  = n => (n >= 0 ? '+' : '') + n.toFixed(2) + '%'

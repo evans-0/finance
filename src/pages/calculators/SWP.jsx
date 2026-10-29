@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { simulateSWP } from '../../lib/calculators/swp.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -37,58 +38,7 @@ export default function SWP() {
   const [inflation,  setInflation]  = useState(6)
   const [inflAdj,    setInflAdj]    = useState(true)
 
-  const results = useMemo(() => {
-    const monthlyRate = returnRate / 100 / 12
-    const inflMonthly = inflation / 100 / 12
-    let bal = corpus
-    let withdrawal = monthly
-    let totalWithdrawn = 0
-    let depletionYear = null
-    const data = [{ year: 0, corpus: bal }]
-
-    for (let month = 1; month <= 600; month++) {
-      // grow corpus
-      bal = bal * (1 + monthlyRate)
-      // withdraw
-      bal -= withdrawal
-      totalWithdrawn += withdrawal
-      // increase withdrawal for inflation if enabled
-      if (inflAdj) withdrawal *= (1 + inflMonthly)
-
-      if (bal <= 0 && depletionYear === null) {
-        depletionYear = Math.ceil(month / 12)
-        bal = 0
-      }
-
-      if (month % 12 === 0) {
-        const year = month / 12
-        data.push({ year, corpus: Math.max(0, Math.round(bal)) })
-        if (depletionYear && year >= depletionYear) break
-        if (year >= 50) break
-      }
-    }
-
-    // Sustainable monthly withdrawal (corpus never depletes)
-    const sustainableMonthly = Math.round(corpus * monthlyRate)
-
-    // Annual withdrawal rate
-    const annualWithdrawalRate = ((monthly * 12) / corpus * 100).toFixed(1)
-
-    // Corpus at 10, 20, 30 years
-    const at10 = data.find(d => d.year === 10)?.corpus ?? 0
-    const at20 = data.find(d => d.year === 20)?.corpus ?? 0
-    const at30 = data.find(d => d.year === 30)?.corpus ?? 0
-
-    return {
-      data,
-      depletionYear,
-      totalWithdrawn,
-      sustainableMonthly,
-      annualWithdrawalRate,
-      at10, at20, at30,
-      lasts: !depletionYear,
-    }
-  }, [corpus, monthly, returnRate, inflation, inflAdj])
+  const results = useMemo(() => simulateSWP({ corpus, monthly, returnRate, inflation, inflAdj }), [corpus, monthly, returnRate, inflation, inflAdj])
 
   const sliders = [
     { label: 'STARTING CORPUS', value: corpus, setter: setCorpus, min: 1000000, max: 100000000, step: 500000, fmt: fmtIN },

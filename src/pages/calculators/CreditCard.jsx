@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { calcPayoff, minimumPayment, effectiveAnnualRate } from '../../lib/calculators/creditCard.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -23,20 +24,6 @@ const fmtIN = n => {
 }
 const fmt = n => INR + fmtIN(n)
 
-function calcPayoff(balance, monthlyRate, payment) {
-  const r = monthlyRate / 100
-  let bal = balance, months = 0, totalInterest = 0
-  const history = [{ month: 0, balance: Math.round(bal) }]
-  while (bal > 0 && months < 600) {
-    const interest = bal * r
-    totalInterest += interest
-    bal = bal + interest - payment
-    months++
-    if (bal < 0) bal = 0
-    if (months <= 120 || months % 12 === 0) history.push({ month: months, balance: Math.round(bal) })
-  }
-  return { months, totalInterest, history, neverPaysOff: months >= 600 }
-}
 
 function InputField({ label, value, onChange, min, max, step, suffix, hint }) {
   return (
@@ -72,9 +59,9 @@ export default function CreditCard() {
   const [monthlyRate,  setMonthlyRate]  = useState(2)
   const [customPay,    setCustomPay]    = useState(3000)
 
-  const minPayment    = Math.max(500, Math.round(balance * 0.05))   // 5% or min 500
+  const minPayment    = minimumPayment(balance)
   const interestOnly  = Math.round(balance * monthlyRate / 100)
-  const effectiveAnnualRate = ((Math.pow(1 + monthlyRate / 100, 12) - 1) * 100).toFixed(2)
+  const annualRate    = effectiveAnnualRate(monthlyRate).toFixed(2)
 
   const minResult    = useMemo(() => calcPayoff(balance, monthlyRate, minPayment),   [balance, monthlyRate, minPayment])
   const customResult = useMemo(() => calcPayoff(balance, monthlyRate, customPay),    [balance, monthlyRate, customPay])
@@ -111,7 +98,7 @@ export default function CreditCard() {
         <div style={{ background: '#1a0a0a', border: '1px solid ' + C.red, borderRadius: 4, padding: '14px 16px', marginBottom: 28, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 18 }}>{String.fromCodePoint(0x26A0)}</span>
           <div style={{ fontSize: 11, color: '#ffaaaa', lineHeight: 1.7 }}>
-            <strong style={{ color: C.red }}>2% per month sounds small.</strong> It is actually {effectiveAnnualRate}% per year after compounding.
+            <strong style={{ color: C.red }}>2% per month sounds small.</strong> It is actually {annualRate}% per year after compounding.
             Most people only pay the minimum — which barely covers the interest and keeps you in debt for years.
           </div>
         </div>
@@ -122,7 +109,7 @@ export default function CreditCard() {
             <div style={{ fontSize: 10, color: C.textSec, letterSpacing: 1.5, marginBottom: 20 }}>YOUR SITUATION</div>
             <InputField label={'OUTSTANDING BALANCE (' + INR + ')'} value={balance} onChange={setBalance} min={1000} max={1000000} step={1000} />
             <InputField label="MONTHLY INTEREST RATE" value={monthlyRate} onChange={setMonthlyRate} min={0.5} max={4} step={0.1} suffix="% / mo"
-              hint={'= ' + effectiveAnnualRate + '% p.a. effective'} />
+              hint={'= ' + annualRate + '% p.a. effective'} />
             <InputField label={'CUSTOM MONTHLY PAYMENT (' + INR + ')'} value={customPay} onChange={setCustomPay} min={100} max={200000} step={500} />
 
             <div style={{ background: C.bg, border: '1px solid ' + C.border, borderRadius: 3, padding: 12, fontSize: 11 }}>
@@ -136,7 +123,7 @@ export default function CreditCard() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: C.textSec }}>Effective annual rate</span>
-                <span style={{ color: C.red, fontWeight: 600 }}>{effectiveAnnualRate}%</span>
+                <span style={{ color: C.red, fontWeight: 600 }}>{annualRate}%</span>
               </div>
             </div>
 
