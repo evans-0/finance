@@ -34,6 +34,30 @@ describe('compareLoanVsInvest', () => {
     expect(r.investCorpus).toBeCloseTo(500000 * (1 + 0.01) ** 240, 0)
   })
 
+  it('investing at a return above the loan rate beats prepaying', () => {
+    // Regression: interest saved used to be added on top of prepayCorpus, so 10–11% returns
+    // against an 8.5% loan were wrongly reported as PREPAY
+    for (const investReturn of [10, 11, 12]) {
+      expect(compareLoanVsInvest({ ...lump, investReturn }).investWins).toBe(true)
+      expect(compareLoanVsInvest({ ...monthly, investReturn }).investWins).toBe(true)
+    }
+  })
+
+  it('investing at a return below the loan rate loses to prepaying', () => {
+    expect(compareLoanVsInvest({ ...lump, investReturn: 6 }).investWins).toBe(false)
+    expect(compareLoanVsInvest({ ...monthly, investReturn: 6 }).investWins).toBe(false)
+  })
+
+  it('at equal rates the two paths come out roughly level', () => {
+    const r = compareLoanVsInvest({ ...lump, investReturn: 8.5 })
+    expect(Math.abs(r.investCorpus - r.prepayCorpus) / r.investCorpus).toBeLessThan(0.02)
+  })
+
+  it('difference is the gap between the two final corpora', () => {
+    const r = compareLoanVsInvest(lump)
+    expect(r.difference).toBeCloseTo(Math.abs(r.investCorpus - r.prepayCorpus), 6)
+  })
+
   it('a prepayment that clears the loan saves all the interest', () => {
     const r = compareLoanVsInvest({ ...lump, extra: 3000000 })
     expect(r.prepayMonths).toBe(0)

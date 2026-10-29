@@ -60,7 +60,6 @@ export function compareLoanVsInvest({ mode, balance, loanRate, tenure, extra, in
   // ── INVESTMENT PATH ─────────────────────────────────────────────────────
   let investBal = balance
   let investCorpus = mode === 'lump' ? extra : 0
-  let investInterest = 0
 
   const investChart = []
   for (let m = 0; m <= tenure; m++) {
@@ -74,7 +73,6 @@ export function compareLoanVsInvest({ mode, balance, loanRate, tenure, extra, in
 
     // Loan continues normally
     const int = investBal * r
-    investInterest += int
     investBal = Math.max(investBal + int - emi, 0)
 
     // Corpus grows
@@ -82,16 +80,12 @@ export function compareLoanVsInvest({ mode, balance, loanRate, tenure, extra, in
     if (mode === 'monthly') investCorpus += extra
   }
 
-  const extraInterestPaid = investInterest - prepayInterest
-
   // Net comparison at end of original tenure
-  // Prepay: loan paid off early, then free cash invested → prepayCorpus
-  // Invest: loan runs full tenure, corpus at end → investCorpus
-  const prepayNetBenefit = prepayCorpus + interestSaved
-  const investNetBenefit = investCorpus - extraInterestPaid
-
-  const investWins = investCorpus > prepayCorpus + interestSaved
-  const difference = Math.abs(investCorpus - (prepayCorpus + interestSaved))
+  // Both paths pay out the same cash each month and both loans are cleared by then,
+  // so the corpus each path ends with is the whole difference. The interest saved by
+  // prepaying is already inside prepayCorpus (it is the freed EMIs), so it is not added again.
+  const investWins = investCorpus > prepayCorpus
+  const difference = Math.abs(investCorpus - prepayCorpus)
 
   // Break-even return rate (≈ loan rate for monthly compounding)
   const breakevenRate = loanRate
@@ -116,6 +110,5 @@ export function compareLoanVsInvest({ mode, balance, loanRate, tenure, extra, in
     emi, baseTotalInterest, interestSaved, monthsSaved, prepayMonths,
     investCorpus, prepayCorpus, investWins, difference,
     breakevenRate, crossoverMonth, chartData,
-    prepayNetBenefit, investNetBenefit,
   }
 }
