@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { calcSIP, calcLumpsumFV } from '../../lib/calculators/sip.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -50,19 +51,6 @@ function Toggle({ label, hint, enabled, onToggle }) {
   )
 }
 
-function calcSIP(monthly, annualRate, years, stepUp, stepUpEnabled, expenseRatio) {
-  const r = Math.max(0, annualRate - expenseRatio) / 12 / 100
-  if (!stepUpEnabled) {
-    const n = years * 12
-    return { futureValue: r > 0 ? monthly * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : monthly * n, invested: monthly * n }
-  }
-  let balance = 0, invested = 0, current = monthly
-  for (let y = 0; y < years; y++) {
-    if (y > 0) current *= (1 + stepUp / 100)
-    for (let m = 0; m < 12; m++) { balance = balance * (1 + r) + current; invested += current }
-  }
-  return { futureValue: balance, invested }
-}
 
 export default function SIP() {
   const [monthly,       setMonthly]       = useState(5000)
@@ -73,7 +61,7 @@ export default function SIP() {
   const [stepUp,        setStepUp]        = useState(10)
   const [lumpsum,       setLumpsum]       = useState(0)
 
-  const lumpsumFV = lumpsum > 0 ? lumpsum * Math.pow(1 + Math.max(0, rate - expenseRatio) / 100, years) : 0
+  const lumpsumFV = calcLumpsumFV(lumpsum, rate, years, expenseRatio)
   const { futureValue: sipFV, invested } = calcSIP(monthly, rate, years, stepUp, stepUpEnabled, expenseRatio)
   const futureValue = sipFV + lumpsumFV
   const totalInvested = invested + lumpsum
@@ -83,7 +71,7 @@ export default function SIP() {
     const yr     = i + 1
     const normal = calcSIP(monthly, rate, yr, stepUp, false,         expenseRatio)
     const step   = calcSIP(monthly, rate, yr, stepUp, stepUpEnabled, expenseRatio)
-    const lumpsumAtYr = lumpsum > 0 ? lumpsum * Math.pow(1 + Math.max(0, rate - expenseRatio) / 100, yr) : 0
+    const lumpsumAtYr = calcLumpsumFV(lumpsum, rate, yr, expenseRatio)
     const row    = { year: 'Yr ' + yr, invested: Math.round(step.invested + lumpsum), value: Math.round(step.futureValue + lumpsumAtYr) }
     if (stepUpEnabled) row.noStepUp = Math.round(normal.futureValue + lumpsumAtYr)
     return row

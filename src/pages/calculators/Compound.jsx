@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { compoundAmount } from '../../lib/calculators/compound.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -40,16 +41,14 @@ export default function Compound() {
   const [years, setYears]         = useState(10)
   const [freq, setFreq]           = useState(4)
 
-  const calc = (p, r, t, n) => p * Math.pow(1 + r / 100 / n, n * t)
-
-  const finalAmount = calc(principal, rate, years, freq)
+  const finalAmount = compoundAmount(principal, rate, years, freq)
   const totalInt    = finalAmount - principal
 
   // Compare all frequencies
   const chartData = Array.from({ length: years }, (_, i) => {
     const t = i + 1
     const row = { year: `Yr ${t}` }
-    FREQUENCIES.forEach(f => { row[f.label] = Math.round(calc(principal, rate, t, f.n)) })
+    FREQUENCIES.forEach(f => { row[f.label] = Math.round(compoundAmount(principal, rate, t, f.n)) })
     return row
   })
 

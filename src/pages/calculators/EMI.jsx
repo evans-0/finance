@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import Navbar from '../../components/Navbar'
+import { calcEMI, amortizationByYear } from '../../lib/calculators/loan.js'
 
 const C = {
   bg: '#020c18', panel: '#050f1e', border: '#0c1d34',
@@ -32,27 +33,14 @@ export default function EMI() {
   const [rate, setRate]           = useState(8.5)
   const [years, setYears]         = useState(20)
 
-  const r          = rate / 12 / 100
   const n          = years * 12
-  const emi        = r > 0 ? principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : principal / n
+  const emi        = calcEMI(principal, rate, n)
   const totalPay   = emi * n
   const totalInt   = totalPay - principal
 
   // Year-by-year breakdown
-  const chartData = []
-  let balance = principal
-  for (let y = 1; y <= Math.min(years, 30); y++) {
-    let yearInt = 0, yearPrin = 0
-    for (let m = 0; m < 12; m++) {
-      const intPay  = balance * r
-      const prinPay = emi - intPay
-      yearInt  += intPay
-      yearPrin += prinPay
-      balance  -= prinPay
-      if (balance < 0) balance = 0
-    }
-    chartData.push({ year: `Y${y}`, principal: Math.round(yearPrin), interest: Math.round(yearInt) })
-  }
+  const chartData = amortizationByYear(principal, rate, years)
+    .map(row => ({ year: `Y${row.year}`, principal: Math.round(row.principal), interest: Math.round(row.interest) }))
 
   return (
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: MONO, color: C.text }}>
