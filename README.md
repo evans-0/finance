@@ -48,6 +48,7 @@ A Bloomberg-style real-time markets terminal combined with a financial literacy 
 | **SWP** | Monthly withdrawal simulation, corpus depletion chart, inflation-adjusted withdrawals, 4% rule context |
 | **Loan Prepayment vs Invest** | Lump sum and monthly modes, interest saved vs corpus built, break-even return rate, crossover chart |
 | **Goal-based SIP** | Inflation-adjusted goal, reverse SIP calculation, lumpsum offset, corpus vs goal chart |
+| **XIRR** | Annualised return for irregular cash flows (SIPs, top-ups, withdrawals), monthly SIP quick fill, matches Excel's XIRR |
 
 ### Financial Education
 
@@ -177,7 +178,8 @@ All API keys live exclusively in Cloudflare encrypted Secrets — never in the c
 │   |       ├── SWP.jsx
 |	|		├── LoanVsInvest.jsx
 │   │       └── FutureNetWorth.jsx
-│   │       └── MonteCarlo.jsx
+│   │       ├── MonteCarlo.jsx
+│   │       └── XIRR.jsx
 │   ├── App.jsx                 # Lazy-loaded routes
 │   ├── FinanceDashboard.jsx
 │   └── main.jsx

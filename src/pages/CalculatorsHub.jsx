@@ -135,6 +135,13 @@ const CALCULATORS = [
   desc: 'Enter your goal in today\'s money. Inflation-adjusts to the real future cost, then calculates the exact monthly SIP needed. House, car, education, travel — any goal.',
   tags: ['SIP', 'Goal Planning', 'Investing', 'Inflation'],
   },
+  {
+  to: '/calculators/xirr',
+  icon: String.fromCodePoint(0x1F4C6),
+  name: 'XIRR Calculator',
+  desc: 'Your real annual return when money goes in and out on different dates. Handles SIPs, top-ups and partial withdrawals, and matches Excel\'s XIRR.',
+  tags: ['XIRR', 'Returns', 'SIP', 'Mutual Funds'],
+  },
 ]
 
 export default function CalculatorsHub() {
@@ -154,7 +161,7 @@ export default function CalculatorsHub() {
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, marginBottom: 10 }}>CALCULATORS</div>
           <h1 style={{ fontSize: 28, fontWeight: 700, color: C.text, marginBottom: 10 }}>Financial Calculators</h1>
           <p style={{ fontSize: 12, color: C.textSec, lineHeight: 1.8 }}>
-            Eighteen calculators for investors and traders. Plan investments, analyse trades, and make better financial decisions.
+            Nineteen calculators for investors and traders. Plan investments, analyse trades, and make better financial decisions.
           </p>
         </div>
         <div style={{ background: C.panel, border: `1px solid ${C.amber}33`, borderRadius: 4, padding: '14px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>

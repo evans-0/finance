@@ -171,7 +171,7 @@ export default function Home() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ fontSize: 10, color: C.amber, letterSpacing: 3, textAlign: 'center', marginBottom: 12 }}>CALCULATORS</div>
           <h2 style={{ fontSize: 26, fontWeight: 600, textAlign: 'center', marginBottom: 12, color: C.text }}>Make smarter financial decisions</h2>
-          <p style={{ fontSize: 12, color: C.textSec, textAlign: 'center', marginBottom: 48 }}>18 calculators built for Indian investors and traders</p>
+          <p style={{ fontSize: 12, color: C.textSec, textAlign: 'center', marginBottom: 48 }}>19 calculators built for Indian investors and traders</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
             {CALCS.map(c => (
               <Link key={c.to} to={c.to} style={{ textDecoration: 'none' }}>
@@ -191,7 +191,7 @@ export default function Home() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 40 }}>
             <Link to="/calculators" style={{ color: C.amber, fontSize: 12, fontWeight: 700, letterSpacing: 1.5, textDecoration: 'none' }}>
-              VIEW ALL 18 CALCULATORS →
+              VIEW ALL 19 CALCULATORS →
             </Link>
           </div>
         </div>
